@@ -77,11 +77,11 @@ def approximate_contour(contours):
 
     for contour in contours:
         contour_perimeter = cv2.arcLength(contour, True)
-        approximated_contour_polygon = cv2.approxPolyDP(contour, 0.08 * contour_perimeter, closed=True)
+        approximated_contour_polygon = cv2.approxPolyDP(contour, 0.05 * contour_perimeter, closed=True)
 
-        if len(approximated_contour_polygon) == 4:
-            # Quadrilateral Detected
-            possible_polygons_with_perimeters.append((approximated_contour_polygon, contour_perimeter))
+        # if len(approximated_contour_polygon) == 4:
+        #     # Quadrilateral Detected
+        possible_polygons_with_perimeters.append((approximated_contour_polygon, contour_perimeter))
 
     print('Possible contours', possible_polygons_with_perimeters)
     result_polygon = max(possible_polygons_with_perimeters, key=lambda item: item[1])[0]
@@ -104,11 +104,17 @@ def draw_localized_plate(img, approximated_polygon):
     return result_image
 
 
+def erode_image(img):
+    kernel = np.ones((2, 2), np.uint8)
+    return cv2.erode(img, kernel, iterations=1)
+
+
 if __name__ == '__main__':
     image = cv2.imread('skewed1.jpg')
     image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     ret, binarized_image = cv2.threshold(image_gray, 180, 255, cv2.THRESH_BINARY)
-    im2, contours, hierarchy = cv2.findContours(binarized_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    eroded_image = erode_image(binarized_image)
+    im2, contours, hierarchy = cv2.findContours(eroded_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_KCOS)
 
     # lengths = [len(contour) for contour in contours]
     # contour = contours[lengths.index(max(lengths))]
@@ -119,8 +125,10 @@ if __name__ == '__main__':
     final_image = draw_localized_plate(image, approximated_polygon)
 
     cv2.imshow("Binarized", binarized_image)
+    cv2.imwrite('/Users/r.makowiecki/Desktop/screenshots')
+    cv2.imshow("Binarized eroded", eroded_image)
     cv2.imshow("Warped", image)
-    cv2.waitKey(0)
+    cv2.waitKey()
 
     # # construct the argument parse and parse the arguments
     # ap = argparse.ArgumentParser()
