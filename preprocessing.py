@@ -1,5 +1,4 @@
 import cv2
-import imutils
 import matplotlib.pyplot as plt
 
 image = cv2.imread('./snapshots/test_001.jpg')
@@ -17,9 +16,15 @@ plt.subplot(2, 2, 2)
 plt.imshow(noise_removed_image)
 plt.title('bilateral filter')
 
-edges_image = cv2.Canny(noise_removed_image, 170, 200)
-plt.subplot(1, 3, 3)
+histogram_equalized_image = cv2.equalizeHist(noise_removed_image)
+plt.subplot(2, 2, 3)
+plt.imshow(histogram_equalized_image)
+plt.title('histogram equalization')
+
+edges_image = cv2.Canny(histogram_equalized_image, 170, 200)
+plt.subplot(2, 2, 4)
 plt.imshow(edges_image)
 plt.title('canny edge detector')
 
+plt.subplots_adjust(bottom=0.05, left=0.1, right=0.9, top=0.95, wspace=0.3, hspace=0.3)
 plt.show()
