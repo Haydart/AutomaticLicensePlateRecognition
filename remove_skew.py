@@ -73,16 +73,20 @@ def find_cntours(img):
 
 
 def approximate_contour(contours):
-    approximated_polygon = None
+    possible_polygons_with_perimeters = []  # [(contour, perimeter), (...)]
+
     for contour in contours:
-        print('contour', contour)
         contour_perimeter = cv2.arcLength(contour, True)
-        print('contour perimeter', contour_perimeter)
-        approximated_polygon = cv2.approxPolyDP(contour, 0.04 * contour_perimeter, closed=True)
-        # Quadrilateral Detected
-        if len(approximated_polygon) == 4:
-            break
-    return approximated_polygon
+        approximated_contour_polygon = cv2.approxPolyDP(contour, 0.08 * contour_perimeter, closed=True)
+
+        if len(approximated_contour_polygon) == 4:
+            # Quadrilateral Detected
+            possible_polygons_with_perimeters.append((approximated_contour_polygon, contour_perimeter))
+
+    print('Possible contours', possible_polygons_with_perimeters)
+    result_polygon = max(possible_polygons_with_perimeters, key=lambda item: item[1])[0]
+    print('Result polygon', result_polygon)
+    return result_polygon
 
 
 def draw_localized_plate(img, approximated_polygon):
@@ -100,15 +104,10 @@ def draw_localized_plate(img, approximated_polygon):
     return result_image
 
 
-def longest_list(l):
-    if not isinstance(l, list): return 0
-    return max([len(l), ] + [len(subl) for subl in l if isinstance(subl, list)] + [longest_list(subl) for subl in l])
-
-
 if __name__ == '__main__':
-    image = cv2.imread('skewed3.jpg')
+    image = cv2.imread('skewed1.jpg')
     image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    ret, binarized_image = cv2.threshold(image_gray, 150, 255, cv2.THRESH_BINARY)
+    ret, binarized_image = cv2.threshold(image_gray, 180, 255, cv2.THRESH_BINARY)
     im2, contours, hierarchy = cv2.findContours(binarized_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     # lengths = [len(contour) for contour in contours]
@@ -117,8 +116,6 @@ if __name__ == '__main__':
     # cv2.drawContours(image, [hull_contour], 0, (0, 255, 0), 3)
 
     approximated_polygon = approximate_contour(contours)
-    print(approximated_polygon)
-
     final_image = draw_localized_plate(image, approximated_polygon)
 
     cv2.imshow("Binarized", binarized_image)
