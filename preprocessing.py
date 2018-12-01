@@ -45,7 +45,7 @@ def canny_edge_detection(img):
 
 
 if __name__ == '__main__':
-    image = cv2.imread('./snapshots/test_088.jpg')
+    image = cv2.imread('./license_plate_snapshots/test_088.jpg')
     # image = imutils.resize(image, width=512)
 
     grayscale_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
