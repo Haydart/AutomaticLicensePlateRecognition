@@ -78,9 +78,6 @@ def approximate_contour(contours):
     for contour in contours:
         contour_perimeter = cv2.arcLength(contour, True)
         approximated_contour_polygon = cv2.approxPolyDP(contour, 0.05 * contour_perimeter, closed=True)
-
-        # if len(approximated_contour_polygon) == 4:
-        #     # Quadrilateral Detected
         possible_polygons_with_perimeters.append((approximated_contour_polygon, contour_perimeter))
 
     print('Possible contours', possible_polygons_with_perimeters)
