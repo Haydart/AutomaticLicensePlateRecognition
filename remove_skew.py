@@ -65,8 +65,8 @@ def four_point_transform(image, pts):
     return warped
 
 
-def find_cntours(img):
-    new_img, contours, hierarchy = cv2.findContours(img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+def find_contours(img):
+    _, contours, _ = cv2.findContours(img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     # For this problem, number plate should have contours with a small area as compared to other contours.
     # Hence, we sort the contours on the basis of contour area and take the least 10 contours
     return sorted(contours, key=cv2.contourArea, reverse=True)[:10]
@@ -80,51 +80,40 @@ def approximate_contour(contours):
         approximated_contour_polygon = cv2.approxPolyDP(contour, 0.05 * contour_perimeter, closed=True)
         possible_polygons_with_perimeters.append((approximated_contour_polygon, contour_perimeter))
 
-    print('Possible contours', possible_polygons_with_perimeters)
     result_polygon = max(possible_polygons_with_perimeters, key=lambda item: item[1])[0]
-    print('Result polygon', result_polygon)
     return result_polygon
 
 
-def draw_localized_plate(img, approximated_polygon):
-    # moments = cv2.moments(approximated_polygon)
-    # c_x = int(moments["m10"] / moments["m00"])
-    # c_y = int(moments["m01"] / moments["m00"])
-
-    result_image = cv2.drawContours(img, [approximated_polygon], -1, (0, 255, 0), 3)
-
-    # cv2.circle(result_image, (c_x, c_y), 7, (0, 255, 0), -1)
-    # cv2.putText(result_image, "(" + str(c_x) + ", " + str(c_y) + ")", (50, 50),
-    #             cv2.FONT_HERSHEY_SIMPLEX,
-    #             1, (0, 255, 0), 2)
-
-    return result_image
+def draw_plate_contour(img, approximated_polygon):
+    return cv2.drawContours(img, [approximated_polygon], -1, (0, 255, 0), 3)
 
 
 def erode_image(img):
-    kernel = np.ones((2, 2), np.uint8)
+    kernel = np.ones((3, 3), np.uint8)
     return cv2.erode(img, kernel, iterations=1)
 
 
+def close_image(img):
+    kernel = np.ones((3, 3), np.uint8)
+    return cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel, iterations=7)
+
+
 if __name__ == '__main__':
-    image = cv2.imread('skewed1.jpg')
+    image = cv2.imread('skewed_license_plate_samples/skewed1.jpg')
     image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     ret, binarized_image = cv2.threshold(image_gray, 180, 255, cv2.THRESH_BINARY)
     eroded_image = erode_image(binarized_image)
-    im2, contours, hierarchy = cv2.findContours(eroded_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_KCOS)
-
-    # lengths = [len(contour) for contour in contours]
-    # contour = contours[lengths.index(max(lengths))]
-    # hull_contour = cv2.convexHull(contour.astype('int'))
-    # cv2.drawContours(image, [hull_contour], 0, (0, 255, 0), 3)
+    closed_image = close_image(eroded_image)
+    im2, contours, hierarchy = cv2.findContours(closed_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_KCOS)
 
     approximated_polygon = approximate_contour(contours)
-    final_image = draw_localized_plate(image, approximated_polygon)
+    final_image = draw_plate_contour(image, approximated_polygon)
 
     cv2.imshow("Binarized", binarized_image)
-    cv2.imwrite('/Users/r.makowiecki/Desktop/screenshots')
     cv2.imshow("Binarized eroded", eroded_image)
     cv2.imshow("Warped", image)
+    cv2.imshow("Morphological closing", closed_image)
+
     cv2.waitKey()
 
     # # construct the argument parse and parse the arguments
