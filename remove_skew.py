@@ -1,7 +1,4 @@
-import cv2
-import numpy as np
-
-import utils as util
+from utils import *
 
 
 def order_points(pts):
@@ -91,11 +88,11 @@ def draw_plate_contour(img, approximated_polygon):
 
 
 if __name__ == '__main__':
-    image = util.load_image('skewed_license_plate_samples/skewed1.jpg')
-    image_gray = util.grayscale(image)
+    image = load_image('skewed_license_plate_samples/skewed1.jpg')
+    image_gray = gray_scale(image)
     ret, binarized_image = cv2.threshold(image_gray, 180, 255, cv2.THRESH_BINARY)
-    eroded_image = util.erode_image(binarized_image)
-    closed_image = util.close_image(eroded_image)
+    eroded_image = erosion(binarized_image)
+    closed_image = morphological_closing(eroded_image)
     im2, contours, hierarchy = cv2.findContours(closed_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_KCOS)
 
     approximated_polygon = approximate_contour(contours)

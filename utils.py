@@ -6,6 +6,9 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 logger = logging.getLogger()
+mpl.rcParams['figure.dpi'] = 150
+subplot_width = 3
+subplot_height = 5
 
 
 def load_image(path):
@@ -24,11 +27,6 @@ def plot(figure, subplot, image, title):
     return True
 
 
-mpl.rcParams['figure.dpi'] = 150
-subplot_width = 3
-subplot_height = 5
-
-
 def plot_image(img, subplot_index, title='', fix_colors=True):
     plt.subplot(subplot_height, subplot_width, subplot_index)
 
@@ -44,36 +42,36 @@ def plot_image(img, subplot_index, title='', fix_colors=True):
     plt.axis('off')
 
 
-def grayscale(img):
-    return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+def gray_scale(image):
+    return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 
-def bilateral_filter(img):
-    return cv2.bilateralFilter(img, 32, 40, 40)
+def bilateral_filter(image):
+    return cv2.bilateralFilter(image, 32, 40, 40)
 
 
-def equalize_histogram(img):
-    return cv2.equalizeHist(img)
+def histogram_equalization(image):
+    return cv2.equalizeHist(image)
 
 
-def morphological_opening(img):
-    opening_mask = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
-    opening_image = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel=opening_mask, iterations=15)
-    return cv2.subtract(img, opening_image)
+def morphological_opening(image, kernel_size=(3, 3), iterations=15):
+    opening_mask = cv2.getStructuringElement(cv2.MORPH_RECT, kernel_size)
+    opening_image = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel=opening_mask, iterations=iterations)
+    return cv2.subtract(image, opening_image)
 
 
-def morphological_closing(img, iterations=7):
-    kernel = np.ones((3, 3), np.uint8)
-    return cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel, iterations=iterations)
+def morphological_closing(image, kernel_size=(3, 3), iterations=7):
+    kernel = np.ones(kernel_size, np.uint8)
+    return cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel, iterations=iterations)
 
 
-def erosion(img):
-    kernel = np.ones((3, 3), np.uint8)
-    return cv2.erode(img, kernel, iterations=1)
+def erosion(image, kernel_size=(3, 3), iterations=1):
+    kernel_size = np.ones(kernel_size, np.uint8)
+    return cv2.erode(image, kernel_size, iterations=iterations)
 
 
-def canny_edge_detection(img):
-    return cv2.Canny(img, 170, 200)
+def canny_edge_detection(image, low_thresh=170, high_thresh=200):
+    return cv2.Canny(image, low_thresh, high_thresh)
 
 
 def show_results(original_image, gray_image, canny_image, auto_canny_image):
