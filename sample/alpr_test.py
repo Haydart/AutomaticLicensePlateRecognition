@@ -2,7 +2,6 @@ import numpy as np
 import cv2
 import imutils
 import sys
-import pytesseract
 import pandas as pd
 import time
 import matplotlib.pyplot as plt

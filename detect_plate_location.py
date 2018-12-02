@@ -1,6 +1,8 @@
 import cv2
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+from band_clipping import BindsFinder
+import utils as util
 
 mpl.rcParams['figure.dpi'] = 150
 subplot_width = 3
@@ -45,7 +47,7 @@ def canny_edge_detection(img):
 
 
 if __name__ == '__main__':
-    image = cv2.imread('./license_plate_snapshots/test_088.jpg')
+    image = cv2.imread('./dataset/test_001.jpg')
     # image = imutils.resize(image, width=512)
 
     grayscale_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -57,6 +59,7 @@ if __name__ == '__main__':
     plot_image(noise_removed_image, 4, 'Bilateral filtering')
     noise_removed_image = bilateral_filter(grayscale_image)
     plot_image(noise_removed_image, 5, 'Bilateral filtering BGR', fix_colors=False)
+    canny = canny_edge_detection(noise_removed_image)
     plot_image(canny_edge_detection(noise_removed_image), 6, 'Canny after bilateral')
 
     histogram_equalized_image = equalize_histogram(noise_removed_image)
@@ -75,5 +78,13 @@ if __name__ == '__main__':
     fig.set_size_inches(10, 15)
 
     print('calculated')
+
+    bf = BindsFinder(canny)
+    bands = bf.get_bands()
+    bands_new = bf.last_step(bands)
+    print(bands_new)
+
+    for y0, y1, x0, x1 in bands_new:
+        util.show_results(histogram_equalized_image, noise_removed_image, canny[y0:y1, ...], canny[y0:y1, x0:x1])
 
     plt.show()
