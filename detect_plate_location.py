@@ -1,51 +1,9 @@
 import cv2
-import matplotlib as mpl
 import matplotlib.pyplot as plt
-
-mpl.rcParams['figure.dpi'] = 150
-subplot_width = 3
-subplot_height = 5
-
-
-def plot_image(img, subplot_index, title='', fix_colors=True):
-    plt.subplot(subplot_height, subplot_width, subplot_index)
-
-    if fix_colors:
-        if len(img.shape) == 3 and img.shape[2] == 3:
-            plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-        else:
-            plt.imshow(img, cmap='gray')
-    else:
-        plt.imshow(img)
-
-    plt.title(title)
-    plt.axis('off')
-
-
-def grayscale(img):
-    return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-
-def bilateral_filter(img):
-    return cv2.bilateralFilter(img, 32, 32, 32)
-
-
-def equalize_histogram(img):
-    return cv2.equalizeHist(img)
-
-
-def morphological_opening(img):
-    opening_mask = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
-    opening_image = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel=opening_mask, iterations=15)
-    return cv2.subtract(img, opening_image)
-
-
-def canny_edge_detection(img):
-    return cv2.Canny(img, 170, 200)
 
 
 if __name__ == '__main__':
-    image = cv2.imread('./license_plate_snapshots/test_088.jpg')
+    image = cv2.imread('./license_plate_snapshots/test_079.jpg')
     # image = imutils.resize(image, width=512)
 
     grayscale_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
