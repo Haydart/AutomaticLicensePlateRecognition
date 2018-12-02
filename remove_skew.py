@@ -88,7 +88,7 @@ def draw_plate_contour(img, approximated_polygon):
 
 
 if __name__ == '__main__':
-    image = load_image('skewed_license_plate_samples/skewed1.jpg')
+    image = load_image('skewed_trimmed_samples/skewed_006.jpg')
     image_gray = gray_scale(image)
     ret, binarized_image = cv2.threshold(image_gray, 180, 255, cv2.THRESH_BINARY)
     eroded_image = erosion(binarized_image)
