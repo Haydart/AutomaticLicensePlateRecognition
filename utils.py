@@ -60,7 +60,7 @@ def morphological_opening(image, kernel_size=(3, 3), iterations=15):
     return cv2.subtract(image, opening_image)
 
 
-def morphological_closing(image, kernel_size=(3, 3), iterations=7):
+def morphological_closing(image, kernel_size=(3, 3), iterations=6):
     kernel = np.ones(kernel_size, np.uint8)
     return cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel, iterations=iterations)
 

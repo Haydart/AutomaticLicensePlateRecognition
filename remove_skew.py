@@ -88,7 +88,7 @@ def draw_plate_contour(img, approximated_polygon):
 
 
 if __name__ == '__main__':
-    image = load_image('skewed_trimmed_samples/skewed_006.jpg')
+    image = load_image('skewed_trimmed_samples/skewed_001.jpg')
     image_gray = gray_scale(image)
     ret, binarized_image = cv2.threshold(image_gray, 180, 255, cv2.THRESH_BINARY)
     eroded_image = erosion(binarized_image)
@@ -101,6 +101,7 @@ if __name__ == '__main__':
     cv2.imshow("Binarized", binarized_image)
     cv2.imshow("Binarized eroded", eroded_image)
     cv2.imshow("Warped", image)
+    cv2.imwrite("qewr.jpgń", closed_image)
     cv2.imshow("Morphological closing", closed_image)
 
     cv2.waitKey()
