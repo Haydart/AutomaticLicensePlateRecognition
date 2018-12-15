@@ -10,12 +10,14 @@ mask_4 = [1, 4, 7, 16, 26, 41, 26, 16, 7, 4, 1]
 mask_5 = [.000229, .005977,	.060598, .241732, .382928, .241732, .060598, .005977, .000229]
 mask_6 = [1, 4, 16, 24, 36, 24, 16, 4, 1]
 mask_7 = [2, 5, 8, 16, 20, 24, 30, 37, 30, 24, 20, 16, 8, 5, 2]
+mask_8 = [2, 5, 8, 16, 20, 24, 30, 37, 42, 37, 30, 24, 20, 16, 8, 5, 2]
+
 
 class BindsFinder:
 
     def __init__(self, image):
         self.image = np.array(image / np.max(image))
-        self.mask = mask_7
+        self.mask = mask_8
 
     def _find_band(self, histogram, c=0.55):
         pick = np.argmax(histogram)
@@ -56,10 +58,10 @@ class BindsFinder:
         return bands
 
     def _find_x_bands(self, image, count=5, threshold=30):
-        x_histogram = np.sum(image, axis=0).tolist()
-        # utils.plot_histograms(x_histogram)
+        before = x_histogram = np.sum(image, axis=0).tolist()
         x_histogram = signal.convolve(x_histogram, self.mask, mode='same')
-        # utils.plot_histograms(x_histogram)
+
+        # utils.plot_histograms(before, x_histogram, str(self.mask[4]))
 
         bands = []
 

@@ -85,9 +85,9 @@ def sample_dataset():
         save_image(image, number, '')
 
 if __name__ == '__main__':
-    sample_dataset()
-    # image, name = sample('019')
-    # grayscale_image = gray_scale(image)
-    # noise_removed_image = bilateral_filter(grayscale_image)
-    #
-    # thresh_bands = thresh_method(noise_removed_image)
+    # sample_dataset()
+    image, name = sample('019')
+    grayscale_image = gray_scale(image)
+    noise_removed_image = bilateral_filter(grayscale_image)
+
+    thresh_bands = thresh_method(noise_removed_image)
