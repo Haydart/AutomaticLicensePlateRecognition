@@ -3,28 +3,27 @@ from random import randint
 from utils import *
 
 
-def approximate_contours(preprocessed_image, original_image):
+def find_plate_contour(preprocessed_image, original_image):
     _, contours, _ = cv2.findContours(preprocessed_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_KCOS)
     contours = sorted(contours, key=cv2.contourArea, reverse=True)[:10]
     # take into consideration only 10 contours covering greatest area
 
-    possible_polygons_with_areas = []  # [(contour, area), (...)]
+    polygons_with_areas = []  # [(contour, area), (...)]
 
     for contour in contours:
         contour_area = cv2.contourArea(contour)
         print("Contour area: ", contour_area, " contour is ", contour)
         contour_perimeter = cv2.arcLength(contour, True)
-        approximated_contour_polygon = cv2.approxPolyDP(contour, 0.02 * contour_perimeter, closed=True)
-        print("app contour polygon", approximated_contour_polygon)
-        possible_polygons_with_areas.append((approximated_contour_polygon, contour_area))
+        approximated_contour_polygon = cv2.approxPolyDP(contour, 0.03 * contour_perimeter, closed=True)
+        print("approximated contour polygon", approximated_contour_polygon)
+        polygons_with_areas.append((approximated_contour_polygon, contour_area))
 
-    result_polygon = max(possible_polygons_with_areas, key=lambda item: item[1])[0]
+    result_polygon = max(polygons_with_areas, key=lambda item: item[1])[0]
 
-    for polygon, _ in possible_polygons_with_areas:
-        original_image = draw_plate_polygons(original_image, polygon)
+    # for polygon, _ in polygons_with_areas:
+    #     original_image = draw_plate_polygons(original_image, polygon)
 
-    # for contour in contours:
-    #     original_image = draw_plate_contour(original_image, contour)
+    print("Result polygon = ", result_polygon)
 
     return original_image, result_polygon
 
@@ -97,29 +96,31 @@ def four_point_transform(image, pts):
 
 
 def process():
-    image = load_image('skewed_trimmed_samples/skewed_004.jpg')
-    image_gray = gray_scale(image)
-    ret, binarized_image = cv2.threshold(image_gray, 180, 255, cv2.THRESH_BINARY)
+    image = load_image('skewed_trimmed_samples/skewed_001.jpg')
+    gray_image = gray_scale(image)
+    ret, binarized_image = cv2.threshold(gray_image, 180, 255, cv2.THRESH_BINARY)
     eroded_image = erosion(binarized_image)
-    closed_image = morphological_closing(eroded_image, (3, 3), iterations=4)
+    closed_image = morphological_closing(binarized_image, iterations=5)
+    eroded_closed_image = morphological_closing(eroded_image, iterations=5)
 
-    preprocessed_image_with_polygons, _ = approximate_contours(closed_image, image)
+    _, result_polygon = find_plate_contour(eroded_closed_image, image)
+    polygon_flat_list = [item for sublist in result_polygon for item in sublist]
+    plate_corners_list = [(arr[0], arr[1]) for arr in polygon_flat_list]
 
-    cv2.imshow("output", closed_image)
-    # cv2.imshow("Preprocessed image", closed_image)
-    # cv2.imshow("Contours on preprocessed image", preprocessed_image_with_contours)
-    cv2.imshow("output2", preprocessed_image_with_polygons)
-    # cv2.imwrite("output/polygons_on_dilated_photo4.jpg", preprocessed_image_with_polygons)
+    deskewed_image = four_point_transform(image, np.array(plate_corners_list))
+    draw_plate_polygons(image, result_polygon)
+
+    cv2.imshow("Grayscale", gray_image)
+    cv2.imshow("Bin", binarized_image)
+    cv2.imshow("Bin -> Erosion", eroded_image)
+    cv2.imshow("Bin -> Erosion -> Closing", eroded_closed_image)
+    cv2.imshow("Bin -> Closing", closed_image)
+    cv2.imshow("Result Polygon", image)
+    cv2.imshow("Deskewed image", deskewed_image)
+
+    cv2.imwrite("detected_deskewed4.jpg", deskewed_image)
 
     cv2.waitKey()
-
-
-    warped = four_point_transform(image, pts)
-
-    # show the original and warped images
-    cv2.imshow("Original", image)
-    cv2.imshow("Warped", warped)
-    cv2.waitKey(0)
 
 
 if __name__ == '__main__':
