@@ -19,7 +19,7 @@ def show_bounds(img, band, color):
 
 
 def save_image(image, number, position):
-    save_path = '/home/lukasz/Studia/Analiza obrazow i wideo/ALPR/SimpleALPR/results'
+    save_path = 'output/dataset_pipelines/'
     position = position.replace(' ', '')
     ext = '.png'
     file_name = '{}_{}_{}'.format(number, position, ext)
@@ -64,6 +64,7 @@ def run_pipelines_real_dataset():
     for image, position, number in dp.images():
         grayscale_image = gray_scale(image)
         noise_removed_image = bilateral_filter(grayscale_image)
+        sobel_bands = sobel_method(noise_removed_image)
 
         canny_bands = canny_method(noise_removed_image)
         thresh_bands = thresh_method(noise_removed_image)
@@ -102,6 +103,7 @@ def run_pipelines_sample_dataset():
 
 
 def process():
+    run_pipelines_sample_dataset()
 
 
 # image, name = sample('006')
