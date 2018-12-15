@@ -98,10 +98,10 @@ if __name__ == '__main__':
     approximated_polygon = approximate_contour(contours)
     final_image = draw_plate_contour(image, approximated_polygon)
 
+    cv2.imshow("Grayscale", image_gray)
     cv2.imshow("Binarized", binarized_image)
     cv2.imshow("Binarized eroded", eroded_image)
     cv2.imshow("Warped", image)
-    cv2.imwrite("qewr.jpgń", closed_image)
     cv2.imshow("Morphological closing", closed_image)
 
     cv2.waitKey()
