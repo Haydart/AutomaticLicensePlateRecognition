@@ -81,7 +81,7 @@ class BindsFinder:
         import math
         derivation = [((histogram[i] - histogram[i-h]) / h) for i in range(h, len(histogram))]
         center = math.ceil(len(derivation) / 2)
-        print("center", len(derivation), center)
+        # print("center", len(derivation), center)
         max_val = max(derivation)
         min_val = min(derivation)
 
