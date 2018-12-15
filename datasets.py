@@ -18,6 +18,12 @@ def samples():
         yield utils.load_image(image), image.split('/')[-1].split('.')[0]
 
 
+def sample(number):
+    source_path = '/home/lukasz/Studia/Analiza obrazow i wideo/ALPR/SimpleALPR/dataset/'
+    sample_path = source_path + 'test_{}.jpg'.format(number)
+    return utils.load_image(sample_path), sample_path.split('/')[-1].split('.')[0]
+
+
 class DatasetsProvider:
 
     def __init__(self, source_path):

@@ -1,5 +1,5 @@
 import imutils
-from datasets import DatasetsProvider, samples
+from datasets import DatasetsProvider, samples, sample
 from band_clipping import BindsFinder
 from utils import *
 import os
@@ -48,37 +48,46 @@ def thresh_method(image):
     return bands_new
 
 
-dp = DatasetsProvider(
+def real_dataset():
+    dp = DatasetsProvider(
         source_path='/home/lukasz/Studia/Analiza obrazow i wideo/UFPR-ALPR dataset/'
     )
+    for image, position, number in dp.images():
+        grayscale_image = gray_scale(image)
+        noise_removed_image = bilateral_filter(grayscale_image)
 
-# for image, position, number in dp.images():
-#     grayscale_image = gray_scale(image)
-#     noise_removed_image = bilateral_filter(grayscale_image)
-#
-#     canny_bands = canny_method(noise_removed_image)
-#     thresh_bands = thresh_method(noise_removed_image)
-#
-#     for band in canny_bands:
-#         show_bounds(image, band, GREEN)
-#
-#     for band in thresh_bands:
-#         show_bounds(image, band, RED)
-#
-#     save_image(image, number, position)
+        canny_bands = canny_method(noise_removed_image)
+        thresh_bands = thresh_method(noise_removed_image)
+
+        for band in canny_bands:
+            show_bounds(image, band, GREEN)
+
+        for band in thresh_bands:
+            show_bounds(image, band, RED)
+
+        save_image(image, number, position)
 
 
-for image, number in samples():
-    grayscale_image = gray_scale(image)
-    noise_removed_image = bilateral_filter(grayscale_image)
+def sample_dataset():
+    for image, number in samples():
+        grayscale_image = gray_scale(image)
+        noise_removed_image = bilateral_filter(grayscale_image)
 
-    canny_bands = canny_method(noise_removed_image)
-    thresh_bands = thresh_method(noise_removed_image)
+        canny_bands = canny_method(noise_removed_image)
+        thresh_bands = thresh_method(noise_removed_image)
 
-    for band in canny_bands:
-        show_bounds(image, band, GREEN)
+        for band in canny_bands:
+            show_bounds(image, band, GREEN)
 
-    for band in thresh_bands:
-        show_bounds(image, band, RED)
+        for band in thresh_bands:
+            show_bounds(image, band, RED)
 
-    save_image(image, number, '')
+        save_image(image, number, '')
+
+if __name__ == '__main__':
+    sample_dataset()
+    # image, name = sample('019')
+    # grayscale_image = gray_scale(image)
+    # noise_removed_image = bilateral_filter(grayscale_image)
+    #
+    # thresh_bands = thresh_method(noise_removed_image)

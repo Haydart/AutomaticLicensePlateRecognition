@@ -26,6 +26,15 @@ def plot(figure, subplot, image, title):
     figure.yticks([])
     return True
 
+def plot_(figure, subplot, image, title):
+    figure.subplot(subplot)
+
+    figure.plot(image)
+    figure.xlabel(title)
+    figure.xticks([])
+    figure.yticks([])
+    return True
+
 
 def plot_image(img, subplot_index, title='', fix_colors=True):
     plt.subplot(subplot_height, subplot_width, subplot_index)
@@ -91,6 +100,10 @@ def show_results(original_image, gray_image, canny_image, auto_canny_image):
     return True
 
 
-def plot_histograms(hist):
-    plt.plot(hist)
+def plot_histograms(hist_1, hist_2, title):
+    plt.figure("Histograms", figsize=(10, 5))
+    plot_(plt, 121, hist_1, "Before")
+    plot_(plt, 122, hist_2, "After")
+
+    plt.title(title)
     plt.show()
