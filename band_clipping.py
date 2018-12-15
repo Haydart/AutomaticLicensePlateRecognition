@@ -1,5 +1,6 @@
 import numpy as np
 from scipy import signal
+
 import utils
 
 mask_0 = [1, 3, 5, 7, 5, 9, 3, 1]
@@ -7,7 +8,7 @@ mask_1 = [1, 5, 9, 12, 15, 12, 9, 5, 1]
 mask_2 = [4, 7, 16, 26, 41, 26, 16, 7, 4]
 mask_3 = [.006, .061, .242, .383, .242, .061, .006]
 mask_4 = [1, 4, 7, 16, 26, 41, 26, 16, 7, 4, 1]
-mask_5 = [.000229, .005977,	.060598, .241732, .382928, .241732, .060598, .005977, .000229]
+mask_5 = [.000229, .005977, .060598, .241732, .382928, .241732, .060598, .005977, .000229]
 mask_6 = [1, 4, 16, 24, 36, 24, 16, 4, 1]
 mask_7 = [2, 5, 8, 16, 20, 24, 30, 37, 30, 24, 20, 16, 8, 5, 2]
 mask_8 = [2, 5, 8, 16, 20, 24, 30, 37, 42, 37, 30, 24, 20, 16, 8, 5, 2]
@@ -22,7 +23,7 @@ class BindsFinder:
     def _find_band(self, histogram, c=0.55):
         pick = np.argmax(histogram)
         left = histogram[0:pick]
-        right = histogram[pick+1:histogram.size+1]
+        right = histogram[pick + 1:histogram.size + 1]
 
         pick_value = histogram[pick]
 
@@ -40,14 +41,14 @@ class BindsFinder:
             return 0, 0
         b1 = np.argmin(right)
 
-        return b0, pick+b1
+        return b0, pick + b1
 
     def _find_y_bands(self, count=5, threshold=10):
         y_projection = np.sum(self.image, axis=1).tolist()
         before = y_projection = y_projection / np.max(y_projection)
         y_projection = signal.convolve(y_projection, self.mask, mode='same')
 
-        # utils.plot_histograms(before, y_histogram, str(self.mask[4]))
+        utils.plot_histograms(before, y_projection, str(self.mask[4]))
 
         bands = []
 
@@ -56,7 +57,7 @@ class BindsFinder:
             (y0, y1) = self._find_band(hist)
             # if y1-y0 >= threshold:
             bands.append((y0, y1))
-            hist[y0:y1+1] = 0
+            hist[y0:y1 + 1] = 0
 
         return bands
 
@@ -72,9 +73,9 @@ class BindsFinder:
         hist = np.copy(x_histogram)
         for i in range(count):
             (x0, x1) = self._find_band(hist, c=0.30)
-            if x1-x0 >= threshold:
+            if x1 - x0 >= threshold:
                 bands.append((x0, x1))
-                hist[x0:x1+1] = 0
+                hist[x0:x1 + 1] = 0
 
         return bands
 
@@ -82,7 +83,7 @@ class BindsFinder:
         bands = []
 
         for y0, y1 in self._find_y_bands():
-            if y1-y0 <= 10:
+            if y1 - y0 <= 10:
                 continue
             band = self.image[y0:y1, ...]
             x_bands = self._find_x_bands(band)
@@ -97,13 +98,13 @@ class BindsFinder:
             img = self.image[y0:y1, x0:x1]
             x_histogram = np.sum(img, axis=0).tolist()
             (nx0, nx1) = self._derivate(x_histogram)
-            bonds.append((y0, y1, x0+nx0, x0+nx1))
+            bonds.append((y0, y1, x0 + nx0, x0 + nx1))
 
         return bonds
 
     def _derivate(self, histogram, h=4, c=0.5):
         import math
-        derivation = [((histogram[i] - histogram[i-h]) / h) for i in range(h, len(histogram))]
+        derivation = [((histogram[i] - histogram[i - h]) / h) for i in range(h, len(histogram))]
         center = math.ceil(len(derivation) / 2)
         # print("center", len(derivation), center)
         max_val = max(derivation)
@@ -123,5 +124,3 @@ class BindsFinder:
         b1 = np.argmin(right)
 
         return b0, center + b1
-
-

@@ -110,7 +110,9 @@ def skeletonization(image):
     size = np.size(image)
     skeleton = np.zeros(image.shape, np.uint8)
 
-    img = binary_threshold(image, 145)
+    # img = cv2.adaptiveThreshold(image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 21, 10)
+    img = binary_threshold(image, 127)
+    cv2.imshow("vertical sobel adaptive threshold", img)
     element = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 3))
     done = False
 
@@ -125,6 +127,7 @@ def skeletonization(image):
         if zeros == size:
             done = True
 
+    cv2.imshow("vertical sobel skeleton", skeleton)
     return skeleton
 
 
