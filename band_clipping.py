@@ -19,44 +19,45 @@ class BindsFinder:
         self.image = np.array(image / np.max(image))
         self.mask = mask_8
 
-    def _find_band(self, histogram, c=0.55):
-        pick = np.argmax(histogram)
-        left = histogram[0:pick]
-        right = histogram[pick+1:histogram.size+1]
+    def _find_band(self, projection, c=0.55):
+        pick = np.argmax(projection)
+        pick_value = projection[pick]
+        threshold = c * pick_value
 
-        pick_value = histogram[pick]
+        # Find upper band
+        left_pick_side = projection[0:pick]
 
-        # Find upper bound
-        left = np.array([val if val <= c * pick_value else 0 for val in np.flip(left, axis=0)])
-        if left.size == 0:
-            return 0, 0
+        b0 = pick
+        for index, intensity in reversed(list(enumerate(left_pick_side))):
+            if intensity <= threshold:
+                b0 = index
 
-        b0 = np.argmax(left)
-        b0 = (left.size - b0)
+        # Find lower band
+        right_pick_side = projection[pick + 1:projection.size + 1]
 
-        # Find lower bound
-        right = np.array([val if val <= c * pick_value else 1 for val in right])
-        if right.size == 0:
-            return 0, 0
-        b1 = np.argmin(right)
+        b1 = pick
+        for index, intensity in enumerate(right_pick_side):
+            if intensity <= threshold:
+                b1 = index
+                break
 
-        return b0, pick+b1
+        return b0, pick + b1
 
     def _find_y_bands(self, count=5, threshold=10):
         y_projection = np.sum(self.image, axis=1).tolist()
         before = y_projection = y_projection / np.max(y_projection)
         y_projection = signal.convolve(y_projection, self.mask, mode='same')
 
-        # utils.plot_histograms(before, y_histogram, str(self.mask[4]))
+        # utils.plot_histograms(before, y_projection, str(self.mask[4]))
 
         bands = []
 
-        hist = np.copy(y_projection)
+        projection = np.copy(y_projection)
         for i in range(count):
-            (y0, y1) = self._find_band(hist)
+            (y0, y1) = self._find_band(projection)
             # if y1-y0 >= threshold:
             bands.append((y0, y1))
-            hist[y0:y1+1] = 0
+            projection[y0:y1+1] = 0
 
         return bands
 
