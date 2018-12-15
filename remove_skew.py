@@ -1,5 +1,4 @@
-import cv2
-import numpy as np
+from utils import *
 
 
 def order_points(pts):
@@ -88,22 +87,12 @@ def draw_plate_contour(img, approximated_polygon):
     return cv2.drawContours(img, [approximated_polygon], -1, (0, 255, 0), 3)
 
 
-def erode_image(img):
-    kernel = np.ones((3, 3), np.uint8)
-    return cv2.erode(img, kernel, iterations=1)
-
-
-def close_image(img):
-    kernel = np.ones((3, 3), np.uint8)
-    return cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel, iterations=7)
-
-
 if __name__ == '__main__':
-    image = cv2.imread('skewed_license_plate_samples/skewed1.jpg')
-    image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    image = load_image('skewed_trimmed_samples/skewed_001.jpg')
+    image_gray = gray_scale(image)
     ret, binarized_image = cv2.threshold(image_gray, 180, 255, cv2.THRESH_BINARY)
-    eroded_image = erode_image(binarized_image)
-    closed_image = close_image(eroded_image)
+    eroded_image = erosion(binarized_image)
+    closed_image = morphological_closing(eroded_image)
     im2, contours, hierarchy = cv2.findContours(closed_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_KCOS)
 
     approximated_polygon = approximate_contour(contours)
@@ -112,6 +101,7 @@ if __name__ == '__main__':
     cv2.imshow("Binarized", binarized_image)
     cv2.imshow("Binarized eroded", eroded_image)
     cv2.imshow("Warped", image)
+    cv2.imwrite("qewr.jpgń", closed_image)
     cv2.imshow("Morphological closing", closed_image)
 
     cv2.waitKey()
