@@ -18,21 +18,23 @@ class BindsFinder:
     def __init__(self, image):
         self.image = np.array(image / np.max(image))
         self.mask = mask_8
+        self.y_c = 0.55
 
-    def _find_band(self, projection, c=0.55):
+    def _find_band(self, projection, c):
         pick = np.argmax(projection)
         pick_value = projection[pick]
         threshold = c * pick_value
 
-        # Find upper band
+        # Find left band
         left_pick_side = projection[0:pick]
 
         b0 = pick
         for index, intensity in reversed(list(enumerate(left_pick_side))):
             if intensity <= threshold:
                 b0 = index
+                break
 
-        # Find lower band
+        # Find right band
         right_pick_side = projection[pick + 1:projection.size + 1]
 
         b1 = pick
@@ -43,19 +45,17 @@ class BindsFinder:
 
         return b0, pick + b1
 
-    def _find_y_bands(self, count=5, threshold=10):
+    def _find_y_bands(self, bands_count_limit=5):
         y_projection = np.sum(self.image, axis=1).tolist()
         before = y_projection = y_projection / np.max(y_projection)
         y_projection = signal.convolve(y_projection, self.mask, mode='same')
 
-        # utils.plot_histograms(before, y_projection, str(self.mask[4]))
+        utils.plot_histograms(before, y_projection, str(self.mask[4]))
 
         bands = []
-
         projection = np.copy(y_projection)
-        for i in range(count):
-            (y0, y1) = self._find_band(projection)
-            # if y1-y0 >= threshold:
+        for i in range(bands_count_limit):
+            (y0, y1) = self._find_band(projection, c=self.y_c)
             bands.append((y0, y1))
             projection[y0:y1+1] = 0
 
