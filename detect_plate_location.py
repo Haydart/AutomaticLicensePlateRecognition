@@ -1,5 +1,4 @@
 import cv2
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 from band_clipping import BindsFinder
 import utils as util

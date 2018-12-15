@@ -1,8 +1,8 @@
-import src.utils as util
+import utils as util
 import cv2
 import imutils
 import numpy as np
-from src.band_clipping import BindsFinder
+from band_clipping import BindsFinder
 
 source_path = '/home/lukasz/Studia/Analiza obrazow i wideo/ANPR/dataset/'
 file_name = 'test_065.jpg'
