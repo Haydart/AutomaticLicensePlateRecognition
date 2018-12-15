@@ -11,9 +11,13 @@ if __name__ == '__main__':
 
     noise_removed_image = bilateral_filter(grayscale_image)
     plot_image(noise_removed_image, 4, 'Bilateral filtering')
+
     noise_removed_image = bilateral_filter(grayscale_image)
     plot_image(noise_removed_image, 5, 'Bilateral filtering BGR', fix_colors=False)
-    plot_image(canny_edge_detection(noise_removed_image), 6, 'Canny after bilateral')
+    vertical_image = vertical_detection(noise_removed_image)
+    print(vertical_image.channels())
+    img = cv2.adaptiveThreshold(vertical_image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+    plot_image(img, 6, 'Vertical after bilateral')
 
     histogram_equalized_image = histogram_equalization(noise_removed_image)
     plot_image(histogram_equalized_image, 7, 'Histogram equalization')

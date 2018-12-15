@@ -41,14 +41,14 @@ class BindsFinder:
         return b0, pick+b1
 
     def _find_y_bands(self, count=5, threshold=10):
-        before = y_histogram = np.sum(self.image, axis=1).tolist()
-        y_histogram = signal.convolve(y_histogram, self.mask, mode='same')
+        before = y_projection = np.sum(self.image, axis=1).tolist()
+        y_projection = signal.convolve(y_projection, self.mask, mode='same')
 
         # utils.plot_histograms(before, y_histogram, str(self.mask[4]))
 
         bands = []
 
-        hist = np.copy(y_histogram)
+        hist = np.copy(y_projection)
         for i in range(count):
             (y0, y1) = self._find_band(hist)
             if y1-y0 >= threshold:

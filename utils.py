@@ -83,9 +83,18 @@ def canny_edge_detection(image, low_thresh=170, high_thresh=200):
     return cv2.Canny(image, low_thresh, high_thresh)
 
 
+def vertical_detection(image):
+    return cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=5)  # x
+
+
+def horizontal_detection(image):
+    return cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=5)  # y
+
+
 def binary_threshold(image, thresh):
     ret, threshed =  cv2.threshold(image, thresh, 255, cv2.THRESH_BINARY)
     return threshed
+
 
 def show_results(original_image, gray_image, canny_image, auto_canny_image):
     plt.figure("test", figsize=(30, 30))

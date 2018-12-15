@@ -36,6 +36,14 @@ def canny_method(image):
     bands_new = bf.last_step(bands)
     return bands_new
 
+def sobel_method(image):
+    canny_image = canny_edge_detection(image)
+
+    bf = BindsFinder(canny_image)
+    bands = bf.get_bands()
+    bands_new = bf.last_step(bands)
+    return bands_new
+
 
 def thresh_method(image):
     histogram_equalized_image = histogram_equalization(image)
