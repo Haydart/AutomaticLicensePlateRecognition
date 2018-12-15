@@ -37,21 +37,22 @@ def canny_method(image):
     return bands_new
 
 
-def thresh_method(image):
-    histogram_equalized_image = histogram_equalization(image)
-    subtracted_image = morphological_opening(histogram_equalized_image)
-    threshed_image = binary_threshold(subtracted_image, 100)
+def skeletonized_sobel_method(image):
+    sobel_vertical_image = sobel_vertical_edge_detection(image)
+    skeletonized_sobel_vertical_image = skeletonization(sobel_vertical_image)
 
-    bf = BindsFinder(threshed_image)
+    bf = BindsFinder(skeletonized_sobel_vertical_image)
     bands = bf.get_bands()
     bands_new = bf.last_step(bands)
     return bands_new
 
 
-def sobel_method(image):
-    canny_image = canny_edge_detection(image)
+def opening_method(image):
+    histogram_equalized_image = histogram_equalization(image)
+    subtracted_image = morphological_opening(histogram_equalized_image)
+    threshed_image = binary_threshold(subtracted_image, 100)
 
-    bf = BindsFinder(canny_image)
+    bf = BindsFinder(threshed_image)
     bands = bf.get_bands()
     bands_new = bf.last_step(bands)
     return bands_new
@@ -64,10 +65,10 @@ def run_pipelines_real_dataset():
     for image, position, number in dp.images():
         grayscale_image = gray_scale(image)
         noise_removed_image = bilateral_filter(grayscale_image)
-        sobel_bands = sobel_method(noise_removed_image)
+        sobel_bands = skeletonized_sobel_method(noise_removed_image)
 
         canny_bands = canny_method(noise_removed_image)
-        thresh_bands = thresh_method(noise_removed_image)
+        thresh_bands = opening_method(noise_removed_image)
 
         for band in canny_bands:
             show_bounds(image, band, GREEN)
@@ -87,8 +88,8 @@ def run_pipelines_sample_dataset():
         noise_removed_image = bilateral_filter(grayscale_image)
 
         canny_bands = canny_method(noise_removed_image)
-        thresh_bands = thresh_method(noise_removed_image)
-        sobel_bands = sobel_method(noise_removed_image)
+        thresh_bands = opening_method(noise_removed_image)
+        sobel_bands = skeletonized_sobel_method(noise_removed_image)
 
         for band in canny_bands:
             show_bounds(image, band, GREEN)
@@ -100,6 +101,7 @@ def run_pipelines_sample_dataset():
             show_bounds(image, band, BLUE)
 
         save_image(image, number, '')
+        print("image done")
 
 
 def process():
