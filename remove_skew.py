@@ -21,7 +21,7 @@ def approximate_contours(preprocessed_image, original_image):
     result_polygon = max(possible_polygons_with_areas, key=lambda item: item[1])[0]
 
     for polygon, _ in possible_polygons_with_areas:
-        original_image = draw_plate_contour(original_image, polygon)
+        original_image = draw_plate_polygons(original_image, polygon)
 
     # for contour in contours:
     #     original_image = draw_plate_contour(original_image, contour)
@@ -29,12 +29,12 @@ def approximate_contours(preprocessed_image, original_image):
     return original_image, result_polygon
 
 
-def draw_plate_contour(image, approximated_polygon):
+def draw_plate_polygons(image, approximated_polygon):
     return cv2.drawContours(image, [approximated_polygon], -1, (randint(0, 255), randint(0, 255), randint(0, 255)), 3)
 
 
-def order_points(pts):
-    # initialzie a list of coordinates that will be ordered
+def order_points(points):
+    # initialize a list of coordinates that will be ordered
     # such that the first entry in the list is the top-left,
     # the second entry is the top-right, the third is the
     # bottom-right, and the fourth is the bottom-left
@@ -42,16 +42,16 @@ def order_points(pts):
 
     # the top-left point will have the smallest sum, whereas
     # the bottom-right point will have the largest sum
-    s = pts.sum(axis=1)
-    rect[0] = pts[np.argmin(s)]
-    rect[2] = pts[np.argmax(s)]
+    sum = points.sum(axis=1)
+    rect[0] = points[np.argmin(sum)]
+    rect[2] = points[np.argmax(sum)]
 
     # now, compute the difference between the points, the
     # top-right point will have the smallest difference,
     # whereas the bottom-left will have the largest difference
-    diff = np.diff(pts, axis=1)
-    rect[1] = pts[np.argmin(diff)]
-    rect[3] = pts[np.argmax(diff)]
+    diff = np.diff(points, axis=1)
+    rect[1] = points[np.argmin(diff)]
+    rect[3] = points[np.argmax(diff)]
 
     # return the ordered coordinates
     return rect
@@ -61,21 +61,21 @@ def four_point_transform(image, pts):
     # obtain a consistent order of the points and unpack them
     # individually
     rect = order_points(pts)
-    (tl, tr, br, bl) = rect
+    (top_left, top_right, bottom_right, bottom_left) = rect
 
     # compute the width of the new image, which will be the
     # maximum distance between bottom-right and bottom-left
     # x-coordiates or the top-right and top-left x-coordinates
-    widthA = np.sqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))
-    widthB = np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
-    maxWidth = max(int(widthA), int(widthB))
+    width_a = np.sqrt(((bottom_right[0] - bottom_left[0]) ** 2) + ((bottom_right[1] - bottom_left[1]) ** 2))
+    width_b = np.sqrt(((top_right[0] - top_left[0]) ** 2) + ((top_right[1] - top_left[1]) ** 2))
+    max_width = max(int(width_a), int(width_b))
 
     # compute the height of the new image, which will be the
     # maximum distance between the top-right and bottom-right
     # y-coordinates or the top-left and bottom-left y-coordinates
-    heightA = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
-    heightB = np.sqrt(((tl[0] - bl[0]) ** 2) + ((tl[1] - bl[1]) ** 2))
-    maxHeight = max(int(heightA), int(heightB))
+    height_a = np.sqrt(((top_right[0] - bottom_right[0]) ** 2) + ((top_right[1] - bottom_right[1]) ** 2))
+    height_b = np.sqrt(((top_left[0] - bottom_left[0]) ** 2) + ((top_left[1] - bottom_left[1]) ** 2))
+    max_height = max(int(height_a), int(height_b))
 
     # now that we have the dimensions of the new image, construct
     # the set of destination points to obtain a "birds eye view",
@@ -84,13 +84,13 @@ def four_point_transform(image, pts):
     # order
     dst = np.array([
         [0, 0],
-        [maxWidth - 1, 0],
-        [maxWidth - 1, maxHeight - 1],
-        [0, maxHeight - 1]], dtype="float32")
+        [max_width - 1, 0],
+        [max_width - 1, max_height - 1],
+        [0, max_height - 1]], dtype="float32")
 
     # compute the perspective transform matrix and then apply it
-    M = cv2.getPerspectiveTransform(rect, dst)
-    warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
+    warp_matrix = cv2.getPerspectiveTransform(rect, dst)
+    warped = cv2.warpPerspective(image, warp_matrix, (max_width, max_height))
 
     # return the warped image
     return warped
@@ -109,33 +109,33 @@ def process():
     # cv2.imshow("Preprocessed image", closed_image)
     # cv2.imshow("Contours on preprocessed image", preprocessed_image_with_contours)
     cv2.imshow("output2", preprocessed_image_with_polygons)
-    # cv2.imwrite("output/contours_on_dilated_photo4.jpg", preprocessed_image_with_polygons)
+    # cv2.imwrite("output/polygons_on_dilated_photo4.jpg", preprocessed_image_with_polygons)
 
     cv2.waitKey()
 
-    # # construct the argument parse and parse the arguments
-    # ap = argparse.ArgumentParser()
-    # ap.add_argument("-i", "--image", help="path to the image file")
-    # ap.add_argument("-c", "--coords",
-    #                 help="comma seperated list of source points")
-    # args = vars(ap.parse_args())
-    #
-    # # load the image and grab the source coordinates (i.e. the list of
-    # # of (x, y) points)
-    # # NOTE: using the 'eval' function is bad form, but for this example
-    # # let's just roll with it -- in future posts I'll show you how to
-    # # automatically determine the coordinates without pre-supplying them
-    # image = cv2.imread(args["image"])
-    # pts = np.array(eval(args["coords"]), dtype="float32")
-    #
-    # # apply the four point tranform to obtain a "birds eye view" of
-    # # the image
-    # warped = four_point_transform(image, pts)
-    #
-    # # show the original and warped images
-    # cv2.imshow("Original", image)
-    # cv2.imshow("Warped", warped)
-    # cv2.waitKey(0)
+    # construct the argument parse and parse the arguments
+    ap = argparse.ArgumentParser()
+    ap.add_argument("-i", "--image", help="path to the image file")
+    ap.add_argument("-c", "--coords",
+                    help="comma seperated list of source points")
+    args = vars(ap.parse_args())
+
+    # load the image and grab the source coordinates (i.e. the list of
+    # of (x, y) points)
+    # NOTE: using the 'eval' function is bad form, but for this example
+    # let's just roll with it -- in future posts I'll show you how to
+    # automatically determine the coordinates without pre-supplying them
+    image = cv2.imread(args["image"])
+    pts = np.array(eval(args["coords"]), dtype="float32")
+
+    # apply the four point tranform to obtain a "birds eye view" of
+    # the image
+    warped = four_point_transform(image, pts)
+
+    # show the original and warped images
+    cv2.imshow("Original", image)
+    cv2.imshow("Warped", warped)
+    cv2.waitKey(0)
 
 
 if __name__ == '__main__':
