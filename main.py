@@ -1,7 +1,7 @@
 import os
 
 from band_clipping import BindsFinder
-from datasets import DatasetsProvider, samples
+from datasets import DatasetsProvider, samples, sample
 from utils import *
 
 GREEN = (0, 255, 0)
@@ -65,8 +65,8 @@ def run_pipelines_real_dataset():
     for image, position, number in dp.images():
         grayscale_image = gray_scale(image)
         noise_removed_image = bilateral_filter(grayscale_image)
-        sobel_bands = skeletonized_sobel_method(noise_removed_image)
 
+        sobel_bands = skeletonized_sobel_method(noise_removed_image)
         canny_bands = canny_method(noise_removed_image)
         thresh_bands = opening_method(noise_removed_image)
 
@@ -105,21 +105,27 @@ def run_pipelines_sample_dataset():
 
 
 def process():
-    run_pipelines_sample_dataset()
+    # run_pipelines_sample_dataset()
 
+    image, name = sample('006')
+    grayscale_image = gray_scale(image)
+    noise_removed_image = bilateral_filter(grayscale_image)
+    sobel = sobel_vertical_edge_detection(noise_removed_image)
+    sobel_thresh = cv2.adaptiveThreshold(sobel, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 21, 10)
+    skeletonized_sobel_vertical = skeletonization(sobel)
 
-# image, name = sample('006')
-# grayscale_image = gray_scale(image)
-# noise_removed_image = bilateral_filter(grayscale_image)
-# sobel = sobel_vertical_edge_detection(noise_removed_image)
-# sobel_thresh = cv2.adaptiveThreshold(sobel, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 21, 10)
-# skeletonized_sobel_vertical = skeletonization(sobel)
-#
-# finder = BindsFinder(skeletonized_sobel_vertical)
-# finder._find_y_bands()
-#
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
+    bf = BindsFinder(skeletonized_sobel_vertical)
+    bands = bf.get_bands()
+    bands_new = bf.last_step(bands)
+
+    for band in bands_new:
+        show_bounds(skeletonized_sobel_vertical, band, RED)
+
+    cv2.imshow("sobel thresh", sobel_thresh)
+    cv2.imshow("sobel skeleton", skeletonized_sobel_vertical)
+
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':
