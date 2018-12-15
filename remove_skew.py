@@ -14,14 +14,17 @@ def approximate_contours(preprocessed_image, original_image):
         contour_area = cv2.contourArea(contour)
         print("Contour area: ", contour_area, " contour is ", contour)
         contour_perimeter = cv2.arcLength(contour, True)
-        approximated_contour_polygon = cv2.approxPolyDP(contour, 0.05 * contour_perimeter, closed=True)
+        approximated_contour_polygon = cv2.approxPolyDP(contour, 0.02 * contour_perimeter, closed=True)
         print("app contour polygon", approximated_contour_polygon)
         possible_polygons_with_areas.append((approximated_contour_polygon, contour_area))
 
     result_polygon = max(possible_polygons_with_areas, key=lambda item: item[1])[0]
 
-    for contour in contours:
-        original_image = draw_plate_contour(original_image, contour)
+    for polygon, _ in possible_polygons_with_areas:
+        original_image = draw_plate_contour(original_image, polygon)
+
+    # for contour in contours:
+    #     original_image = draw_plate_contour(original_image, contour)
 
     return original_image, result_polygon
 
@@ -94,20 +97,19 @@ def four_point_transform(image, pts):
 
 
 def process():
-    image = load_image('skewed_trimmed_samples/skewed_003.jpg')
+    image = load_image('skewed_trimmed_samples/skewed_004.jpg')
     image_gray = gray_scale(image)
     ret, binarized_image = cv2.threshold(image_gray, 180, 255, cv2.THRESH_BINARY)
-    # eroded_image = erosion(binarized_image)
-    # closed_image = morphological_closing(eroded_image)
+    eroded_image = erosion(binarized_image)
+    closed_image = morphological_closing(eroded_image, (3, 3), iterations=4)
 
-    preprocessed_image_with_contours, _ = approximate_contours(binarized_image, image)
-    # preprocessed_image_with_contours, _ = approximate_contours(closed_image, image)
+    preprocessed_image_with_polygons, _ = approximate_contours(closed_image, image)
 
-    cv2.imshow("Binarized", binarized_image)
+    cv2.imshow("output", closed_image)
     # cv2.imshow("Preprocessed image", closed_image)
     # cv2.imshow("Contours on preprocessed image", preprocessed_image_with_contours)
-    cv2.imshow("Contours on original image", preprocessed_image_with_contours)
-    cv2.imwrite("output/contours_on_binarized_photo3.jpg", preprocessed_image_with_contours)
+    cv2.imshow("output2", preprocessed_image_with_polygons)
+    # cv2.imwrite("output/contours_on_dilated_photo4.jpg", preprocessed_image_with_polygons)
 
     cv2.waitKey()
 
