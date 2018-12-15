@@ -31,8 +31,7 @@ def plot_(figure, subplot, image, title):
 
     figure.plot(image)
     figure.xlabel(title)
-    figure.xticks([])
-    figure.yticks([])
+
     return True
 
 

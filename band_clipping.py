@@ -3,6 +3,7 @@ import math
 import numpy as np
 from scipy import signal
 
+
 mask_0 = [1, 3, 5, 7, 5, 9, 3, 1]
 mask_1 = [1, 5, 9, 12, 15, 12, 9, 5, 1]
 mask_2 = [4, 7, 16, 26, 41, 26, 16, 7, 4]
@@ -19,9 +20,9 @@ class BindsFinder:
     def __init__(self, image):
         self.image = np.array(image / np.max(image))
         self.mask = mask_8
-        self.y_c = 0.55
-        self.x_c = 0.86
-        self.trim_c = 0.42
+        self.y_c = 0.20
+        self.x_c = 0.42
+        self.trim_c = 0.2
         self.derivation_step = 4
 
     def _find_band(self, projection, c):
@@ -50,8 +51,8 @@ class BindsFinder:
         return b0, pick + b1
 
     def _find_y_bands(self, bands_count_limit=5):
-        y_projection = np.sum(self.image, axis=1).tolist()
-        before = y_projection = y_projection / np.max(y_projection)
+        before = y_projection = np.sum(self.image, axis=1).tolist()
+        # before = y_projection = y_projection / np.max(y_projection)
         y_projection = signal.convolve(y_projection, self.mask, mode='same')
 
         # utils.plot_histograms(before, y_projection, str(self.mask[0:5]))
@@ -60,14 +61,19 @@ class BindsFinder:
         projection = np.copy(y_projection)
         for i in range(bands_count_limit):
             (y0, y1) = self._find_band(projection, c=self.y_c)
-            bands.append((y0, y1))
+
+            if y1-y0 >= 10:
+                bands.append((y0, y1))
+
             projection[y0:y1+1] = 0
+
+            # utils.plot_histograms(before, projection, str(self.mask[0:5]))
 
         return bands
 
     def _find_x_bands_phase_one(self, image, bands_count_limit=5, plate_min_width=30):
-        x_projection = np.sum(image, axis=0).tolist()
-        before = x_projection = x_projection / np.max(x_projection)
+        before = x_projection = np.sum(image, axis=0).tolist()
+        # before = x_projection = x_projection / np.max(x_projection)
         x_projection = signal.convolve(x_projection, self.mask, mode='same')
 
         # utils.plot_histograms(before, x_projection, str(self.mask[0:5]))
@@ -78,7 +84,8 @@ class BindsFinder:
             (x0, x1) = self._find_band(projection, c=self.x_c)
             if x1-x0 >= plate_min_width:
                 bands.append((x0, x1))
-                projection[x0:x1+1] = 0
+
+            projection[x0:x1+1] = 0
 
         return bands
 
@@ -88,8 +95,9 @@ class BindsFinder:
         for y0, y1, x0, x1 in bands:
             plate_area = self.image[y0:y1, x0:x1]
             x_projection = np.sum(plate_area, axis=0).tolist()
-            (nx0, nx1) = self._trim_plate_area(x_projection, c=self.trim_c)
-            trimmed_bands.append((y0, y1, x0+nx0, x0+nx1))
+            if len(x_projection) > 8:
+                (nx0, nx1) = self._trim_plate_area(x_projection, c=self.trim_c)
+                trimmed_bands.append((y0, y1, x0+nx0, x0+nx1+1))
 
         return trimmed_bands
 
@@ -126,6 +134,8 @@ class BindsFinder:
                 b1 = index
                 break
 
+        # utils.plot_histograms(projection, derivative, str(self.mask[0:5]))
+
         return b0, center_index + b1
 
     def find_bands(self):
@@ -140,6 +150,6 @@ class BindsFinder:
             for x0, x1 in x_bands:
                 bands.append((y0, y1, x0, x1))
 
-        bands = self._find_x_bands_phase_two(bands)
+        # bands = self._find_x_bands_phase_two(bands)
 
         return bands

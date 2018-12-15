@@ -1,5 +1,5 @@
 import imutils
-from datasets import DatasetsProvider, samples, sample
+from datasets import DatasetsProvider, samples, sample, samples_v2
 from band_clipping import BindsFinder
 from utils import *
 import os
@@ -33,16 +33,15 @@ def canny_method(image):
 
     bf = BindsFinder(canny_image)
     bands = bf.find_bands()
-    bands_new = bf._find_x_bands_phase_two(bands)
-    return bands_new
+
+    return bands, canny_image
 
 def sobel_method(image):
     canny_image = canny_edge_detection(image)
 
     bf = BindsFinder(canny_image)
     bands = bf.find_bands()
-    bands_new = bf._find_x_bands_phase_two(bands)
-    return bands_new
+    return bands
 
 
 def thresh_method(image):
@@ -52,7 +51,8 @@ def thresh_method(image):
 
     bf = BindsFinder(threshed_image)
     bands = bf.find_bands()
-    return bands
+
+    return bands, threshed_image
 
 
 def real_dataset():
@@ -80,8 +80,8 @@ def sample_dataset():
         grayscale_image = gray_scale(image)
         noise_removed_image = bilateral_filter(grayscale_image)
 
-        canny_bands = canny_method(noise_removed_image)
-        thresh_bands = thresh_method(noise_removed_image)
+        canny_bands, img1 = canny_method(noise_removed_image)
+        thresh_bands, img = thresh_method(noise_removed_image)
 
         for band in canny_bands:
             show_bounds(image, band, GREEN)
@@ -92,9 +92,15 @@ def sample_dataset():
         save_image(image, number, '')
 
 if __name__ == '__main__':
-    # sample_dataset()
-    image, name = sample('019')
-    grayscale_image = gray_scale(image)
-    noise_removed_image = bilateral_filter(grayscale_image)
-
-    thresh_bands = thresh_method(noise_removed_image)
+    sample_dataset()
+    # real_dataset()
+    # image, name = sample('001')
+    # grayscale_image = gray_scale(image)
+    # noise_removed_image = bilateral_filter(grayscale_image)
+    #
+    # thresh_bands = thresh_method(noise_removed_image)
+    #
+    # for y0, y1, x0, x1 in thresh_bands:
+    #     from matplotlib import pyplot as plt
+    #     plt.imshow(image[y0:y1, x0:x1])
+    #     plt.show()
