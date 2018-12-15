@@ -1,11 +1,23 @@
 import numpy as np
 from scipy import signal
+import utils
+
+mask_0 = [1, 3, 5, 7, 5, 9, 3, 1]
+mask_1 = [1, 5, 9, 12, 15, 12, 9, 5, 1]
+mask_2 = [4, 7, 16, 26, 41, 26, 16, 7, 4]
+mask_3 = [.006, .061, .242, .383, .242, .061, .006]
+mask_4 = [1, 4, 7, 16, 26, 41, 26, 16, 7, 4, 1]
+mask_5 = [.000229, .005977,	.060598, .241732, .382928, .241732, .060598, .005977, .000229]
+mask_6 = [1, 4, 16, 24, 36, 24, 16, 4, 1]
+mask_7 = [2, 5, 8, 16, 20, 24, 30, 37, 30, 24, 20, 16, 8, 5, 2]
+mask_8 = [2, 5, 8, 16, 20, 24, 30, 37, 42, 37, 30, 24, 20, 16, 8, 5, 2]
 
 
 class BindsFinder:
 
     def __init__(self, image):
         self.image = np.array(image / np.max(image))
+        self.mask = mask_8
 
     def _find_band(self, histogram, c=0.55):
         pick = np.argmax(histogram)
@@ -31,12 +43,15 @@ class BindsFinder:
         return b0, pick+b1
 
     def _find_y_bands(self, count=5, threshold=10):
-        y_histogram = np.sum(self.image, axis=1).tolist()
-        y_histogram = y_histogram / np.max(y_histogram)
-        y_histogram = signal.convolve(y_histogram, [1, 1, 1, 0, 0, 0, 1, 1, 1], mode='same')
+        y_projection = np.sum(self.image, axis=1).tolist()
+        before = y_projection = y_projection / np.max(y_projection)
+        y_projection = signal.convolve(y_projection, self.mask, mode='same')
+
+        # utils.plot_histograms(before, y_histogram, str(self.mask[4]))
+
         bands = []
 
-        hist = np.copy(y_histogram)
+        hist = np.copy(y_projection)
         for i in range(count):
             (y0, y1) = self._find_band(hist)
             # if y1-y0 >= threshold:
@@ -46,9 +61,11 @@ class BindsFinder:
         return bands
 
     def _find_x_bands(self, image, count=5, threshold=30):
-        x_histogram = np.sum(image, axis=0).tolist()
+        before = x_histogram = np.sum(image, axis=0).tolist()
         x_histogram = x_histogram / np.max(x_histogram)
-        x_histogram = signal.convolve(x_histogram, [1, 1, 1, 0, 0, 0, 1, 1, 1], mode='same')
+        x_histogram = signal.convolve(x_histogram, self.mask, mode='same')
+
+        # utils.plot_histograms(before, x_histogram, str(self.mask[4]))
 
         bands = []
 
@@ -88,6 +105,7 @@ class BindsFinder:
         import math
         derivation = [((histogram[i] - histogram[i-h]) / h) for i in range(h, len(histogram))]
         center = math.ceil(len(derivation) / 2)
+        # print("center", len(derivation), center)
         max_val = max(derivation)
         min_val = min(derivation)
 

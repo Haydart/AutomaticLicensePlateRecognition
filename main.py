@@ -1,24 +1,101 @@
 import imutils
-
+from datasets import DatasetsProvider, samples, sample
 from band_clipping import BindsFinder
 from utils import *
+import os
 
-image = load_image('license_plate_snapshots/test_065.jpg')
-image_grey = gray_scale(image)
 
-gaussian_image = cv2.GaussianBlur(image_grey, (5, 5), 0)
-median_image = cv2.medianBlur(image_grey, 5)
+GREEN = (0, 255, 0)
+RED = (255, 0, 0)
 
-auto_canny_image = imutils.auto_canny(gaussian_image)
 
-canny_image = canny_edge_detection(gaussian_image)
+def show_bounds(img, band, color):
+    x = band[2]
+    y = band[0]
+    x1 = band[3]
+    y1 = band[1]
 
-bf = BindsFinder(canny_image)
-bands = bf.get_bands()
-bands_new = bf.last_step(bands)
+    cv2.rectangle(img, (x, y), (x1, y1), color, 2)
 
-print(np.asarray(bands))
-print(np.asarray(bands_new))
 
-for y0, y1, x0, x1 in bands_new:
-    show_results(gaussian_image, canny_image, canny_image[y0:y1, ...], canny_image[y0:y1, x0:x1])
+def save_image(image, number, position):
+    save_path = '/home/lukasz/Studia/Analiza obrazow i wideo/ALPR/SimpleALPR/results'
+    position = position.replace(' ', '')
+    ext = '.png'
+    file_name = '{}_{}_{}'.format(number, position, ext)
+    file_path = os.path.join(save_path, file_name)
+    print(file_path)
+    cv2.imwrite(file_path, image)
+
+
+def canny_method(image):
+    canny_image = canny_edge_detection(image)
+
+    bf = BindsFinder(canny_image)
+    bands = bf.get_bands()
+    bands_new = bf.last_step(bands)
+    return bands_new
+
+def sobel_method(image):
+    canny_image = canny_edge_detection(image)
+
+    bf = BindsFinder(canny_image)
+    bands = bf.get_bands()
+    bands_new = bf.last_step(bands)
+    return bands_new
+
+
+def thresh_method(image):
+    histogram_equalized_image = histogram_equalization(image)
+    subtracted_image = morphological_opening(histogram_equalized_image)
+    threshed_image = binary_threshold(subtracted_image, 100)
+
+    bf = BindsFinder(threshed_image)
+    bands = bf.get_bands()
+    bands_new = bf.last_step(bands)
+    return bands_new
+
+
+def real_dataset():
+    dp = DatasetsProvider(
+        source_path='/home/lukasz/Studia/Analiza obrazow i wideo/UFPR-ALPR dataset/'
+    )
+    for image, position, number in dp.images():
+        grayscale_image = gray_scale(image)
+        noise_removed_image = bilateral_filter(grayscale_image)
+
+        canny_bands = canny_method(noise_removed_image)
+        thresh_bands = thresh_method(noise_removed_image)
+
+        for band in canny_bands:
+            show_bounds(image, band, GREEN)
+
+        for band in thresh_bands:
+            show_bounds(image, band, RED)
+
+        save_image(image, number, position)
+
+
+def sample_dataset():
+    for image, number in samples():
+        grayscale_image = gray_scale(image)
+        noise_removed_image = bilateral_filter(grayscale_image)
+
+        canny_bands = canny_method(noise_removed_image)
+        thresh_bands = thresh_method(noise_removed_image)
+
+        for band in canny_bands:
+            show_bounds(image, band, GREEN)
+
+        for band in thresh_bands:
+            show_bounds(image, band, RED)
+
+        save_image(image, number, '')
+
+if __name__ == '__main__':
+    # sample_dataset()
+    image, name = sample('019')
+    grayscale_image = gray_scale(image)
+    noise_removed_image = bilateral_filter(grayscale_image)
+
+    thresh_bands = thresh_method(noise_removed_image)
