@@ -1,5 +1,5 @@
 import imutils
-from datasets import DatasetsProvider
+from datasets import DatasetsProvider, samples
 from band_clipping import BindsFinder
 from utils import *
 import os
@@ -52,7 +52,23 @@ dp = DatasetsProvider(
         source_path='/home/lukasz/Studia/Analiza obrazow i wideo/UFPR-ALPR dataset/'
     )
 
-for image, position, number in dp.images():
+# for image, position, number in dp.images():
+#     grayscale_image = gray_scale(image)
+#     noise_removed_image = bilateral_filter(grayscale_image)
+#
+#     canny_bands = canny_method(noise_removed_image)
+#     thresh_bands = thresh_method(noise_removed_image)
+#
+#     for band in canny_bands:
+#         show_bounds(image, band, GREEN)
+#
+#     for band in thresh_bands:
+#         show_bounds(image, band, RED)
+#
+#     save_image(image, number, position)
+
+
+for image, number in samples():
     grayscale_image = gray_scale(image)
     noise_removed_image = bilateral_filter(grayscale_image)
 
@@ -65,4 +81,4 @@ for image, position, number in dp.images():
     for band in thresh_bands:
         show_bounds(image, band, RED)
 
-    save_image(image, number, position)
+    save_image(image, number, '')

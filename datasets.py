@@ -3,10 +3,19 @@ from enum import Enum
 import pandas as pd
 import utils
 
+
 class Dataset(Enum):
     train = 'train'
     validation = 'validation'
     test = 'test'
+
+
+def samples():
+    source_path = '/home/lukasz/Studia/Analiza obrazow i wideo/ALPR/SimpleALPR/dataset/'
+    train_directory_path = source_path + 'test_*.jpg'
+    images = sorted(glob.glob(train_directory_path))
+    for image in images:
+        yield utils.load_image(image), image.split('/')[-1].split('.')[0]
 
 
 class DatasetsProvider:
@@ -42,9 +51,13 @@ class DatasetsProvider:
 
 
 if __name__ == '__main__':
-    dp = DatasetsProvider(
-        source_path='/home/lukasz/Studia/Analiza obrazow i wideo/UFPR-ALPR dataset/'
-    )
+    # dp = DatasetsProvider(
+    #     source_path='/home/lukasz/Studia/Analiza obrazow i wideo/UFPR-ALPR dataset/'
+    # )
+    #
+    # for example in dp.images():
+    #     print(example)
 
-    for example in dp.images():
+
+    for example in samples():
         print(example)
