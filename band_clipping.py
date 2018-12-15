@@ -24,42 +24,49 @@ class BindsFinder:
 
         # Find lower bound
         right = np.array([val if val <= c * pick_value else 1 for val in right])
+        if right.size == 0:
+            return 0, 0
         b1 = np.argmin(right)
 
         return b0, pick+b1
 
     def _find_y_bands(self, count=5, threshold=10):
         y_histogram = np.sum(self.image, axis=1).tolist()
+        y_histogram = y_histogram / np.max(y_histogram)
         y_histogram = signal.convolve(y_histogram, [1, 1, 1, 0, 0, 0, 1, 1, 1], mode='same')
         bands = []
 
         hist = np.copy(y_histogram)
         for i in range(count):
             (y0, y1) = self._find_band(hist)
-            if y1-y0 >= threshold:
-                bands.append((y0, y1))
-                hist[y0:y1] = 0
+            # if y1-y0 >= threshold:
+            bands.append((y0, y1))
+            hist[y0:y1+1] = 0
 
         return bands
 
     def _find_x_bands(self, image, count=5, threshold=30):
         x_histogram = np.sum(image, axis=0).tolist()
+        x_histogram = x_histogram / np.max(x_histogram)
         x_histogram = signal.convolve(x_histogram, [1, 1, 1, 0, 0, 0, 1, 1, 1], mode='same')
 
         bands = []
 
         hist = np.copy(x_histogram)
         for i in range(count):
-            (x0, x1) = self._find_band(hist, c=0.42)
+            (x0, x1) = self._find_band(hist, c=0.30)
             if x1-x0 >= threshold:
                 bands.append((x0, x1))
-                hist[x0:x1] = 0
+                hist[x0:x1+1] = 0
 
         return bands
 
     def get_bands(self):
         bands = []
+
         for y0, y1 in self._find_y_bands():
+            if y1-y0 <= 10:
+                continue
             band = self.image[y0:y1, ...]
             x_bands = self._find_x_bands(band)
             [bands.append((y0, y1, x0, x1)) for x0, x1 in x_bands]
@@ -81,7 +88,6 @@ class BindsFinder:
         import math
         derivation = [((histogram[i] - histogram[i-h]) / h) for i in range(h, len(histogram))]
         center = math.ceil(len(derivation) / 2)
-        print("center", len(derivation), center)
         max_val = max(derivation)
         min_val = min(derivation)
 
