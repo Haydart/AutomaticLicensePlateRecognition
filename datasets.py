@@ -19,6 +19,12 @@ def samples():
     for image in images:
         yield utils.load_image(image), image.split('/')[-1].split('.')[0]
 
+def samples_v2():
+    source_path = '/home/lukasz/Studia/Analiza obrazow i wideo/ALPR/SimpleALPR/dataset_v2/*/'
+    train_directory_path = source_path + '*.jpg'
+    images = sorted(glob.glob(train_directory_path))
+    for image in images:
+        yield utils.load_image(image), image.split('/')[-2] + image.split('/')[-1].split('.')[0]
 
 def sample(number):
     source_path = 'license_plate_snapshots/'
