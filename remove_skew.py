@@ -19,12 +19,6 @@ def find_plate_contour(preprocessed_image, original_image):
         polygons_with_areas.append((approximated_contour_polygon, contour_area))
 
     result_polygon = max(polygons_with_areas, key=lambda item: item[1])[0]
-
-    # for polygon, _ in polygons_with_areas:
-    #     original_image = draw_plate_polygons(original_image, polygon)
-
-    print("Result polygon = ", result_polygon)
-
     return original_image, result_polygon
 
 
@@ -32,34 +26,24 @@ def draw_plate_polygons(image, approximated_polygon):
     return cv2.drawContours(image, [approximated_polygon], -1, (randint(0, 255), randint(0, 255), randint(0, 255)), 3)
 
 
-def order_points(points):
-    # initialize a list of coordinates that will be ordered
-    # such that the first entry in the list is the top-left,
-    # the second entry is the top-right, the third is the
-    # bottom-right, and the fourth is the bottom-left
+def order_corner_points(points):
+    # initialize a list of coordinates that will be ordered top-left, top-right, bottom-right, bottom-left
     rect = np.zeros((4, 2), dtype="float32")
-
     # the top-left point will have the smallest sum, whereas
     # the bottom-right point will have the largest sum
-    sum = points.sum(axis=1)
-    rect[0] = points[np.argmin(sum)]
-    rect[2] = points[np.argmax(sum)]
-
-    # now, compute the difference between the points, the
-    # top-right point will have the smallest difference,
-    # whereas the bottom-left will have the largest difference
+    ooints_sum = points.sum(axis=1)
+    rect[0] = points[np.argmin(ooints_sum)]
+    rect[2] = points[np.argmax(ooints_sum)]
+    # top-right point will have the smallest difference, bottom-left will have the largest difference
     diff = np.diff(points, axis=1)
     rect[1] = points[np.argmin(diff)]
     rect[3] = points[np.argmax(diff)]
 
-    # return the ordered coordinates
     return rect
 
 
-def four_point_transform(image, pts):
-    # obtain a consistent order of the points and unpack them
-    # individually
-    rect = order_points(pts)
+def four_point_transform(image, points):
+    rect = order_corner_points(points)
     (top_left, top_right, bottom_right, bottom_left) = rect
 
     # compute the width of the new image, which will be the
@@ -76,22 +60,15 @@ def four_point_transform(image, pts):
     height_b = np.sqrt(((top_left[0] - bottom_left[0]) ** 2) + ((top_left[1] - bottom_left[1]) ** 2))
     max_height = max(int(height_a), int(height_b))
 
-    # now that we have the dimensions of the new image, construct
-    # the set of destination points to obtain a "birds eye view",
-    # (i.e. top-down view) of the image, again specifying points
-    # in the top-left, top-right, bottom-right, and bottom-left
-    # order
     dst = np.array([
         [0, 0],
         [max_width - 1, 0],
         [max_width - 1, max_height - 1],
         [0, max_height - 1]], dtype="float32")
 
-    # compute the perspective transform matrix and then apply it
     warp_matrix = cv2.getPerspectiveTransform(rect, dst)
     warped = cv2.warpPerspective(image, warp_matrix, (max_width, max_height))
 
-    # return the warped image
     return warped
 
 
