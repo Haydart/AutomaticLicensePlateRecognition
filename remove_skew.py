@@ -64,14 +64,10 @@ def four_point_transform(image, pts):
     return warped
 
 
-def find_contours(img):
-    _, contours, _ = cv2.findContours(img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    # For this problem, number plate should have contours with a small area as compared to other contours.
-    # Hence, we sort the contours on the basis of contour area and take the least 10 contours
-    return sorted(contours, key=cv2.contourArea, reverse=True)[:10]
+def approximate_contours(image):
+    im2, contours, hierarchy = cv2.findContours(closed_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_KCOS)
+    contours = sorted(contours, key=cv2.contourArea, reverse=True)[:10]
 
-
-def approximate_contour(contours):
     possible_polygons_with_perimeters = []  # [(contour, perimeter), (...)]
 
     for contour in contours:
@@ -93,9 +89,8 @@ if __name__ == '__main__':
     ret, binarized_image = cv2.threshold(image_gray, 180, 255, cv2.THRESH_BINARY)
     eroded_image = erosion(binarized_image)
     closed_image = morphological_closing(eroded_image)
-    im2, contours, hierarchy = cv2.findContours(closed_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_KCOS)
 
-    approximated_polygon = approximate_contour(contours)
+    approximated_polygon = approximate_contours(closed_image)
     final_image = draw_plate_contour(image, approximated_polygon)
 
     cv2.imshow("Grayscale", image_gray)
