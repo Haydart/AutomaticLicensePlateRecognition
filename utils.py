@@ -26,6 +26,7 @@ def plot(figure, subplot, image, title):
     figure.yticks([])
     return True
 
+
 def plot_(figure, subplot, image, title):
     figure.subplot(subplot)
 
@@ -83,17 +84,48 @@ def canny_edge_detection(image, low_thresh=170, high_thresh=200):
     return cv2.Canny(image, low_thresh, high_thresh)
 
 
-def vertical_detection(image):
-    return cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=5)  # x
+def _normalize_sobel_to_cv8u(sobel_image):
+    sobelx_64f = sobel_image - np.min(sobel_image)  # to have only positive values
+    div = np.max(sobelx_64f) / 255  # calculate the normalize divisor
+    sobel_8u = np.uint8(sobelx_64f / div)
+    return sobel_8u
 
 
-def horizontal_detection(image):
-    return cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=5)  # y
+def sobel_vertical_edge_detection(image):
+    vertical_image = cv2.Sobel(image, cv2.CV_32F, 1, 0, ksize=3)
+    return _normalize_sobel_to_cv8u(vertical_image)
+
+
+def sobel_horizontal_edge_detection(image):
+    horizontal_image = cv2.Sobel(image, cv2.CV_32F, 0, 1, ksize=3)
+    return _normalize_sobel_to_cv8u(horizontal_image)
 
 
 def binary_threshold(image, thresh):
-    ret, threshed =  cv2.threshold(image, thresh, 255, cv2.THRESH_BINARY)
+    _, threshed = cv2.threshold(image, thresh, 255, cv2.THRESH_BINARY)
     return threshed
+
+
+def skeletonization(image):
+    size = np.size(image)
+    skeleton = np.zeros(image.shape, np.uint8)
+
+    img = binary_threshold(image, 145)
+    element = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 3))
+    done = False
+
+    while not done:
+        eroded = cv2.erode(img, element)
+        temp = cv2.dilate(eroded, element)
+        temp = cv2.subtract(img, temp)
+        skeleton = cv2.bitwise_or(skeleton, temp)
+        img = eroded.copy()
+
+        zeros = size - cv2.countNonZero(img)
+        if zeros == size:
+            done = True
+
+    return skeleton
 
 
 def show_results(original_image, gray_image, canny_image, auto_canny_image):
