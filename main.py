@@ -32,16 +32,16 @@ def canny_method(image):
     canny_image = canny_edge_detection(image)
 
     bf = BindsFinder(canny_image)
-    bands = bf.get_bands()
-    bands_new = bf.last_step(bands)
+    bands = bf.find_bands()
+    bands_new = bf._find_x_bands_phase_two(bands)
     return bands_new
 
 def sobel_method(image):
     canny_image = canny_edge_detection(image)
 
     bf = BindsFinder(canny_image)
-    bands = bf.get_bands()
-    bands_new = bf.last_step(bands)
+    bands = bf.find_bands()
+    bands_new = bf._find_x_bands_phase_two(bands)
     return bands_new
 
 
@@ -51,9 +51,8 @@ def thresh_method(image):
     threshed_image = binary_threshold(subtracted_image, 100)
 
     bf = BindsFinder(threshed_image)
-    bands = bf.get_bands()
-    bands_new = bf.last_step(bands)
-    return bands_new
+    bands = bf.find_bands()
+    return bands
 
 
 def real_dataset():
