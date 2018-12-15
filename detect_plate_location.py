@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from band_clipping import BindsFinder
 import utils as util
 
-mpl.rcParams['figure.dpi'] = 150
+# mpl.rcParams['figure.dpi'] = 150
 subplot_width = 3
 subplot_height = 5
 
@@ -47,7 +47,8 @@ def canny_edge_detection(img):
 
 
 if __name__ == '__main__':
-    image = cv2.imread('./dataset/test_001.jpg')
+    # image = cv2.imread('./dataset/test_022.jpg')
+    image = cv2.imread('./dataset/track0008[01].png')
     # image = imutils.resize(image, width=512)
 
     grayscale_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -72,19 +73,23 @@ if __name__ == '__main__':
     plot_image(subtracted_image, 11, 'Opening subtracted BGR', fix_colors=False)
     plot_image(canny_edge_detection(subtracted_image), 12, 'Canny after opening subtraction')
 
+
     plt.subplots_adjust(bottom=0.1, left=0.1, right=0.9, top=0.9, wspace=0.3, hspace=0.3)
 
     fig = plt.gcf()
     fig.set_size_inches(10, 15)
+    plt.savefig('pipeline')
 
     print('calculated')
+    ret, thresh1 = cv2.threshold(subtracted_image, 100, 255, cv2.THRESH_BINARY)
 
-    bf = BindsFinder(canny)
+    bf = BindsFinder(thresh1)
     bands = bf.get_bands()
     bands_new = bf.last_step(bands)
     print(bands_new)
 
     for y0, y1, x0, x1 in bands_new:
-        util.show_results(histogram_equalized_image, noise_removed_image, canny[y0:y1, ...], canny[y0:y1, x0:x1])
+        util.show_results(grayscale_image, thresh1, thresh1[y0:y1, ...], thresh1[y0:y1, x0:x1])
 
-    plt.show()
+    # plt.savefig('pipeline')
+    # plt.show()
