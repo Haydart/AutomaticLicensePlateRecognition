@@ -110,10 +110,14 @@ def process():
     image, name = sample('043')
     grayscale_image = gray_scale(image)
     noise_removed_image = bilateral_filter(grayscale_image)
-    sobel = sobel_horizontal_edge_detection(noise_removed_image)
-    skeletonized_sobel_vertical, sobel_thresh = skeletonization(sobel)
 
-    bf = BindsFinder(skeletonized_sobel_vertical)
+    horizontal_sobel = sobel_horizontal_edge_detection(noise_removed_image)
+    horizontal_sobel_skeleton, horizontal_sobel_thresh = skeletonization(horizontal_sobel)
+
+    vertical_sobel = sobel_vertical_edge_detection(noise_removed_image)
+    vertical_sobel_skeleton, vertical_sobel_thresh = skeletonization(vertical_sobel)
+
+    bf = BindsFinder(horizontal_sobel_skeleton)
     bands = bf.find_bands()
 
     for band in bands:
@@ -121,10 +125,12 @@ def process():
 
     plot_image(grayscale_image, 1, 'grayscale')
     plot_image(noise_removed_image, 2, 'bilateral')
-    plot_image(sobel, 3, 'vertical sobel')
-    plot_image(sobel_thresh, 4, 'vertical sobel adt threshold')
-    plot_image(skeletonized_sobel_vertical, 5, 'vertical sobel skeleton')
-    plot_image(image, 6, 'image with bounds')
+    plot_image(horizontal_sobel, 3, 'vertical sobel')
+    plot_image(horizontal_sobel_thresh, 4, 'horizontal sobel threshold')
+    plot_image(horizontal_sobel_skeleton, 5, 'horizontal sobel skeleton')
+    plot_image(vertical_sobel_thresh, 6, 'vertical sobel threshold')
+    plot_image(vertical_sobel_skeleton, 7, 'vertical sobel skeleton')
+    plot_image(image, 8, 'image with bounds')
 
 
     plt.subplots_adjust(bottom=0.1, left=0.1, right=0.9, top=0.9, wspace=0.3, hspace=0.3)
