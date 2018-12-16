@@ -109,8 +109,11 @@ def skeletonization(image):
     size = np.size(image)
     skeleton = np.zeros(image.shape, np.uint8)
 
-    # img = cv2.adaptiveThreshold(image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 21, 10)
-    img = binary_threshold(image, 127)
+    img = cv2.adaptiveThreshold(image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 21, 10)
+
+    cv2.imshow("asx", img)
+    cv2.waitKey(1000)
+    # img = binary_threshold(image, 127)
     element = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 3))
     done = False
 

@@ -107,25 +107,37 @@ def run_pipelines_sample_dataset():
 def process():
     # run_pipelines_sample_dataset()
 
-    image, name = sample('006')
+    image, name = sample('002')
     grayscale_image = gray_scale(image)
     noise_removed_image = bilateral_filter(grayscale_image)
+    canny = canny_edge_detection(noise_removed_image, low_thresh=150, high_thresh=200)
     sobel = sobel_vertical_edge_detection(noise_removed_image)
+    sobel_canny = sobel_vertical_edge_detection(canny)
     sobel_thresh = cv2.adaptiveThreshold(sobel, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 21, 10)
+    sobel_canny_thresh = cv2.adaptiveThreshold(sobel_canny, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 21,
+                                               10)
     skeletonized_sobel_vertical = skeletonization(sobel)
 
     bf = BindsFinder(skeletonized_sobel_vertical)
-    bands = bf.get_bands()
-    bands_new = bf.last_step(bands)
+    bands = bf.find_bands()
 
-    for band in bands_new:
+    for band in bands:
         show_bounds(skeletonized_sobel_vertical, band, RED)
 
-    cv2.imshow("sobel thresh", sobel_thresh)
-    cv2.imshow("sobel skeleton", skeletonized_sobel_vertical)
+    plot_image(grayscale_image, 1, 'grayscale')
+    plot_image(noise_removed_image, 2, 'bilateral')
+    plot_image(canny, 3, 'canny')
+    plot_image(sobel, 4, 'vertical sobel')
+    plot_image(sobel_thresh, 5, 'vertical sobel adt threshold')
+    plot_image(skeletonized_sobel_vertical, 6, 'vertical sobel skeleton')
+    plot_image(sobel_canny, 7, 'canny -> vertical sobel')
+    plot_image(sobel_canny_thresh, 8, 'canny -> sobel -> adt thresh')
 
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    plt.subplots_adjust(bottom=0.1, left=0.1, right=0.9, top=0.9, wspace=0.3, hspace=0.3)
+    fig = plt.gcf()
+    fig.set_size_inches(10, 15)
+    print('calculated')
+    plt.show()
 
 
 if __name__ == '__main__':
