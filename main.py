@@ -110,7 +110,7 @@ def process():
     image, name = sample('043')
     grayscale_image = gray_scale(image)
     noise_removed_image = bilateral_filter(grayscale_image)
-    sobel = sobel_vertical_edge_detection(noise_removed_image)
+    sobel = sobel_horizontal_edge_detection(noise_removed_image)
     skeletonized_sobel_vertical, sobel_thresh = skeletonization(sobel)
 
     bf = BindsFinder(skeletonized_sobel_vertical)
