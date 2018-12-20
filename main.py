@@ -107,7 +107,7 @@ def run_pipelines_sample_dataset():
 def process():
     # run_pipelines_sample_dataset()
 
-    image, name = sample('005')
+    image, name = sample('006')
     grayscale_image = gray_scale(image)
     noise_removed_image = bilateral_filter(grayscale_image)
 
