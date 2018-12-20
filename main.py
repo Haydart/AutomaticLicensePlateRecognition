@@ -107,11 +107,12 @@ def run_pipelines_sample_dataset():
 def process():
     # run_pipelines_sample_dataset()
 
-    image, name = sample('043')
+    image, name = sample('005')
     grayscale_image = gray_scale(image)
     noise_removed_image = bilateral_filter(grayscale_image)
 
     horizontal_sobel = sobel_horizontal_edge_detection(noise_removed_image)
+    cv2.threshold(horizontal_sobel, 135, 255, cv2.THRESH_TOZERO, horizontal_sobel)
     horizontal_sobel_skeleton, horizontal_sobel_thresh = skeletonization(horizontal_sobel)
 
     vertical_sobel = sobel_vertical_edge_detection(noise_removed_image)
@@ -125,13 +126,13 @@ def process():
 
     plot_image(grayscale_image, 1, 'grayscale')
     plot_image(noise_removed_image, 2, 'bilateral')
-    plot_image(horizontal_sobel, 3, 'vertical sobel')
+    plot_image(image, 3, 'image with bounds')
+    plot_image(horizontal_sobel, 3, 'horizontal sobel')
     plot_image(horizontal_sobel_thresh, 4, 'horizontal sobel threshold')
     plot_image(horizontal_sobel_skeleton, 5, 'horizontal sobel skeleton')
-    plot_image(vertical_sobel_thresh, 6, 'vertical sobel threshold')
-    plot_image(vertical_sobel_skeleton, 7, 'vertical sobel skeleton')
-    plot_image(image, 8, 'image with bounds')
-
+    plot_image(vertical_sobel, 6, 'vertical sobel')
+    plot_image(vertical_sobel_thresh, 7, 'vertical sobel threshold')
+    plot_image(vertical_sobel_skeleton, 8, 'vertical sobel skeleton')
 
     plt.subplots_adjust(bottom=0.1, left=0.1, right=0.9, top=0.9, wspace=0.3, hspace=0.3)
     fig = plt.gcf()
