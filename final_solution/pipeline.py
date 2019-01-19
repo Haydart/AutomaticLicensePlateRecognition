@@ -1,9 +1,9 @@
 import sys
 import argparse
-import final_solution.input_output as io
+import final_solution.src.input_output as io
 
 from copy import copy
-from final_solution.transformation import AdvancedTransforms
+from final_solution.src.transformation import AdvancedTransforms
 
 
 def parse():
@@ -29,10 +29,6 @@ def main(argv):
     img_loader = io.ImageLoader()
     for image in img_loader.load_images(args.input_dir):
         image = process(image)
-
-
-        # import utils
-        # utils.show_results(image,image,image,image)
 
 
 
