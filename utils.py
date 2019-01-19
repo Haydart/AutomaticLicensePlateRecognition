@@ -49,12 +49,12 @@ def canny_edge_detection(image, low_thresh=170, high_thresh=200):
     return cv2.Canny(image, low_thresh, high_thresh)
 
 
-def show_results(original_image, gray_image, canny_image, auto_canny_image):
+def show_results(original_image, gray_image, canny_image, auto_canny_image=None):
     plt.figure("test", figsize=(30, 30))
     plot(plt, 321, original_image, "Original image")
     plot(plt, 322, gray_image, "Canny image")
     plot(plt, 323, canny_image, "Y bound")
-    plot(plt, 324, auto_canny_image, "X bound")
+    # plot(plt, 324, auto_canny_image, "X bound")
 
     plt.tight_layout()
     plt.show()
