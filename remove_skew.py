@@ -1,6 +1,16 @@
 from random import randint
+import cv2
+import numpy as np
 
-from utils import *
+
+def morphological_closing(image, kernel_size=(3, 3), iterations=6):
+    kernel = np.ones(kernel_size, np.uint8)
+    return cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel, iterations=iterations)
+
+
+def erosion(image, kernel_size=(3, 3), iterations=1):
+    kernel_size = np.ones(kernel_size, np.uint8)
+    return cv2.erode(image, kernel_size, iterations=iterations)
 
 
 def find_plate_contour(preprocessed_image, original_image):

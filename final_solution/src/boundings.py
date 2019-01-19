@@ -5,9 +5,9 @@ RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 
 
-def apply_bounding_boxes(image, bands):
+def apply_bounding_boxes(image, bands, color=GREEN):
     for band in bands:
-        __draw_box(image, band, GREEN)
+        __draw_box(image, band, color)
 
     return image
 

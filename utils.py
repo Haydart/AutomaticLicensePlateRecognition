@@ -3,7 +3,6 @@ import logging
 
 import cv2
 import matplotlib as mpl
-import numpy as np
 from matplotlib import pyplot as plt
 
 logger = logging.getLogger()
@@ -44,16 +43,6 @@ def plot_image(img, subplot_index, title='', fix_colors=True):
 
     plt.title(title)
     plt.axis('off')
-
-
-def morphological_closing(image, kernel_size=(3, 3), iterations=6):
-    kernel = np.ones(kernel_size, np.uint8)
-    return cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel, iterations=iterations)
-
-
-def erosion(image, kernel_size=(3, 3), iterations=1):
-    kernel_size = np.ones(kernel_size, np.uint8)
-    return cv2.erode(image, kernel_size, iterations=iterations)
 
 
 def canny_edge_detection(image, low_thresh=170, high_thresh=200):
