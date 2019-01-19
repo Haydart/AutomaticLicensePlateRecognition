@@ -1,6 +1,7 @@
 import sys
 import argparse
 import final_solution.src.input_output as io
+import final_solution.src.band_clipping as bc
 
 from copy import copy
 from final_solution.src.transformation import AdvancedTransforms
@@ -21,6 +22,13 @@ def process(image):
 
     image_sobel_method_vertical, image_sobel_method_horizontal = model.skeletonized_sobel_method(copy(image))
     image_opening_method = model.opening_method(copy(image))
+
+    sobel_candidates = bc.find_candidates(bc.sobel_method)
+    opening_candidates = bc.find_candidates(bc.opening_method)
+
+
+
+
 
 
 def main(argv):

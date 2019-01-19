@@ -160,7 +160,15 @@ class BindsFinder:
 
         return bands
 
+sobel_method = 'sobel'
+opening_method = 'opening'
 
-def find_bands(image):
-    bf = BindsFinder(image)
-    bands = bf.find_bands()
+def find_candidates(method, **image):
+    bf = BindsFinder(image[0])
+
+    if method == sobel_method:
+        bands = bf.find_bands(image[1])
+    else:
+        bands = bf.find_bands(image[0])
+
+    return bands
