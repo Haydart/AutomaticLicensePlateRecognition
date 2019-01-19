@@ -83,29 +83,32 @@ def four_point_transform(image, points):
 
 
 def process():
-    image = load_image('skewed_trimmed_samples/skewed_003.jpg')
+    # image = load_image('skewed_trimmed_samples/skewed_007.jpg')
+    image = load_image('detect.jpg')
     gray_image = gray_scale(image)
+    # contrast_bumped_image = contrast_bump(gray_image, alpha=2, beta=50)
 
     ret, binarized_image = cv2.threshold(gray_image, 175, 255, cv2.THRESH_BINARY)
     eroded_image = erosion(binarized_image)
     closed_image = morphological_closing(binarized_image, iterations=5)
     eroded_closed_image = morphological_closing(eroded_image, iterations=5)
 
-    _, result_polygon = find_plate_contour(eroded_closed_image, image)
-    polygon_flat_list = [item for sublist in result_polygon for item in sublist]
-    plate_corners_list = [(arr[0], arr[1]) for arr in polygon_flat_list]
-
-    deskewed_image = four_point_transform(image, np.array(plate_corners_list))
-    draw_plate_polygons(image, result_polygon)
+    # _, result_polygon = find_plate_contour(eroded_closed_image, image)
+    # polygon_flat_list = [item for sublist in result_polygon for item in sublist]
+    # plate_corners_list = [(arr[0], arr[1]) for arr in polygon_flat_list]
+    #
+    # deskewed_image = four_point_transform(gray_image, np.array(plate_corners_list))
+    # draw_plate_polygons(image, result_polygon)
 
     cv2.imshow("Grayscale", gray_image)
+    # cv2.imshow("Contrast bumped", 4)
     cv2.imshow("Bin", binarized_image)
     cv2.imshow("Bin -> Erosion", eroded_image)
     cv2.imshow("Bin -> Erosion -> Closing", eroded_closed_image)
     cv2.imshow("Bin -> Closing", closed_image)
     cv2.imshow("Result Polygon", image)
-    cv2.imshow("Deskewed image", deskewed_image)
-    cv2.imwrite("ocr-ready.jpg", deskewed_image)
+    # cv2.imshow("Deskewed image", deskewed_image)
+    # cv2.imwrite("ocr-ready.jpg", deskewed_image)
 
     cv2.waitKey()
 
