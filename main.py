@@ -38,28 +38,6 @@ def canny_method(image):
 
     return bands
 
-def sobel_method(image):
-    canny_image = canny_edge_detection(image)
-
-def skeletonized_sobel_method(image):
-    sobel_vertical_image = sobel_vertical_edge_detection(image)
-    skeletonized_sobel_vertical_image = skeletonization(sobel_vertical_image)
-
-    bf = BindsFinder(skeletonized_sobel_vertical_image)
-    bands = bf.find_bands()
-    return bands
-
-
-def opening_method(image):
-    histogram_equalized_image = histogram_equalization(image)
-    subtracted_image = morphological_opening(histogram_equalized_image)
-    threshed_image = binary_threshold(subtracted_image, 100)
-
-    bf = BindsFinder(threshed_image)
-    bands = bf.find_bands()
-
-    return bands
-
 
 def run_pipelines_real_dataset():
     dp = DatasetsProvider(

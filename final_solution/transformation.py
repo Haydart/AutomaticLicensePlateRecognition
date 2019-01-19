@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from copy import copy
 
 
 class BasicTransforms:
@@ -11,6 +12,10 @@ class BasicTransforms:
     @staticmethod
     def bilateral_filter(image):
         return cv2.bilateralFilter(image, 32, 40, 40)
+
+    @staticmethod
+    def histogram_equalization(image):
+        return cv2.equalizeHist(image)
 
     @staticmethod
     def sobel_vertical_edge_detection(image):
@@ -35,7 +40,7 @@ class BasicTransforms:
         return threshed
 
     @staticmethod
-    def skeletonization(image):
+    def skeletonize(image):
         size = np.size(image)
         skeleton = np.zeros(image.shape, np.uint8)
 
@@ -57,9 +62,15 @@ class BasicTransforms:
 
         return skeleton
 
+    @staticmethod
+    def morphological_opening(image, kernel_size=(3, 3), iterations=15):
+        opening_mask = cv2.getStructuringElement(cv2.MORPH_RECT, kernel_size)
+        opening_image = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel=opening_mask, iterations=iterations)
+        return cv2.subtract(image, opening_image)
 
 
-class Model:
+
+class AdvancedTransforms:
 
     def __init__(self, transforms=BasicTransforms):
         self.transforms = transforms
@@ -70,6 +81,16 @@ class Model:
         return image
 
     def skeletonized_sobel_method(self, image):
-        image = self.transforms.sobel_vertical_edge_detection(image)
-        image = self.transforms.skeletonization(image)
+        image_vertical = self.transforms.sobel_vertical_edge_detection(copy(image))
+        image_horizontal = self.transforms.sobel_horizontal_edge_detection(copy(image))
+
+        image_vertical = self.transforms.skeletonize(image_vertical)
+        image_horizontal = self.transforms.skeletonize(image_horizontal)
+
+        return image_vertical, image_horizontal
+
+    def opening_method(self, image):
+        image = self.transforms.histogram_equalization(image)
+        image = self.transforms.morphological_opening(image)
+        image = self.transforms.binary_threshold(image, 100)
         return image
