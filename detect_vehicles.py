@@ -3,7 +3,7 @@ import numpy as np
 
 from utils import load_image
 
-classes = [line.strip() for line in open("yolo_suite/detection_classes.txt", 'r').readlines()]
+classes = [line.strip() for line in open("yolo_suite/classes.txt", 'r').readlines()]
 COLORS = np.random.uniform(0, 255, size=(len(classes), 3))
 
 
@@ -74,4 +74,4 @@ def detect_vehicles(image_path):
 
 
 if __name__ == '__main__':
-    detect_vehicles("dataset/track002.png")
+    detect_vehicles("dataset/track001.png")
