@@ -95,6 +95,7 @@ def process():
     cv2.imshow("Bin -> Closing", closed_image)
     cv2.imshow("Result Polygon", image)
     cv2.imshow("Deskewed image", deskewed_image)
+    cv2.imwrite("ocr-ready.jpg", deskewed_image)
 
     cv2.waitKey()
 
