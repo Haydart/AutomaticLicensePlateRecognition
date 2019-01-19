@@ -56,7 +56,7 @@ class BindsFinder:
         # before = y_projection = y_projection / np.max(y_projection)
         y_projection = signal.convolve(y_projection, self.mask, mode='same')
 
-        utils.plot_histograms(before, y_projection, str(self.mask[0:5]))
+        # utils.plot_histograms(before, y_projection, str(self.mask[0:5]))
 
         bands = []
         projection = np.copy(y_projection)
@@ -146,7 +146,7 @@ class BindsFinder:
             if y1-y0 <= 10:
                 continue
 
-            if phase_two_image:
+            if phase_two_image is not None:
                 band = phase_two_image[y0:y1, ...]
             else:
                 band = self.image[y0:y1, ...]
@@ -160,10 +160,12 @@ class BindsFinder:
 
         return bands
 
+
 sobel_method = 'sobel'
 opening_method = 'opening'
 
-def find_candidates(method, **image):
+
+def find_candidates(method, *image):
     bf = BindsFinder(image[0])
 
     if method == sobel_method:

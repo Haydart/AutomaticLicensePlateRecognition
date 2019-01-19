@@ -1,5 +1,13 @@
 import glob
 import cv2
+import os
+
+
+class Image:
+
+    def __init__(self, image, path):
+        self.image = image
+        self.path = path
 
 
 class ImageLoader:
@@ -19,11 +27,14 @@ class ImageLoader:
         Generate images from source.
 
         :param source_path:
-        :return: image: Image in form of matrix
+        :return: image: Image
         """
 
         for file in self.__get_all_paths(source_path):
-            yield self.__load_image(file)
+            yield Image(
+                image=self.__load_image(file),
+                path=file
+            )
 
     def __get_all_paths(self, source_path):
         paths = ['{}{}'.format(source_path, pattern) for pattern in self.patterns]
@@ -36,3 +47,22 @@ class ImageLoader:
 
     def __load_image(self, file):
         return cv2.imread(file)
+
+
+class ImageSaver:
+
+    def __init__(self, path):
+        self.path = path
+
+    def save_image(self, image):
+        path = self.__make_save_path(image.path)
+        cv2.imwrite(path, image.image)
+        print('Image saved at:' + path)
+
+    def __make_save_path(self, source_path):
+        source_name = source_path.split('/')[-1]
+
+        name = source_name
+        path = os.path.join(self.path, name)
+
+        return path

@@ -2,7 +2,8 @@ import os
 
 from final_solution.src.band_clipping import BindsFinder
 from datasets import DatasetsProvider, samples, sample
-from utils import *
+
+
 import cv2
 import numpy as np
 
@@ -18,16 +19,6 @@ def show_bounds(img, band, color):
     y1 = band[1]
 
     cv2.rectangle(img, (x, y), (x1, y1), color, 2)
-
-
-def save_image(image, number, position):
-    save_path = '/home/lukasz/Studia/Analiza obrazow i wideo/ALPR/SimpleALPR/results'
-    position = position.replace(' ', '')
-    ext = '.png'
-    file_name = '{}_{}_{}'.format(number, position, ext)
-    file_path = os.path.join(save_path, file_name)
-    print(file_path)
-    cv2.imwrite(file_path, image)
 
 
 def canny_method(image):

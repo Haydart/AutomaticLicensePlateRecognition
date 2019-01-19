@@ -3,6 +3,8 @@ import argparse
 import final_solution.src.input_output as io
 import final_solution.src.band_clipping as bc
 
+from final_solution.src.boundings import apply_bounding_boxes
+
 from copy import copy
 from final_solution.src.transformation import AdvancedTransforms
 
@@ -23,21 +25,26 @@ def process(image):
     image_sobel_method_vertical, image_sobel_method_horizontal = model.skeletonized_sobel_method(copy(image))
     image_opening_method = model.opening_method(copy(image))
 
-    sobel_candidates = bc.find_candidates(bc.sobel_method)
-    opening_candidates = bc.find_candidates(bc.opening_method)
+    sobel_candidates = bc.find_candidates(bc.sobel_method, image_sobel_method_vertical, image_sobel_method_horizontal)
+    opening_candidates = bc.find_candidates(bc.opening_method, image_opening_method)
 
+    candidates = sobel_candidates + opening_candidates
 
-
-
+    return candidates
 
 
 def main(argv):
     args = parse()
 
     img_loader = io.ImageLoader()
+    img_saver = io.ImageSaver(args.output_dir)
     for image in img_loader.load_images(args.input_dir):
-        image = process(image)
+        print(image.path)
+        candidates = process(image.image)
+        image_boxes = apply_bounding_boxes(copy(image.image), candidates)
 
+        image.image = image_boxes
+        img_saver.save_image(image)
 
 
 if __name__ == '__main__':
