@@ -1,6 +1,8 @@
 import sys
 import argparse
 import final_solution.input_output as io
+
+from copy import copy
 from final_solution.transformation import Model
 
 
@@ -15,8 +17,11 @@ def parse():
 
 def process(image):
     model = Model()
-    image = model.preproces(image)
+    image = model.preprocess(image)
 
+    image_sobel_method = model.skeletonized_sobel_method(copy(image))
+
+    return image_sobel_method
 
 
 def main(argv):
@@ -24,7 +29,10 @@ def main(argv):
 
     img_loader = io.ImageLoader()
     for image in img_loader.load_images(args.input_dir):
-        process(image)
+        image = process(image)
+        import utils
+        utils.show_results(image,image,image,image)
+
 
 
 if __name__ == '__main__':
