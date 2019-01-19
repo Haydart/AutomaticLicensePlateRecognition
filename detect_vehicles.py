@@ -3,8 +3,9 @@ import numpy as np
 
 from utils import load_image
 
-classes = None
-COLORS = np.random.uniform(0, 255, size=(4, 3))
+classes = [line.strip() for line in open("yolo_suite/detection_classes.txt", 'r').readlines()]
+print(classes)
+COLORS = np.random.uniform(0, 255, size=(len(classes), 3))
 
 
 def _get_output_layers(net):
@@ -25,9 +26,6 @@ def detect_vehicles(image_path):
     image_width = image.shape[1]
     image_height = image.shape[0]
     scale = 0.00392
-
-    with open("yolo_suite/detection_classes.txt", 'r') as classes_file:
-        classes = [line.strip() for line in classes_file.readlines()]
 
     net = cv2.dnn.readNet("yolo_suite/yolov3.weights", "yolo_suite/yolov3.cfg")
     blob = cv2.dnn.blobFromImage(image, scale, (416, 416), (0, 0, 0), True, crop=False)
@@ -57,6 +55,8 @@ def detect_vehicles(image_path):
 
     indices = cv2.dnn.NMSBoxes(boxes, confidences, confidence_threshold, nms_threshold)
 
+    print(class_ids)
+
     for i in indices:
         i = i[0]
         box = boxes[i]
@@ -74,4 +74,4 @@ def detect_vehicles(image_path):
 
 
 if __name__ == '__main__':
-    detect_vehicles("dataset/track001.png")
+    detect_vehicles("dataset/track002.png")
