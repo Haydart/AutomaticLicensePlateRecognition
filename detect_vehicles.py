@@ -1,3 +1,5 @@
+import os
+
 import cv2
 import numpy as np
 
@@ -11,15 +13,6 @@ def _get_output_layers(net):
     layer_names = net.getLayerNames()
     output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
     return output_layers
-
-
-def _draw_prediction(img, class_id, confidence, x, y, x_plus_w, y_plus_h):
-    if class_id < len(classes):
-        class_name = str(classes[class_id])
-        label = '{} {}'.format(class_name, confidence)
-        color = COLORS[class_id]
-        cv2.rectangle(img, (x, y), (x_plus_w, y_plus_h), color, 2)
-        cv2.putText(img, label, (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
 
 def detect_vehicles(image_path):
@@ -56,8 +49,11 @@ def detect_vehicles(image_path):
 
     indices = cv2.dnn.NMSBoxes(boxes, confidences, confidence_threshold, nms_threshold)
 
-    print(class_ids)
+    # _show_and_save_detected_vehicles_predictions(boxes, class_ids, confidences, image, image_path, indices)
+    _create_temp_dataset(image, boxes, image_path, indices)
 
+
+def _show_and_save_detected_vehicles_predictions(boxes, class_ids, confidences, image, image_path, indices):
     for i in indices:
         i = i[0]
         box = boxes[i]
@@ -67,12 +63,42 @@ def detect_vehicles(image_path):
         h = box[3]
         _draw_prediction(image, class_ids[i], confidences[i], round(x), round(y), round(x + w), round(y + h))
 
-    # cv2.imshow("object detection", image)
     cv2.imwrite("output/{}".format(image_path), image)
     cv2.waitKey()
     cv2.destroyAllWindows()
 
 
+def _draw_prediction(image, class_id, confidence, x, y, x_plus_w, y_plus_h):
+    if class_id < len(classes):
+        class_name = str(classes[class_id])
+        label = '{} {}'.format(class_name, confidence)
+        color = COLORS[class_id]
+        cv2.rectangle(image, (x, y), (x_plus_w, y_plus_h), color, 2)
+        cv2.putText(image, label, (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+
+
+def _create_temp_dataset(image, boxes, image_path, indices):
+    boxes_areas = [calculate_area(box) for box in boxes]
+    largest_box_index = np.argmax(boxes_areas)
+    box = boxes[largest_box_index]
+
+    x = int(max(box[0], 0))
+    y = int(max(box[1], 0))
+    w = int(abs(box[2]))
+    h = int(abs(box[3]))
+
+    cropped_image = image[y: y + h, x: x + w]
+    # cv2.imshow("cropped", cropped_image)
+    # cv2.waitKey()
+    # cv2.destroyAllWindows()
+    cv2.imwrite("output/{}".format(image_path), cropped_image)
+
+
+def calculate_area(box):
+    return box[2] * box[3]
+
+
 if __name__ == '__main__':
-    for i in range(20):
-        detect_vehicles("dataset/track{}.png".format(i + 1))
+    for index, file_name in enumerate(os.listdir("dataset/UFPR-ALPR-snapshots"), 1):
+        print("Processing image {}: {}".format(index, file_name))
+        detect_vehicles("dataset/UFPR-ALPR-snapshots/{}".format(file_name))
