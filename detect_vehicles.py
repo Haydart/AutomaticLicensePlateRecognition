@@ -4,7 +4,6 @@ import numpy as np
 from utils import load_image
 
 classes = [line.strip() for line in open("yolo_suite/detection_classes.txt", 'r').readlines()]
-print(classes)
 COLORS = np.random.uniform(0, 255, size=(len(classes), 3))
 
 
@@ -15,10 +14,12 @@ def _get_output_layers(net):
 
 
 def _draw_prediction(img, class_id, confidence, x, y, x_plus_w, y_plus_h):
-    label = '{} {}'.format(str(classes[class_id]), confidence)
-    color = COLORS[class_id]
-    cv2.rectangle(img, (x, y), (x_plus_w, y_plus_h), color, 2)
-    cv2.putText(img, label, (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+    if class_id < len(classes):
+        class_name = str(classes[class_id])
+        label = '{} {}'.format(class_name, confidence)
+        color = COLORS[class_id]
+        cv2.rectangle(img, (x, y), (x_plus_w, y_plus_h), color, 2)
+        cv2.putText(img, label, (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
 
 def detect_vehicles(image_path):
@@ -67,9 +68,8 @@ def detect_vehicles(image_path):
         _draw_prediction(image, class_ids[i], confidences[i], round(x), round(y), round(x + w), round(y + h))
 
     cv2.imshow("object detection", image)
-    cv2.waitKey()
-
     cv2.imwrite("object-detection.jpg", image)
+    cv2.waitKey()
     cv2.destroyAllWindows()
 
 
