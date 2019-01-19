@@ -68,6 +68,32 @@ class BasicTransforms:
         opening_image = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel=opening_mask, iterations=iterations)
         return cv2.subtract(image, opening_image)
 
+    @staticmethod
+    def color_mask(image, color):
+        image_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+        if color == 'yellow':
+            lower_mask = np.array([10, 100, 100])  # Yellow
+            upper_mask = np.array([60, 255, 255])  # Yellow
+        elif color == 'green':
+            lower_mask = np.array([0, 100, 50])    # Green
+            upper_mask = np.array([100, 255, 255]) # Green
+        elif color == 'red':
+            lower_mask = np.array([0, 30, 60])  # Red
+            upper_mask = np.array([10, 120, 100])  # Red
+        elif color == 'blue':
+            lower_mask = np.array([20, 100, 100])  # Blue
+            upper_mask = np.array([30, 255, 255])  # Blue
+        else:
+            raise Exception('Specified color not supported')
+
+        mask = cv2.inRange(image_hsv, lower_mask, upper_mask)
+        image_masked = cv2.bitwise_and(image, image, mask=mask)
+        import utils
+        # utils.show_results(image_hsv, mask, image_masked, cv2.cvtColor(image_masked, cv2.COLOR_HSV2BGR))
+        utils.show_one_image(mask)
+        return mask
+
 
 
 class AdvancedTransforms:
@@ -93,4 +119,10 @@ class AdvancedTransforms:
         image = self.transforms.histogram_equalization(image)
         image = self.transforms.morphological_opening(image)
         image = self.transforms.binary_threshold(image, 100)
+        return image
+
+    def color_mask_method(self, image):
+        # image = self.transforms.color_mask(copy(image), 'yellow')
+        image = self.transforms.color_mask(copy(image), 'red')
+        # image = self.preprocess(image)
         return image

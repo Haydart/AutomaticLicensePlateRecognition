@@ -53,31 +53,7 @@ def run_pipelines_real_dataset():
 
         save_image(image, number, position)
 
-
-def run_pipelines_sample_dataset():
-    for image, number in samples():
-        grayscale_image = gray_scale(image)
-        noise_removed_image = bilateral_filter(grayscale_image)
-
-        canny_bands, img1 = canny_method(noise_removed_image)
-        thresh_bands, img = opening_method(noise_removed_image)
-        sobel_bands, img2 = skeletonized_sobel_method(noise_removed_image)
-
-        for band in canny_bands:
-            show_bounds(image, band, GREEN)
-
-        for band in thresh_bands:
-            show_bounds(image, band, RED)
-
-        for band in sobel_bands:
-            show_bounds(image, band, BLUE)
-
-        save_image(image, number, '')
-        print("image done")
-
-
 def process():
-    # run_pipelines_sample_dataset()
 
     image, name = sample('006')
     grayscale_image = gray_scale(image)
@@ -114,60 +90,24 @@ def process():
 
 
 if __name__ == '__main__':
-    process()
-    # sample_dataset()
-    # real_dataset()
-    # image, name = sample('001')
-    # grayscale_image = gray_scale(image)
-    # noise_removed_image = bilateral_filter(grayscale_image)
-    #
-    # thresh_bands = thresh_method(noise_removed_image)
-    #
-    # for y0, y1, x0, x1 in thresh_bands:
-    #     from matplotlib import pyplot as plt
-    #     plt.imshow(image[y0:y1, x0:x1])
-    #     plt.show()
 
-    path = '/home/lukasz/Studia/Analiza obrazow i wideo/ALPR/SimpleALPR/dataset/P1010002.jpg'
-    # Read image
-    # im = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
-    # Standard imports
-    # import cv2
-    # import numpy as np
-    #
-    # path = '/home/lukasz/Studia/Analiza obrazow i wideo/ALPR/SimpleALPR/dataset/P1010003.jpg'
-    # # Read image
-    # # im = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
-    # #
-    # # # Set up the detector with default parameters.
-    # # detector = cv2.SimpleBlobDetector_create()
-    # #
-    # # # Detect blobs.
-    # # keypoints = detector.detect(im)
-    # #
-    # # # Draw detected blobs as red circles.
-    # # # cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS ensures the size of the circle corresponds to the size of blob
-    # # im_with_keypoints = cv2.drawKeypoints(im, keypoints, np.array([]), (0, 0, 255),
-    # #                                       cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-    #
-    # im = cv2.imread(path)
-    # hsv = cv2.cvtColor(im, cv2.COLOR_BGR2HSV)
-    #
-    # lower_red = np.array([20, 100, 100]) # Yellow
-    # upper_red = np.array([30, 255, 255]) # Yellow
-    #
-    # # lower_red = np.array([0, 100, 50])  # Green
-    # # upper_red = np.array([100, 255, 255])  # Green
-    #
-    # mask = cv2.inRange(hsv, lower_red, upper_red)
-    # res = cv2.bitwise_and(im, im, mask=mask)
-    #
-    #
-    # plt.imshow(res)
-    # plt.show()
-    # # Show keypoints
-    # # cv2.imshow("Keypoints", im_with_keypoints)
-    # # cv2.waitKey(0)
+    hsv = cv2.cvtColor(im, cv2.COLOR_BGR2HSV)
+
+    lower_red = np.array([20, 100, 100]) # Yellow
+    upper_red = np.array([30, 255, 255]) # Yellow
+
+    # lower_red = np.array([0, 100, 50])  # Green
+    # upper_red = np.array([100, 255, 255])  # Green
+
+    mask = cv2.inRange(hsv, lower_red, upper_red)
+    res = cv2.bitwise_and(im, im, mask=mask)
+
+
+    plt.imshow(res)
+    plt.show()
+    # Show keypoints
+    # cv2.imshow("Keypoints", im_with_keypoints)
+    # cv2.waitKey(0)
 
     lower_red = np.array([0, 100, 50])  # Green
     upper_red = np.array([100, 255, 255])  # Green

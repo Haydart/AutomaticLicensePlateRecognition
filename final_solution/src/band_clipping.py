@@ -163,6 +163,7 @@ class BindsFinder:
 
 sobel_method = 'sobel'
 opening_method = 'opening'
+color_method = 'color'
 
 
 def find_candidates(method, *image):

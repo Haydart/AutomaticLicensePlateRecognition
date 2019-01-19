@@ -62,6 +62,14 @@ def show_results(original_image, gray_image, canny_image, auto_canny_image):
     return True
 
 
+def show_one_image(image):
+    plt.figure("Show image", figsize=(30, 30))
+    plot(plt, 111, image, "Original image")
+    plt.tight_layout()
+    plt.show()
+
+    return True
+
 def plot_histograms(hist_1, hist_2, title):
     plt.figure("Histograms", figsize=(10, 5))
     plot_(plt, 121, hist_1, "Before")
