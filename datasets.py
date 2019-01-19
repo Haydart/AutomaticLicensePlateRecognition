@@ -1,6 +1,8 @@
 import glob
 from enum import Enum
+
 import pandas as pd
+
 import utils
 
 
@@ -11,7 +13,7 @@ class Dataset(Enum):
 
 
 def samples():
-    source_path = '/home/lukasz/Studia/Analiza obrazow i wideo/ALPR/SimpleALPR/dataset/'
+    source_path = 'license_plate_snapshots/'
     train_directory_path = source_path + 'test_*.jpg'
     images = sorted(glob.glob(train_directory_path))
     for image in images:
@@ -25,7 +27,7 @@ def samples_v2():
         yield utils.load_image(image), image.split('/')[-2] + image.split('/')[-1].split('.')[0]
 
 def sample(number):
-    source_path = '/home/lukasz/Studia/Analiza obrazow i wideo/ALPR/SimpleALPR/dataset/'
+    source_path = 'license_plate_snapshots/'
     sample_path = source_path + 'test_{}.jpg'.format(number)
     return utils.load_image(sample_path), sample_path.split('/')[-1].split('.')[0]
 

@@ -1,12 +1,14 @@
-import imutils
-from datasets import DatasetsProvider, samples, sample, samples_v2
-from band_clipping import BindsFinder
-from utils import *
 import os
 
+from band_clipping import BindsFinder
+from datasets import DatasetsProvider, samples, sample
+from utils import *
+import cv2
+import numpy as np
 
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
+BLUE = (0, 0, 255)
 
 
 def show_bounds(img, band, color):
@@ -19,7 +21,7 @@ def show_bounds(img, band, color):
 
 
 def save_image(image, number, position):
-    save_path = '/home/lukasz/Studia/Analiza obrazow i wideo/ALPR/SimpleALPR/results'
+    save_path = 'output/dataset_pipelines/'
     position = position.replace(' ', '')
     ext = '.png'
     file_name = '{}_{}_{}'.format(number, position, ext)
@@ -36,15 +38,17 @@ def canny_method(image):
 
     return bands, canny_image
 
-def sobel_method(image):
-    canny_image = canny_edge_detection(image)
 
-    bf = BindsFinder(canny_image)
+def skeletonized_sobel_method(image):
+    sobel_vertical_image = sobel_vertical_edge_detection(image)
+    skeletonized_sobel_vertical_image = skeletonization(sobel_vertical_image)
+
+    bf = BindsFinder(skeletonized_sobel_vertical_image)
     bands = bf.find_bands()
     return bands
 
 
-def thresh_method(image):
+def opening_method(image):
     histogram_equalized_image = histogram_equalization(image)
     subtracted_image = morphological_opening(histogram_equalized_image)
     threshed_image = binary_threshold(subtracted_image, 100)
@@ -55,7 +59,7 @@ def thresh_method(image):
     return bands, threshed_image
 
 
-def real_dataset():
+def run_pipelines_real_dataset():
     dp = DatasetsProvider(
         source_path='/home/lukasz/Studia/Analiza obrazow i wideo/UFPR-ALPR dataset/'
     )
@@ -63,8 +67,9 @@ def real_dataset():
         grayscale_image = gray_scale(image)
         noise_removed_image = bilateral_filter(grayscale_image)
 
+        sobel_bands = skeletonized_sobel_method(noise_removed_image)
         canny_bands = canny_method(noise_removed_image)
-        thresh_bands = thresh_method(noise_removed_image)
+        thresh_bands = opening_method(noise_removed_image)
 
         for band in canny_bands:
             show_bounds(image, band, GREEN)
@@ -72,16 +77,20 @@ def real_dataset():
         for band in thresh_bands:
             show_bounds(image, band, RED)
 
+        for band in sobel_bands:
+            show_bounds(image, band, BLUE)
+
         save_image(image, number, position)
 
 
-def sample_dataset():
+def run_pipelines_sample_dataset():
     for image, number in samples():
         grayscale_image = gray_scale(image)
         noise_removed_image = bilateral_filter(grayscale_image)
 
         canny_bands, img1 = canny_method(noise_removed_image)
-        thresh_bands, img = thresh_method(noise_removed_image)
+        thresh_bands, img = opening_method(noise_removed_image)
+        sobel_bands, img2 = skeletonized_sobel_method(noise_removed_image)
 
         for band in canny_bands:
             show_bounds(image, band, GREEN)
@@ -89,9 +98,52 @@ def sample_dataset():
         for band in thresh_bands:
             show_bounds(image, band, RED)
 
+        for band in sobel_bands:
+            show_bounds(image, band, BLUE)
+
         save_image(image, number, '')
+        print("image done")
+
+
+def process():
+    # run_pipelines_sample_dataset()
+
+    image, name = sample('006')
+    grayscale_image = gray_scale(image)
+    noise_removed_image = bilateral_filter(grayscale_image)
+
+    horizontal_sobel = sobel_horizontal_edge_detection(noise_removed_image)
+    cv2.threshold(horizontal_sobel, 135, 255, cv2.THRESH_TOZERO, horizontal_sobel)
+    horizontal_sobel_skeleton, horizontal_sobel_thresh = skeletonization(horizontal_sobel)
+
+    vertical_sobel = sobel_vertical_edge_detection(noise_removed_image)
+    vertical_sobel_skeleton, vertical_sobel_thresh = skeletonization(vertical_sobel)
+
+    bf = BindsFinder(horizontal_sobel_skeleton)
+    bands = bf.find_bands()
+
+    for band in bands:
+        show_bounds(image, band, RED)
+
+    plot_image(grayscale_image, 1, 'grayscale')
+    plot_image(noise_removed_image, 2, 'bilateral')
+    plot_image(image, 3, 'image with bounds')
+    plot_image(horizontal_sobel, 3, 'horizontal sobel')
+    plot_image(horizontal_sobel_thresh, 4, 'horizontal sobel threshold')
+    plot_image(horizontal_sobel_skeleton, 5, 'horizontal sobel skeleton')
+    plot_image(vertical_sobel, 6, 'vertical sobel')
+    plot_image(vertical_sobel_thresh, 7, 'vertical sobel threshold')
+    plot_image(vertical_sobel_skeleton, 8, 'vertical sobel skeleton')
+
+    plt.subplots_adjust(bottom=0.1, left=0.1, right=0.9, top=0.9, wspace=0.3, hspace=0.3)
+    fig = plt.gcf()
+    fig.set_size_inches(10, 15)
+    print('calculated')
+    plt.show()
+
 
 if __name__ == '__main__':
+    process()
     # sample_dataset()
     # real_dataset()
     # image, name = sample('001')
@@ -104,10 +156,6 @@ if __name__ == '__main__':
     #     from matplotlib import pyplot as plt
     #     plt.imshow(image[y0:y1, x0:x1])
     #     plt.show()
-
-    # Standard imports
-    import cv2
-    import numpy as np
 
     path = '/home/lukasz/Studia/Analiza obrazow i wideo/ALPR/SimpleALPR/dataset/P1010002.jpg'
     # Read image
@@ -135,7 +183,6 @@ if __name__ == '__main__':
 
     mask = cv2.inRange(hsv, lower_red, upper_red)
     res = cv2.bitwise_and(im, im, mask=mask)
-
 
     plt.imshow(res)
     plt.show()

@@ -5,19 +5,19 @@ if __name__ == '__main__':
     # image = imutils.resize(image, width=512)
 
     grayscale_image = gray_scale(image)
+
     plot_image(grayscale_image, 1, 'Original image grayscale')
     plot_image(grayscale_image, 2, 'Original image grayscale BGR', fix_colors=False)
-    plot_image(canny_edge_detection(grayscale_image), 3, 'Canny on original image')
 
+    plot_image(canny_edge_detection(grayscale_image), 3, 'Canny on original image')
     noise_removed_image = bilateral_filter(grayscale_image)
     plot_image(noise_removed_image, 4, 'Bilateral filtering')
-
     noise_removed_image = bilateral_filter(grayscale_image)
     plot_image(noise_removed_image, 5, 'Bilateral filtering BGR', fix_colors=False)
-    vertical_image = vertical_detection(noise_removed_image)
-    print(vertical_image.channels())
-    img = cv2.adaptiveThreshold(vertical_image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
-    plot_image(img, 6, 'Vertical after bilateral')
+
+    vertical_image = sobel_vertical_edge_detection(noise_removed_image)
+    skeletonized_vertical_edges_image = skeletonization(vertical_image)
+    plot_image(skeletonized_vertical_edges_image, 6, 'Vertical Sobel after bilateral', fix_colors=False)
 
     histogram_equalized_image = histogram_equalization(noise_removed_image)
     plot_image(histogram_equalized_image, 7, 'Histogram equalization')

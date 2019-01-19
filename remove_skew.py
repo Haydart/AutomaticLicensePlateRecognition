@@ -73,9 +73,10 @@ def four_point_transform(image, points):
 
 
 def process():
-    image = load_image('skewed_trimmed_samples/skewed_001.jpg')
+    image = load_image('skewed_trimmed_samples/skewed_003.jpg')
     gray_image = gray_scale(image)
-    ret, binarized_image = cv2.threshold(gray_image, 180, 255, cv2.THRESH_BINARY)
+
+    ret, binarized_image = cv2.threshold(gray_image, 175, 255, cv2.THRESH_BINARY)
     eroded_image = erosion(binarized_image)
     closed_image = morphological_closing(binarized_image, iterations=5)
     eroded_closed_image = morphological_closing(eroded_image, iterations=5)
@@ -94,8 +95,7 @@ def process():
     cv2.imshow("Bin -> Closing", closed_image)
     cv2.imshow("Result Polygon", image)
     cv2.imshow("Deskewed image", deskewed_image)
-
-    cv2.imwrite("detected_deskewed4.jpg", deskewed_image)
+    cv2.imwrite("ocr-ready.jpg", deskewed_image)
 
     cv2.waitKey()
 
