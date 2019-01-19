@@ -1,6 +1,6 @@
 import os
 
-from band_clipping import BindsFinder
+from final_solution.src.band_clipping import BindsFinder
 from datasets import DatasetsProvider, samples, sample
 from utils import *
 import cv2
