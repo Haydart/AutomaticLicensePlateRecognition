@@ -49,8 +49,8 @@ def detect_vehicles(image_path):
 
     indices = cv2.dnn.NMSBoxes(boxes, confidences, confidence_threshold, nms_threshold)
 
-    # _show_and_save_detected_vehicles_predictions(boxes, class_ids, confidences, image, image_path, indices)
-    _create_temp_dataset(image, boxes, image_path, indices)
+    _show_and_save_detected_vehicles_predictions(boxes, class_ids, confidences, image, image_path, indices)
+    # _create_temp_dataset(image, boxes, image_path, indices)
 
 
 def _show_and_save_detected_vehicles_predictions(boxes, class_ids, confidences, image, image_path, indices):
@@ -63,7 +63,7 @@ def _show_and_save_detected_vehicles_predictions(boxes, class_ids, confidences, 
         h = box[3]
         _draw_prediction(image, class_ids[i], confidences[i], round(x), round(y), round(x + w), round(y + h))
 
-    cv2.imwrite("output/{}".format(image_path), image)
+    cv2.imwrite("output/yolov3{}".format(image_path), image)
     cv2.waitKey()
     cv2.destroyAllWindows()
 
@@ -91,7 +91,7 @@ def _create_temp_dataset(image, boxes, image_path, indices):
     # cv2.imshow("cropped", cropped_image)
     # cv2.waitKey()
     # cv2.destroyAllWindows()
-    cv2.imwrite("output/{}".format(image_path), cropped_image)
+    # cv2.imwrite("output/{}".format(image_path), cropped_image)
 
 
 def calculate_area(box):
