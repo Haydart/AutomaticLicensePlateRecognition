@@ -82,6 +82,8 @@ ipython_config.py
 # pyenv
 .python-version
 
+*.weights
+
 # celery beat schedule file
 celerybeat-schedule
 

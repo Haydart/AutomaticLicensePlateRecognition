@@ -1,9 +1,11 @@
+import os
+
 import cv2
 import numpy as np
 
 from utils import load_image
 
-classes = None
+classes = [line.strip() for line in open("yolo_suite/classes.txt", 'r').readlines()]
 COLORS = np.random.uniform(0, 255, size=(len(classes), 3))
 
 
@@ -13,21 +15,11 @@ def _get_output_layers(net):
     return output_layers
 
 
-def _draw_prediction(img, class_id, confidence, x, y, x_plus_w, y_plus_h):
-    label = '{} {}'.format(str(classes[class_id]), confidence)
-    color = COLORS[class_id]
-    cv2.rectangle(img, (x, y), (x_plus_w, y_plus_h), color, 2)
-    cv2.putText(img, label, (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
-
-
 def detect_vehicles(image_path):
     image = load_image(image_path)
     image_width = image.shape[1]
     image_height = image.shape[0]
     scale = 0.00392
-
-    with open("yolo_suite/detection_classes", 'r') as classes_file:
-        classes = [line.strip() for line in classes_file.readlines()]
 
     net = cv2.dnn.readNet("yolo_suite/yolov3.weights", "yolo_suite/yolov3.cfg")
     blob = cv2.dnn.blobFromImage(image, scale, (416, 416), (0, 0, 0), True, crop=False)
@@ -57,6 +49,11 @@ def detect_vehicles(image_path):
 
     indices = cv2.dnn.NMSBoxes(boxes, confidences, confidence_threshold, nms_threshold)
 
+    _show_and_save_detected_vehicles_predictions(boxes, class_ids, confidences, image, image_path, indices)
+    # _create_temp_dataset(image, boxes, image_path, indices)
+
+
+def _show_and_save_detected_vehicles_predictions(boxes, class_ids, confidences, image, image_path, indices):
     for i in indices:
         i = i[0]
         box = boxes[i]
@@ -66,14 +63,42 @@ def detect_vehicles(image_path):
         h = box[3]
         _draw_prediction(image, class_ids[i], confidences[i], round(x), round(y), round(x + w), round(y + h))
 
-    cv2.imshow("object detection", image)
+    cv2.imwrite("output/yolov3{}".format(image_path), image)
     cv2.waitKey()
-
-    cv2.imwrite("object-detection.jpg", image)
     cv2.destroyAllWindows()
 
 
+def _draw_prediction(image, class_id, confidence, x, y, x_plus_w, y_plus_h):
+    if class_id < len(classes):
+        class_name = str(classes[class_id])
+        label = '{} {}'.format(class_name, confidence)
+        color = COLORS[class_id]
+        cv2.rectangle(image, (x, y), (x_plus_w, y_plus_h), color, 2)
+        cv2.putText(image, label, (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+
+
+def _create_temp_dataset(image, boxes, image_path, indices):
+    boxes_areas = [calculate_area(box) for box in boxes]
+    largest_box_index = np.argmax(boxes_areas)
+    box = boxes[largest_box_index]
+
+    x = int(max(box[0], 0))
+    y = int(max(box[1], 0))
+    w = int(abs(box[2]))
+    h = int(abs(box[3]))
+
+    cropped_image = image[y: y + h, x: x + w]
+    # cv2.imshow("cropped", cropped_image)
+    # cv2.waitKey()
+    # cv2.destroyAllWindows()
+    # cv2.imwrite("output/{}".format(image_path), cropped_image)
+
+
+def calculate_area(box):
+    return box[2] * box[3]
+
+
 if __name__ == '__main__':
-    detect_vehicles("dataset/track001.png")
->> >> >> > Stashed
-changes
+    for index, file_name in enumerate(os.listdir("dataset/UFPR-ALPR-snapshots"), 1):
+        print("Processing image {}: {}".format(index, file_name))
+        detect_vehicles("dataset/UFPR-ALPR-snapshots/{}".format(file_name))
