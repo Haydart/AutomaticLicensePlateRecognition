@@ -76,8 +76,8 @@ class BasicTransforms:
             lower_mask = np.array([10, 100, 100])  # Yellow
             upper_mask = np.array([60, 255, 255])  # Yellow
         elif color == 'green':
-            lower_mask = np.array([0, 100, 50])    # Green
-            upper_mask = np.array([100, 255, 255]) # Green
+            lower_mask = np.array([73, 100, 100])    # Green
+            upper_mask = np.array([93, 255, 255]) # Green
         elif color == 'red':
             lower_mask = np.array([0, 30, 60])  # Red
             upper_mask = np.array([10, 120, 100])  # Red
@@ -123,6 +123,7 @@ class AdvancedTransforms:
 
     def color_mask_method(self, image):
         # image = self.transforms.color_mask(copy(image), 'yellow')
-        image = self.transforms.color_mask(copy(image), 'red')
+        # image = self.transforms.color_mask(copy(image), 'red')
+        image = self.transforms.color_mask(copy(image), 'green')
         # image = self.preprocess(image)
         return image
