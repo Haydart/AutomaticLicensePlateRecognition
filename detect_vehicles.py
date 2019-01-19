@@ -4,7 +4,7 @@ import numpy as np
 from utils import load_image
 
 classes = None
-COLORS = np.random.uniform(0, 255, size=(len(classes), 3))
+COLORS = np.random.uniform(0, 255, size=(4, 3))
 
 
 def _get_output_layers(net):
@@ -75,5 +75,3 @@ def detect_vehicles(image_path):
 
 if __name__ == '__main__':
     detect_vehicles("dataset/track001.png")
->> >> >> > Stashed
-changes
