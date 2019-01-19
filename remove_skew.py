@@ -73,7 +73,7 @@ def four_point_transform(image, points):
 
 
 def process():
-    image = load_image('skewed_trimmed_samples/skewed_002.jpg')
+    image = load_image('skewed_trimmed_samples/skewed_003.jpg')
     gray_image = gray_scale(image)
 
     ret, binarized_image = cv2.threshold(gray_image, 175, 255, cv2.THRESH_BINARY)

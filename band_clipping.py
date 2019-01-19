@@ -1,8 +1,9 @@
-import utils
 import math
+
 import numpy as np
 from scipy import signal
 
+import utils
 
 mask_0 = [1, 3, 5, 7, 5, 9, 3, 1]
 mask_1 = [1, 5, 9, 12, 15, 12, 9, 5, 1]
@@ -55,7 +56,7 @@ class BindsFinder:
         # before = y_projection = y_projection / np.max(y_projection)
         y_projection = signal.convolve(y_projection, self.mask, mode='same')
 
-        # utils.plot_histograms(before, y_projection, str(self.mask[0:5]))
+        utils.plot_histograms(before, y_projection, str(self.mask[0:5]))
 
         bands = []
         projection = np.copy(y_projection)

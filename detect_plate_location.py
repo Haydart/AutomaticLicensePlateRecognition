@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
     vertical_image = sobel_vertical_edge_detection(noise_removed_image)
     skeletonized_vertical_edges_image = skeletonization(vertical_image)
-    plot_image(skeletonized_vertical_edges_image, 6, 'Vertical Sobel after bilateral')
+    plot_image(skeletonized_vertical_edges_image, 6, 'Vertical Sobel after bilateral', fix_colors=False)
 
     histogram_equalized_image = histogram_equalization(noise_removed_image)
     plot_image(histogram_equalized_image, 7, 'Histogram equalization')
