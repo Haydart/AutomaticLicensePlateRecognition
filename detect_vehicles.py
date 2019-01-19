@@ -26,7 +26,7 @@ def detect_vehicles(image_path):
     image_height = image.shape[0]
     scale = 0.00392
 
-    with open("yolo_suite/detection_classes", 'r') as classes_file:
+    with open("yolo_suite/detection_classes.txt", 'r') as classes_file:
         classes = [line.strip() for line in classes_file.readlines()]
 
     net = cv2.dnn.readNet("yolo_suite/yolov3.weights", "yolo_suite/yolov3.cfg")
