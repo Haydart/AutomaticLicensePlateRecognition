@@ -37,15 +37,19 @@ def process(image):
 
     # image_sobel_method_vertical, image_sobel_method_horizontal = model.skeletonized_sobel_method(copy(image_work))
     # image_opening_method = model.opening_method(copy(image_work))
-    image_color_method = model.color_mask_method(copy(image))
-
-    # image_sobel = BasicTransforms.sobel_vertical_edge_detection(image_color_method)
-    # import utils
-    # utils.show_one_image(image_sobel)
+    images_color_method = model.color_mask_method(copy(image))
 
     # sobel_candidates = bc.find_candidates(bc.sobel_method, image_sobel_method_vertical, image_sobel_method_horizontal)
     # opening_candidates = bc.find_candidates(bc.opening_method, image_opening_method)
-    color_candidates = bc.find_candidates(bc.color_method, image_color_method)
+
+    color_candidates = []
+    for image_color in images_color_method:
+        try:
+            print(color_candidates)
+            candidates = bc.find_candidates(bc.color_method, image_color)
+            color_candidates.extend(candidates)
+        except ValueError:
+            continue
 
     candidates = Candidates(
         # sobel_candidates=sobel_candidates,

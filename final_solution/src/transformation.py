@@ -76,10 +76,10 @@ class BasicTransforms:
             lower_mask = np.array([10, 100, 100])  # Yellow
             upper_mask = np.array([60, 255, 255])  # Yellow
         elif color == 'green':
-            lower_mask = np.array([73, 100, 100])    # Green
-            upper_mask = np.array([93, 255, 255]) # Green
+            lower_mask = np.array([73, 100, 100])  # Green
+            upper_mask = np.array([93, 255, 255])  # Green
         elif color == 'red':
-            lower_mask = np.array([0, 30, 60])  # Red
+            lower_mask = np.array([0, 30, 60])     # Red
             upper_mask = np.array([10, 120, 100])  # Red
         elif color == 'blue':
             lower_mask = np.array([20, 100, 100])  # Blue
@@ -88,10 +88,6 @@ class BasicTransforms:
             raise Exception('Specified color not supported')
 
         mask = cv2.inRange(image_hsv, lower_mask, upper_mask)
-        image_masked = cv2.bitwise_and(image, image, mask=mask)
-        import utils
-        # utils.show_results(image_hsv, mask, image_masked, cv2.cvtColor(image_masked, cv2.COLOR_HSV2BGR))
-        utils.show_one_image(mask)
         return mask
 
 
@@ -122,8 +118,8 @@ class AdvancedTransforms:
         return image
 
     def color_mask_method(self, image):
-        # image = self.transforms.color_mask(copy(image), 'yellow')
-        # image = self.transforms.color_mask(copy(image), 'red')
-        image = self.transforms.color_mask(copy(image), 'green')
-        # image = self.preprocess(image)
-        return image
+        image_yellow = self.transforms.color_mask(copy(image), 'yellow')
+        image_red = self.transforms.color_mask(copy(image), 'red')
+        image_green = self.transforms.color_mask(copy(image), 'green')
+        # image = self.transforms.color_mask(copy(image), 'blue')
+        return [image_yellow, image_green, image_red]
