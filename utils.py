@@ -63,6 +63,10 @@ def histogram_equalization(image):
     return cv2.equalizeHist(image)
 
 
+def contrast_bump(image, alpha=2, beta=50):
+    return cv2.addWeighted(image, alpha, np.zeros(image.shape, image.dtype), 0, beta)
+
+
 def morphological_opening(image, kernel_size=(3, 3), iterations=15):
     opening_mask = cv2.getStructuringElement(cv2.MORPH_RECT, kernel_size)
     opening_image = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel=opening_mask, iterations=iterations)

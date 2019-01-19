@@ -67,11 +67,12 @@ def detect_vehicles(image_path):
         h = box[3]
         _draw_prediction(image, class_ids[i], confidences[i], round(x), round(y), round(x + w), round(y + h))
 
-    cv2.imshow("object detection", image)
-    cv2.imwrite("object-detection.jpg", image)
+    # cv2.imshow("object detection", image)
+    cv2.imwrite("output/{}".format(image_path), image)
     cv2.waitKey()
     cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':
-    detect_vehicles("dataset/track001.png")
+    for i in range(20):
+        detect_vehicles("dataset/track{}.png".format(i + 1))
