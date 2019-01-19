@@ -1,8 +1,10 @@
 import sys
 import argparse
+
 import final_solution.src.input_output as io
 import final_solution.src.band_clipping as bc
 import final_solution.src.boundings as bb
+import final_solution.src.vehicles_detection as vd
 
 
 from copy import copy
@@ -71,7 +73,10 @@ def main(argv):
 
     img_loader = io.ImageLoader()
     img_saver = io.ImageSaver(args.output_dir)
+
+    vehicle_detector = vd.VehiclesDetector()
     for image in img_loader.load_images(args.input_dir):
+        image.image = vehicle_detector.detect_vehicles(image.image)
         candidates = process(image.image)
         image_boxes = bounding_box(image.image, candidates)
 

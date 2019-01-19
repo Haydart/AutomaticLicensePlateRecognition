@@ -127,7 +127,6 @@ class AdvancedTransforms:
         # image_red = self.transforms.sobel_vertical_edge_detection(image_red)
         # image_green = self.transforms.sobel_vertical_edge_detection(image_green)
 
-        import utils
-        utils.show_results(image_yellow, image_red, image_green)
+
 
         return [image_yellow, image_green, image_red]
