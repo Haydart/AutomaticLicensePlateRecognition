@@ -1,6 +1,7 @@
 import sys
 import argparse
-
+import final_solution.input_output as io
+# from .input_output import ImageLoader
 
 def parse():
     parser = argparse.ArgumentParser()
@@ -13,6 +14,10 @@ def parse():
 
 def main(argv):
     args = parse()
+
+    img_loader = io.ImageLoader()
+    for image in img_loader.load_images(args.input_dir):
+        print(image)
 
 
 if __name__ == '__main__':
