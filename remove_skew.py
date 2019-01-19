@@ -73,7 +73,7 @@ def four_point_transform(image, points):
 
 
 def process():
-    image = load_image('skewed_trimmed_samples/skewed_003.jpg')
+    image = load_image('skewed_trimmed_samples/skewed_007.jpg')
     gray_image = gray_scale(image)
 
     ret, binarized_image = cv2.threshold(gray_image, 175, 255, cv2.THRESH_BINARY)
@@ -85,7 +85,7 @@ def process():
     polygon_flat_list = [item for sublist in result_polygon for item in sublist]
     plate_corners_list = [(arr[0], arr[1]) for arr in polygon_flat_list]
 
-    deskewed_image = four_point_transform(image, np.array(plate_corners_list))
+    deskewed_image = four_point_transform(gray_image, np.array(plate_corners_list))
     draw_plate_polygons(image, result_polygon)
 
     cv2.imshow("Grayscale", gray_image)
