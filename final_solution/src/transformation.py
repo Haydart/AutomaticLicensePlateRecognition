@@ -79,8 +79,8 @@ class BasicTransforms:
             lower_mask = np.array([73, 100, 100])  # Green
             upper_mask = np.array([93, 255, 255])  # Green
         elif color == 'red':
-            lower_mask = np.array([0, 30, 60])     # Red
-            upper_mask = np.array([10, 120, 100])  # Red
+            lower_mask = np.array([162, 40, 10])     # Red
+            upper_mask = np.array([180, 140, 110])  # Red
         elif color == 'blue':
             lower_mask = np.array([20, 100, 100])  # Blue
             upper_mask = np.array([30, 255, 255])  # Blue
@@ -118,15 +118,17 @@ class AdvancedTransforms:
         return image
 
     def color_mask_method(self, image):
-        image_yellow = self.transforms.color_mask(copy(image), 'yellow')
+        # image_yellow = self.transforms.color_mask(copy(image), 'yellow')
         image_red = self.transforms.color_mask(copy(image), 'red')
-        image_green = self.transforms.color_mask(copy(image), 'green')
+        # image_green = self.transforms.color_mask(copy(image), 'green')
         # image = self.transforms.color_mask(copy(image), 'blue')
 
         # image_yellow = self.transforms.sobel_vertical_edge_detection(image_yellow)
         # image_red = self.transforms.sobel_vertical_edge_detection(image_red)
         # image_green = self.transforms.sobel_vertical_edge_detection(image_green)
 
+        import utils
+        utils.show_one_image(image_red)
 
-
-        return [image_yellow, image_green, image_red]
+        return [ image_red]
+        # return [image_yellow, image_green, image_red]

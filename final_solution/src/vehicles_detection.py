@@ -53,23 +53,21 @@ class VehiclesDetector:
                     boxes.append([x, y, w, h])
 
         indices = cv2.dnn.NMSBoxes(boxes, confidences, confidence_threshold, nms_threshold)
-        print(indices)
-        bands = []
+        images = []
         for i in indices:
             i = i[0]
             if class_ids[i] < len(self.classes):
                 box = boxes[i]
-                x = box[0]
-                y = box[1]
-                w = box[2]
-                h = box[3]
+                x = int(max(box[0], 0))
+                y = int(max(box[1], 0))
+                w = int(abs(box[2]))
+                h = int(abs(box[3]))
 
                 y0 = round(y)
                 y1 = round(y + h)
                 x0 = round(x)
                 x1 = round(x + w)
-                bands.append((y0, y1, x0, x1))
-                return image[y0:y1,x0:x1]
-                break
+                print(y0, y1, x0, x1)
+                images.append(image[y0:y1,x0:x1])
 
-        return bands
+        return images

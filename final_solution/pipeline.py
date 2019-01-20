@@ -37,12 +37,12 @@ def process(image):
     model = AdvancedTransforms()
     image_work = model.preprocess(image_work)
 
-    image_sobel_method_vertical, image_sobel_method_horizontal = model.skeletonized_sobel_method(copy(image_work))
-    image_opening_method = model.opening_method(copy(image_work))
+    # image_sobel_method_vertical, image_sobel_method_horizontal = model.skeletonized_sobel_method(copy(image_work))
+    # image_opening_method = model.opening_method(copy(image_work))
     images_color_method = model.color_mask_method(copy(image))
 
-    sobel_candidates = bc.find_candidates(bc.sobel_method, image_sobel_method_vertical, image_sobel_method_horizontal)
-    opening_candidates = bc.find_candidates(bc.opening_method, image_opening_method)
+    # sobel_candidates = bc.find_candidates(bc.sobel_method, image_sobel_method_vertical, image_sobel_method_horizontal)
+    # opening_candidates = bc.find_candidates(bc.opening_method, image_opening_method)
 
     color_candidates = []
     for image_color in images_color_method:
@@ -53,11 +53,11 @@ def process(image):
             continue
 
     candidates = Candidates(
-        sobel_candidates=sobel_candidates,
-        opening_candidates=opening_candidates,
+        # sobel_candidates=sobel_candidates,
+        # opening_candidates=opening_candidates,
         color_candidtes=color_candidates
     )
-
+    print(candidates.color_candidates)
     return candidates
 
 
@@ -76,12 +76,13 @@ def main(argv):
 
     vehicle_detector = vd.VehiclesDetector()
     for image in img_loader.load_images(args.input_dir):
-        image.image = vehicle_detector.detect_vehicles(image.image)
-        candidates = process(image.image)
-        image_boxes = bounding_box(image.image, candidates)
+        # for sub_image in vehicle_detector.detect_vehicles(image.image):
+        #     image.image = sub_image
+            candidates = process(image.image)
+            image_boxes = bounding_box(image.image, candidates)
 
-        image.image = image_boxes
-        img_saver.save_image(image)
+            image.image = image_boxes
+            img_saver.save_image(image)
 
 
 if __name__ == '__main__':
