@@ -12,7 +12,7 @@ class ImageDisplayHelper:
         self.subplot_width = subplot_width
         self.subplot_height = subplot_height
 
-    def subplot_image(self, image, subplot_index, title='', fix_colors=True):
+    def add_to_plot(self, image, subplot_index, title='', fix_colors=True):
         plt.subplot(self.subplot_height, self.subplot_width, subplot_index)
 
         if fix_colors:

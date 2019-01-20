@@ -3,7 +3,7 @@ import sys
 from copy import copy
 
 import util.band_clipping as bc
-import util.boundings as bb
+import util.bounding_boxes as bb
 import util.input_output as io
 from main_pipeline.candidates import Candidates
 from util.pipeline_transformations import PipelineTransformations

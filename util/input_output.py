@@ -1,4 +1,3 @@
-import glob
 import os
 
 import cv2
@@ -12,17 +11,6 @@ class Image:
 
 
 class ImageLoader:
-    """Loads images from source file.
-
-    Args:
-        file_extension (list): List of file extensions strings to be loaded
-    """
-
-    def __init__(self, file_extension=None):
-        if file_extension is None:
-            file_extension = ['jpg', 'jpeg', 'png']
-        self.file_extension = file_extension
-        self.patterns = ['*.{}'.format(ext) for ext in self.file_extension]
 
     def load_images(self, source_path):
         """
@@ -32,23 +20,14 @@ class ImageLoader:
         :return: image: Image
         """
 
-        for file in self.__get_all_paths(source_path):
-            yield Image(
-                image=self.__load_image(file),
-                path=file
-            )
-
-    def __get_all_paths(self, source_path):
-        paths = ['{}{}'.format(source_path, pattern) for pattern in self.patterns]
-
-        files = []
-        for path in paths:
-            files.extend(glob.glob(path))
-
-        return files
-
-    def __load_image(self, file):
-        return cv2.imread(file)
+        for filename in os.listdir(source_path):
+            if any(extension in filename for extension in [".jpg", ".jpeg", ".png"]):
+                relative_path = "{}/{}".format(source_path, filename)
+                image = cv2.imread(relative_path)
+                yield Image(
+                    image=image,
+                    path=filename
+                )
 
 
 class ImageSaver:
@@ -57,6 +36,8 @@ class ImageSaver:
         self.path = path
 
     def save_image(self, image):
+        cv2.imshow("SOMETHING", image)
+        cv2.waitKey()
         path = self.__make_save_path(image.path)
         cv2.imwrite(path, image.image)
         print('Image saved at:' + path)
