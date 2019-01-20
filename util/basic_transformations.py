@@ -4,8 +4,8 @@ import numpy as np
 
 class BasicTransformations:
 
-    def __init__(self, debug_pipeline):
-        self.pipeline_debug_enabled = debug_pipeline
+    def __init__(self, display_helper):
+        self.display_helper = display_helper
 
     def gray_scale(self, image):
         return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
