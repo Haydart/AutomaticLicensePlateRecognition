@@ -10,7 +10,7 @@ class Image:
         self.path = path
 
 
-class ImageLoader:
+class BatchImageLoader:
 
     def load_images(self, source_path):
         """

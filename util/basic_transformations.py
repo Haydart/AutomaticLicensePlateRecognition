@@ -16,6 +16,12 @@ class BasicTransformations:
     def histogram_equalization(self, image):
         return cv2.equalizeHist(image)
 
+    def contrast_brightness(self, image, alpha=2, beta=50):
+        return cv2.addWeighted(image, alpha, np.zeros(image.shape, image.dtype), 0, beta)
+
+    def canny_edge_detection(self, image, low_thresh=170, high_thresh=200):
+        return cv2.Canny(image, low_thresh, high_thresh)
+
     def sobel_vertical_edge_detection(self, image):
         vertical_image = cv2.Sobel(image, cv2.CV_32F, 1, 0, ksize=3)
         return self.normalize_sobel_to_cv8u(vertical_image)
@@ -34,11 +40,15 @@ class BasicTransformations:
         _, threshed = cv2.threshold(image, thresh, 255, cv2.THRESH_BINARY)
         return threshed
 
+    def otsu_threshold(self, image):
+        _, threshed = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        return threshed
+
     def skeletonize(self, image):
         size = np.size(image)
         skeleton = np.zeros(image.shape, np.uint8)
 
-        image = self.binary_threshold(image, 140)
+        image = self.otsu_threshold(image)
 
         element = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 3))
         done = False
@@ -60,6 +70,14 @@ class BasicTransformations:
         opening_mask = cv2.getStructuringElement(cv2.MORPH_RECT, kernel_size)
         opening_image = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel=opening_mask, iterations=iterations)
         return cv2.subtract(image, opening_image)
+
+    def morphological_closing(self, image, kernel_size=(3, 3), iterations=6):
+        kernel = np.ones(kernel_size, np.uint8)
+        return cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel, iterations=iterations)
+
+    def erosion(self, image, kernel_size=(3, 3), iterations=1):
+        kernel_size = np.ones(kernel_size, np.uint8)
+        return cv2.erode(image, kernel_size, iterations=iterations)
 
     def color_mask(self, image, color):
         image_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)

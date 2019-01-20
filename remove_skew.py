@@ -1,16 +1,10 @@
 from random import randint
-import cv2
+
 import numpy as np
 
-
-def morphological_closing(image, kernel_size=(3, 3), iterations=6):
-    kernel = np.ones(kernel_size, np.uint8)
-    return cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel, iterations=iterations)
-
-
-def erosion(image, kernel_size=(3, 3), iterations=1):
-    kernel_size = np.ones(kernel_size, np.uint8)
-    return cv2.erode(image, kernel_size, iterations=iterations)
+from util.basic_transformations import BasicTransformations
+from util.image_display_helper import ImageDisplayHelper
+from util.input_output import *
 
 
 def find_plate_contour(preprocessed_image, original_image):
@@ -83,9 +77,12 @@ def four_point_transform(image, points):
 
 
 def process(image_path):
-    image = load_image(image_path)
-    gray_image = gray_scale(image)
-    contrast_bumped_image = contrast_bump(gray_image, alpha=2, beta=50)
+    display = ImageDisplayHelper(True, 2, 5)
+    bt = BasicTransformations(display)
+
+    image = cv2.imread(image_path)
+    gray_image = bt.gray_scale(image_path)
+    contrast_bumped_image = bt.contrast_brightness(gray_image, alpha=2, beta=50)
 
     binarized_image = otsu_threshold(gray_image)
     eroded_image = erosion(binarized_image)

@@ -12,7 +12,7 @@ from util.pipeline_transformations import PipelineTransformations
 def main(argv):
     args = parse()
 
-    img_loader = io.ImageLoader()
+    img_loader = io.BatchImageLoader()
     img_saver = io.ImageSaver(args.output_dir)
 
     for image in img_loader.load_images(args.input_dir):
