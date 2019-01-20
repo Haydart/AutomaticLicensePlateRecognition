@@ -5,7 +5,7 @@ from copy import copy
 import util.band_clipping as bc
 import util.boundings as bb
 import util.input_output as io
-from util.pipeline_transformations import TransformationPipeline
+from util.pipeline_transformations import PipelineTransformations
 
 
 class Candidates:
@@ -37,7 +37,7 @@ def parse():
 
 def process(image):
     working_image = copy(image)
-    transformations = TransformationPipeline()
+    transformations = PipelineTransformations(debug_pipeline=True)
     working_image = transformations.preprocess(working_image)
 
     vert_sobel_image, hor_sobel_image = transformations.apply_skeletonized_sobel(copy(working_image))

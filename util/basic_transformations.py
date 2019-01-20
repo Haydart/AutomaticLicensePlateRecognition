@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 
-class BasicTransforms:
+class BasicTransformations:
 
     def __init__(self, debug_pipeline):
         self.pipeline_debug_enabled = debug_pipeline

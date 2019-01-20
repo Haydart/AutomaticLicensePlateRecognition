@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 from datasets import DatasetsProvider, sample
-from util.band_clipping import BindsFinder
+from util.band_clipping import BandsFinder
 
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
@@ -21,7 +21,7 @@ def show_bounds(img, band, color):
 def canny_method(image):
     canny_image = canny_edge_detection(image)
 
-    bf = BindsFinder(canny_image)
+    bf = BandsFinder(canny_image)
     bands = bf.find_bands()
 
     return bands
@@ -63,7 +63,7 @@ def process():
     vertical_sobel = sobel_vertical_edge_detection(noise_removed_image)
     vertical_sobel_skeleton, vertical_sobel_thresh = skeletonization(vertical_sobel)
 
-    bf = BindsFinder(horizontal_sobel_skeleton)
+    bf = BandsFinder(horizontal_sobel_skeleton)
     bands = bf.find_bands()
 
     for band in bands:

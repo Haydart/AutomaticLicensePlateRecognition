@@ -14,7 +14,7 @@ mask_7 = [2, 5, 8, 16, 20, 24, 30, 37, 30, 24, 20, 16, 8, 5, 2]
 mask_8 = [2, 5, 8, 16, 20, 24, 30, 37, 42, 37, 30, 24, 20, 16, 8, 5, 2]
 
 
-class BindsFinder:
+class BandsFinder:
 
     def __init__(self, image):
         self.image = np.array(image / np.max(image))
@@ -165,7 +165,7 @@ color_method = 'color'
 
 
 def find_candidates(method, *image):
-    bf = BindsFinder(image[0])
+    bf = BandsFinder(image[0])
 
     if method == sobel_method:
         bands = bf.find_bands(image[1])

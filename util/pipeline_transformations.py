@@ -1,15 +1,14 @@
 from copy import copy
 
-from util.basic_transformations import BasicTransforms
+from util.basic_transformations import BasicTransformations
 
 
-class TransformationPipeline:
+class PipelineTransformations:
+    basic_transformations = None
     pipeline_debug_enabled = False
 
-    def __init__(self, transforms=BasicTransforms):
-        self.basic_transformations = transforms
-
     def __init__(self, debug_pipeline):
+        self.basic_transformations = BasicTransformations()
         self.pipeline_debug_enabled = debug_pipeline
 
     def preprocess(self, image):
