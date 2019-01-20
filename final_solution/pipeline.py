@@ -1,17 +1,22 @@
-import sys
 import argparse
-import final_solution.src.input_output as io
+import sys
+from copy import copy
+
 import final_solution.src.band_clipping as bc
 import final_solution.src.boundings as bb
-
-
-from copy import copy
-from final_solution.src.transformation import AdvancedTransforms, BasicTransforms
+import final_solution.src.input_output as io
+from final_solution.src.transformation import AdvancedTransformations
 
 
 class Candidates:
 
-    def __init__(self, sobel_candidates=[], opening_candidates=[], color_candidtes=[]):
+    def __init__(self, sobel_candidates=None, opening_candidates=None, color_candidtes=None):
+        if color_candidtes is None:
+            color_candidtes = []
+        if opening_candidates is None:
+            opening_candidates = []
+        if sobel_candidates is None:
+            sobel_candidates = []
         self.sobel_candidates = sobel_candidates
         self.opening_candidates = opening_candidates
         self.color_candidates = color_candidtes
@@ -31,15 +36,15 @@ def parse():
 
 
 def process(image):
-    image_work = copy(image)
-    model = AdvancedTransforms()
-    image_work = model.preprocess(image_work)
+    working_image = copy(image)
+    transformations = AdvancedTransformations()
+    working_image = transformations.preprocess(working_image)
 
-    image_sobel_method_vertical, image_sobel_method_horizontal = model.skeletonized_sobel_method(copy(image_work))
-    image_opening_method = model.opening_method(copy(image_work))
-    images_color_method = model.color_mask_method(copy(image))
+    vert_sobel_image, hor_sobel_image = transformations.skeletonized_sobel_method(copy(working_image))
+    image_opening_method = transformations.opening_method(copy(working_image))
+    images_color_method = transformations.color_mask_method(copy(image))
 
-    sobel_candidates = bc.find_candidates(bc.sobel_method, image_sobel_method_vertical, image_sobel_method_horizontal)
+    sobel_candidates = bc.find_candidates(bc.sobel_method, vert_sobel_image, hor_sobel_image)
     opening_candidates = bc.find_candidates(bc.opening_method, image_opening_method)
 
     color_candidates = []
@@ -65,6 +70,7 @@ def bounding_box(image, candidates):
     image_boxes = bb.apply_bounding_boxes(image_boxes, candidates.opening_candidates, bb.RED)
     image_boxes = bb.apply_bounding_boxes(image_boxes, candidates.color_candidates, bb.BLUE)
     return image_boxes
+
 
 def main(argv):
     args = parse()

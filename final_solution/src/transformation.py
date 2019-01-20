@@ -1,6 +1,7 @@
+from copy import copy
+
 import cv2
 import numpy as np
-from copy import copy
 
 
 class BasicTransforms:
@@ -11,7 +12,7 @@ class BasicTransforms:
 
     @staticmethod
     def bilateral_filter(image):
-        return cv2.bilateralFilter(image, 32, 40, 40)
+        return cv2.bilateralFilter(image, 16, 24, 24)
 
     @staticmethod
     def histogram_equalization(image):
@@ -79,7 +80,7 @@ class BasicTransforms:
             lower_mask = np.array([73, 100, 100])  # Green
             upper_mask = np.array([93, 255, 255])  # Green
         elif color == 'red':
-            lower_mask = np.array([0, 30, 60])     # Red
+            lower_mask = np.array([0, 30, 60])  # Red
             upper_mask = np.array([10, 120, 100])  # Red
         elif color == 'blue':
             lower_mask = np.array([20, 100, 100])  # Blue
@@ -91,8 +92,7 @@ class BasicTransforms:
         return mask
 
 
-
-class AdvancedTransforms:
+class AdvancedTransformations:
 
     def __init__(self, transforms=BasicTransforms):
         self.transforms = transforms
