@@ -56,7 +56,7 @@ def gray_scale(image):
 
 
 def bilateral_filter(image):
-    return cv2.bilateralFilter(image, 32, 40, 40)
+    return cv2.bilateralFilter(image, 16, 32, 32)
 
 
 def histogram_equalization(image):
@@ -109,12 +109,17 @@ def binary_threshold(image, thresh):
     return threshed
 
 
+def otsu_threshold(image):
+    _, threshed = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    return threshed
+
+
 def skeletonization(image):
     size = np.size(image)
     skeleton = np.zeros(image.shape, np.uint8)
 
     # img = cv2.adaptiveThreshold(image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 21, 10)
-    img = binary_threshold(image, 140)
+    img = otsu_threshold(image)
     sobel_thresh = img
 
     element = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 3))

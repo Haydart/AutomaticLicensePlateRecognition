@@ -1,7 +1,7 @@
 from utils import *
 
 if __name__ == '__main__':
-    image = load_image('./license_plate_snapshots/test_079.jpg')
+    image = load_image('dataset/license_plate_snapshots/test_079.jpg')
     # image = imutils.resize(image, width=512)
 
     grayscale_image = gray_scale(image)
@@ -16,7 +16,7 @@ if __name__ == '__main__':
     plot_image(noise_removed_image, 5, 'Bilateral filtering BGR', fix_colors=False)
 
     vertical_image = sobel_vertical_edge_detection(noise_removed_image)
-    skeletonized_vertical_edges_image = skeletonization(vertical_image)
+    skeletonized_vertical_edges_image, _ = skeletonization(vertical_image)
     plot_image(skeletonized_vertical_edges_image, 6, 'Vertical Sobel after bilateral', fix_colors=False)
 
     histogram_equalized_image = histogram_equalization(noise_removed_image)
