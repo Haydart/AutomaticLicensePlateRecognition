@@ -9,15 +9,17 @@ if __name__ == '__main__':
     plot_image(grayscale_image, 1, 'Original image grayscale')
     plot_image(grayscale_image, 2, 'Original image grayscale BGR', fix_colors=False)
 
-    plot_image(canny_edge_detection(grayscale_image), 3, 'Canny on original image')
+    vertical_image = sobel_vertical_edge_detection(grayscale_image)
+    skeletonized_image, _ = skeletonization(vertical_image)
+    plot_image(skeletonized_image, 3, 'Vertical Sobel -> skeletonization')
+
     noise_removed_image = bilateral_filter(grayscale_image)
     plot_image(noise_removed_image, 4, 'Bilateral filtering')
-    noise_removed_image = bilateral_filter(grayscale_image)
     plot_image(noise_removed_image, 5, 'Bilateral filtering BGR', fix_colors=False)
 
     vertical_image = sobel_vertical_edge_detection(noise_removed_image)
     skeletonized_vertical_edges_image, _ = skeletonization(vertical_image)
-    plot_image(skeletonized_vertical_edges_image, 6, 'Vertical Sobel after bilateral', fix_colors=False)
+    plot_image(skeletonized_vertical_edges_image, 6, 'bilateral -> VSobel -> skeleton')
 
     histogram_equalized_image = histogram_equalization(noise_removed_image)
     plot_image(histogram_equalized_image, 7, 'Histogram equalization')
