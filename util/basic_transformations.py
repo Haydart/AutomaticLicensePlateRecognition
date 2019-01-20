@@ -8,29 +8,43 @@ class BasicTransformations:
         self.display_helper = display_helper
 
     def gray_scale(self, image):
-        return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        self.display_helper.add_to_plot(self, image, title='Grayscale', fix_colors=True)
+        return image
 
     def bilateral_filter(self, image):
-        return cv2.bilateralFilter(image, 16, 24, 24)
+        image = cv2.bilateralFilter(image, 16, 24, 24)
+        self.display_helper.add_to_plot(self, image, title='Bilateral', fix_colors=True)
+        return image
 
     def histogram_equalization(self, image):
-        return cv2.equalizeHist(image)
+        image = cv2.equalizeHist(image)
+        self.display_helper.add_to_plot(self, image, title='Hist equalization', fix_colors=True)
+        return image
 
     def contrast_brightness(self, image, alpha=2, beta=50):
-        return cv2.addWeighted(image, alpha, np.zeros(image.shape, image.dtype), 0, beta)
+        image = cv2.addWeighted(image, alpha, np.zeros(image.shape, image.dtype), 0, beta)
+        self.display_helper.add_to_plot(self, image, title='Contrast-brightness', fix_colors=True)
+        return image
 
     def canny_edge_detection(self, image, low_thresh=170, high_thresh=200):
-        return cv2.Canny(image, low_thresh, high_thresh)
+        image = cv2.Canny(image, low_thresh, high_thresh)
+        self.display_helper.add_to_plot(self, image, title='Canny', fix_colors=True)
+        return image
 
     def sobel_vertical_edge_detection(self, image):
         vertical_image = cv2.Sobel(image, cv2.CV_32F, 1, 0, ksize=3)
-        return self.normalize_sobel_to_cv8u(vertical_image)
+        image = self._normalize_sobel_to_cv8u(vertical_image)
+        self.display_helper.add_to_plot(self, image, title='Canny', fix_colors=True)
+        return image
 
     def sobel_horizontal_edge_detection(self, image):
         horizontal_image = cv2.Sobel(image, cv2.CV_32F, 0, 1, ksize=3)
-        return self.normalize_sobel_to_cv8u(horizontal_image)
+        image = self._normalize_sobel_to_cv8u(horizontal_image)
+        self.display_helper.add_to_plot(self, image, title='Canny', fix_colors=True)
+        return image
 
-    def normalize_sobel_to_cv8u(self, sobel_image):
+    def _normalize_sobel_to_cv8u(self, sobel_image):
         sobelx_64f = sobel_image - np.min(sobel_image)  # to have only positive values
         div = np.max(sobelx_64f) / 255  # calculate the normalize divisor
         sobel_8u = np.uint8(sobelx_64f / div)
@@ -38,15 +52,17 @@ class BasicTransformations:
 
     def binary_threshold(self, image, thresh):
         _, threshed = cv2.threshold(image, thresh, 255, cv2.THRESH_BINARY)
+        self.display_helper.add_to_plot(self, threshed, title='Binary threshold', fix_colors=True)
         return threshed
 
     def otsu_threshold(self, image):
         _, threshed = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        self.display_helper.add_to_plot(self, threshed, title='Otsu threshold', fix_colors=True)
         return threshed
 
     def skeletonize(self, image):
         size = np.size(image)
-        skeleton = np.zeros(image.shape, np.uint8)
+        skeletonized = np.zeros(image.shape, np.uint8)
 
         image = self.otsu_threshold(image)
 
@@ -57,26 +73,32 @@ class BasicTransformations:
             eroded = cv2.erode(image, element)
             temp = cv2.dilate(eroded, element)
             temp = cv2.subtract(image, temp)
-            skeleton = cv2.bitwise_or(skeleton, temp)
+            skeletonized = cv2.bitwise_or(skeletonized, temp)
             image = eroded.copy()
 
             zeros = size - cv2.countNonZero(image)
             if zeros == size:
                 done = True
 
-        return skeleton
+        self.display_helper.add_to_plot(self, skeletonized, title='Skeletonization', fix_colors=True)
+        return skeletonized
 
     def morphological_opening(self, image, kernel_size=(3, 3), iterations=15):
         opening_mask = cv2.getStructuringElement(cv2.MORPH_RECT, kernel_size)
         opening_image = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel=opening_mask, iterations=iterations)
-        return cv2.subtract(image, opening_image)
+        image = cv2.subtract(image, opening_image)
+        self.display_helper.add_to_plot(self, image, title='Morph opening', fix_colors=True)
+        return image
 
     def morphological_closing(self, image, kernel_size=(3, 3), iterations=6):
         kernel = np.ones(kernel_size, np.uint8)
-        return cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel, iterations=iterations)
+        self.display_helper.add_to_plot(self, image, title='Morph closing', fix_colors=True)
+        image = cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel, iterations=iterations)
+        return image
 
     def erosion(self, image, kernel_size=(3, 3), iterations=1):
         kernel_size = np.ones(kernel_size, np.uint8)
+        self.display_helper.add_to_plot(self, image, title='Erosion', fix_colors=True)
         return cv2.erode(image, kernel_size, iterations=iterations)
 
     def color_mask(self, image, color):
@@ -98,4 +120,5 @@ class BasicTransformations:
             raise Exception('Specified color not supported')
 
         mask = cv2.inRange(image_hsv, lower_mask, upper_mask)
+        self.display_helper.add_to_plot(self, mask, title='{} mask'.format(color), fix_colors=True)
         return mask
