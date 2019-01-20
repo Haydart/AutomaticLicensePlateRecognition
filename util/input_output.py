@@ -36,8 +36,6 @@ class ImageSaver:
         self.path = path
 
     def save_image(self, image):
-        cv2.imshow("SOMETHING", image)
-        cv2.waitKey()
         path = self.__make_save_path(image.path)
         cv2.imwrite(path, image.image)
         print('Image saved at:' + path)

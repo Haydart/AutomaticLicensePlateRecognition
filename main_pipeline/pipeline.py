@@ -14,6 +14,7 @@ def main(argv):
 
     img_loader = io.ImageLoader()
     img_saver = io.ImageSaver(args.output_dir)
+
     for image in img_loader.load_images(args.input_dir):
         candidates = process(image.image)
         image_boxes = apply_bounding_boxex(image.image, candidates)
