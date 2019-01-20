@@ -32,13 +32,13 @@ def parse():
 
 
 def process(image):
-    pipeline = PipelineTransformations(debug_pipeline=True)
+    transformations = PipelineTransformations(debug_pipeline=True)
     working_image = copy(image)
-    working_image = pipeline.preprocess(working_image)
+    working_image = transformations.preprocess(working_image)
 
-    vert_sobel_image, hor_sobel_image = pipeline.apply_skeletonized_sobel(copy(working_image))
-    image_opening_method = pipeline.apply_morph_opening(copy(working_image))
-    images_color_method = pipeline.apply_color_masks(copy(image))
+    vert_sobel_image, hor_sobel_image = transformations.apply_skeletonized_sobel(copy(working_image))
+    image_opening_method = transformations.apply_morph_opening(copy(working_image))
+    images_color_method = transformations.apply_color_masks(copy(image))
 
     sobel_candidates = bc.find_candidates(bc.sobel_method, vert_sobel_image, hor_sobel_image)
     opening_candidates = bc.find_candidates(bc.opening_method, image_opening_method)

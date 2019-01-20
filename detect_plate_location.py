@@ -1,4 +1,4 @@
-from utils import *
+from util.utils import *
 
 if __name__ == '__main__':
     image = cv2.imread('dataset/license_plate_snapshots/test_002.jpg')

@@ -8,8 +8,8 @@ class PipelineTransformations:
     pipeline_debug_enabled = False
 
     def __init__(self, debug_pipeline):
-        self.basic_transformations = BasicTransformations()
         self.pipeline_debug_enabled = debug_pipeline
+        self.basic_transformations = BasicTransformations(debug_pipeline)
 
     def preprocess(self, image):
         image = self.basic_transformations.gray_scale(image)
@@ -41,7 +41,7 @@ class PipelineTransformations:
         # image_red = self.transforms.sobel_vertical_edge_detection(image_red)
         # image_green = self.transforms.sobel_vertical_edge_detection(image_green)
 
-        import utils
+        from util import utils
         utils.show_results(image_yellow, image_red, image_green)
 
         return [image_yellow, image_green, image_red]

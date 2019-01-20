@@ -3,7 +3,7 @@ from enum import Enum
 
 import pandas as pd
 
-import utils
+from util import utils
 
 
 class Dataset(Enum):

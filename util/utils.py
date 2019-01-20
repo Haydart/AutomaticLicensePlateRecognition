@@ -1,13 +1,10 @@
 import logging
+
 import cv2
-import matplotlib as mpl
-from matplotlib import pyplot as plt
 import numpy as np
+from matplotlib import pyplot as plt
 
 logger = logging.getLogger()
-mpl.rcParams['figure.dpi'] = 150
-subplot_width = 3
-subplot_height = 5
 
 
 def plot(figure, subplot, image, title):
@@ -27,21 +24,6 @@ def plot_(figure, subplot, image, title):
     figure.xlabel(title)
 
     return True
-
-
-def plot_image(img, subplot_index, title='', fix_colors=True):
-    plt.subplot(subplot_height, subplot_width, subplot_index)
-
-    if fix_colors:
-        if len(img.shape) == 3 and img.shape[2] == 3:
-            plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-        else:
-            plt.imshow(img, cmap='gray')
-    else:
-        plt.imshow(img)
-
-    plt.title(title)
-    plt.axis('off')
 
 
 def gray_scale(image):
