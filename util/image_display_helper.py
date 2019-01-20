@@ -15,17 +15,22 @@ class ImageDisplayHelper:
         self.subplot_height = subplot_height
         self.pipeline_debug_enabled = debug_pipeline
 
+    def reset_subplot_index(self):
+        self.subplot_index = 0
+
     def add_to_plot(self, image, subplot_index=None, title='', fix_colors=True):
         if self.pipeline_debug_enabled:
             current_subplot_index = None
-            print(subplot_index)
             if not subplot_index:
                 self.subplot_index = self.subplot_index + 1
                 current_subplot_index = self.subplot_index
             else:
                 current_subplot_index = subplot_index
 
-            plt.subplot(self.subplot_height, self.subplot_width, current_subplot_index)
+            try:
+                plt.subplot(self.subplot_height, self.subplot_width, current_subplot_index)
+            except SyntaxError:
+                print("Please enlarge subplot space in image helper definition")
 
             if fix_colors:
                 if len(image.shape) == 3 and image.shape[2] == 3:
@@ -42,7 +47,7 @@ class ImageDisplayHelper:
         if self.pipeline_debug_enabled:
             plt.subplots_adjust(bottom=0.1, left=0.1, right=0.9, top=0.9, wspace=0.3, hspace=0.3)
             fig = plt.gcf()
-            fig.set_size_inches(10, 15)
+            fig.set_size_inches(5, 7.5)
             print('plot display')
             plt.show()
 

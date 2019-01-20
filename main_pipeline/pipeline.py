@@ -6,7 +6,12 @@ import util.band_clipping as bc
 import util.bounding_boxes as bb
 import util.input_output as io
 from main_pipeline.candidates import Candidates
+from util.basic_transformations import BasicTransformations
+from util.image_display_helper import ImageDisplayHelper
 from util.pipeline_transformations import PipelineTransformations
+
+image_helper = ImageDisplayHelper(True, 2, 15)
+transformations = PipelineTransformations(BasicTransformations(image_helper))
 
 
 def main(argv):
@@ -21,6 +26,8 @@ def main(argv):
 
         image.image = image_boxes
         img_saver.save_image(image)
+        image_helper.plot_results()
+        image_helper.reset_subplot_index()
 
 
 def parse():
@@ -33,7 +40,6 @@ def parse():
 
 
 def process(image):
-    transformations = PipelineTransformations(debug_pipeline=True)
     working_image = copy(image)
     working_image = transformations.preprocess(working_image)
 
