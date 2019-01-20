@@ -38,14 +38,14 @@ def process(image):
     working_image = transformations.preprocess(working_image)
 
     vert_sobel_image, hor_sobel_image = transformations.apply_skeletonized_sobel(copy(working_image))
-    image_opening_method = transformations.apply_morph_opening(copy(working_image))
-    images_color_method = transformations.apply_color_masks(copy(image))
+    image_opening_method_image = transformations.apply_morph_opening(copy(working_image))
+    images_color_method_image = transformations.apply_color_masks(copy(image))
 
     sobel_candidates = bc.find_candidates(bc.sobel_method, vert_sobel_image, hor_sobel_image)
-    opening_candidates = bc.find_candidates(bc.opening_method, image_opening_method)
+    opening_candidates = bc.find_candidates(bc.opening_method, image_opening_method_image)
 
     color_candidates = []
-    for image_color in images_color_method:
+    for image_color in images_color_method_image:
         try:
             candidates = bc.find_candidates(bc.color_method, image_color)
             color_candidates.extend(candidates)

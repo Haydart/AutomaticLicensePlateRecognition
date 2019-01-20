@@ -40,11 +40,11 @@ class ImageDisplayHelper:
 
     def plot_results(self):
         if self.pipeline_debug_enabled:
-        plt.subplots_adjust(bottom=0.1, left=0.1, right=0.9, top=0.9, wspace=0.3, hspace=0.3)
-        fig = plt.gcf()
-        fig.set_size_inches(10, 15)
-        print('plot display')
-        plt.show()
+            plt.subplots_adjust(bottom=0.1, left=0.1, right=0.9, top=0.9, wspace=0.3, hspace=0.3)
+            fig = plt.gcf()
+            fig.set_size_inches(10, 15)
+            print('plot display')
+            plt.show()
 
     def save_results(self, path):
         plt.savefig(path)
