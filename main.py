@@ -1,11 +1,8 @@
-import os
-
-from final_solution.src.band_clipping import BindsFinder
-from datasets import DatasetsProvider, samples, sample
-
-
 import cv2
 import numpy as np
+
+from datasets import DatasetsProvider, sample
+from util.band_clipping import BindsFinder
 
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)

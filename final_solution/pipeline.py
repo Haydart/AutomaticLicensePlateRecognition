@@ -2,10 +2,10 @@ import argparse
 import sys
 from copy import copy
 
-import final_solution.src.band_clipping as bc
-import final_solution.src.boundings as bb
-import final_solution.src.input_output as io
-from final_solution.src.transformation import AdvancedTransformations
+import util.band_clipping as bc
+import util.boundings as bb
+import util.input_output as io
+from util.pipeline_transformations import TransformationPipeline
 
 
 class Candidates:
@@ -37,12 +37,12 @@ def parse():
 
 def process(image):
     working_image = copy(image)
-    transformations = AdvancedTransformations()
+    transformations = TransformationPipeline()
     working_image = transformations.preprocess(working_image)
 
-    vert_sobel_image, hor_sobel_image = transformations.skeletonized_sobel_method(copy(working_image))
-    image_opening_method = transformations.opening_method(copy(working_image))
-    images_color_method = transformations.color_mask_method(copy(image))
+    vert_sobel_image, hor_sobel_image = transformations.apply_skeletonized_sobel(copy(working_image))
+    image_opening_method = transformations.apply_morph_opening(copy(working_image))
+    images_color_method = transformations.apply_color_masks(copy(image))
 
     sobel_candidates = bc.find_candidates(bc.sobel_method, vert_sobel_image, hor_sobel_image)
     opening_candidates = bc.find_candidates(bc.opening_method, image_opening_method)

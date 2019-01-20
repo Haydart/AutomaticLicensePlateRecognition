@@ -1,7 +1,8 @@
 import sys
-import numpy as np
+
 import cv2
- 
+import numpy as np
+
 blue = sys.argv[1]
 green = sys.argv[2]
 red = sys.argv[3]  

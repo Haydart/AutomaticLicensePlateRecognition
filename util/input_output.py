@@ -1,6 +1,7 @@
 import glob
-import cv2
 import os
+
+import cv2
 
 
 class Image:
@@ -11,16 +12,17 @@ class Image:
 
 
 class ImageLoader:
-
     """Loads images from source file.
 
     Args:
         file_extension (list): List of file extensions strings to be loaded
     """
 
-    def __init__(self, file_extension=['jpg', 'jpeg', 'png']):
+    def __init__(self, file_extension=None):
+        if file_extension is None:
+            file_extension = ['jpg', 'jpeg', 'png']
         self.file_extension = file_extension
-        self.patterns = ['*.{}'.format(ext) for ext in self.file_extension ]
+        self.patterns = ['*.{}'.format(ext) for ext in self.file_extension]
 
     def load_images(self, source_path):
         """

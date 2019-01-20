@@ -3,8 +3,6 @@ import math
 import numpy as np
 from scipy import signal
 
-import utils
-
 mask_0 = [1, 3, 5, 7, 5, 9, 3, 1]
 mask_1 = [1, 5, 9, 12, 15, 12, 9, 5, 1]
 mask_2 = [4, 7, 16, 26, 41, 26, 16, 7, 4]
