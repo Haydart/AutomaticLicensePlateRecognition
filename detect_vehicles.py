@@ -3,7 +3,7 @@ import os
 import cv2
 import numpy as np
 
-from utils import load_image
+from util.utils import load_image
 
 classes = [line.strip() for line in open("yolo_suite/classes.txt", 'r').readlines()]
 COLORS = np.random.uniform(0, 255, size=(len(classes), 3))
