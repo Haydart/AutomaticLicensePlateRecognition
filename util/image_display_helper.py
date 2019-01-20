@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 
 
 class ImageDisplayHelper:
-    mpl.rcParams['figure.dpi'] = 150
+    mpl.rcParams['figure.dpi'] = 50
     subplot_width = None
     subplot_height = None
     subplot_index = 0
@@ -15,8 +15,9 @@ class ImageDisplayHelper:
         self.subplot_height = subplot_height
         self.pipeline_debug_enabled = debug_pipeline
 
-    def reset_subplot_index(self):
+    def reset_subplot(self):
         self.subplot_index = 0
+        plt.gcf().clf()
 
     def add_to_plot(self, image, subplot_index=None, title='', fix_colors=True):
         if self.pipeline_debug_enabled:
@@ -45,11 +46,12 @@ class ImageDisplayHelper:
 
     def plot_results(self):
         if self.pipeline_debug_enabled:
-            plt.subplots_adjust(bottom=0.1, left=0.1, right=0.9, top=0.9, wspace=0.3, hspace=0.3)
+            # plt.subplots_adjust(bottom=0.1, left=0.1, right=0.9, top=0.9, wspace=0.3, hspace=0.3)
             fig = plt.gcf()
-            fig.set_size_inches(5, 7.5)
+            fig.set_size_inches(5, 10)
+
+            plt.interactive(False)
             print('plot display')
-            plt.show()
 
     def save_results(self, path):
         plt.savefig(path)

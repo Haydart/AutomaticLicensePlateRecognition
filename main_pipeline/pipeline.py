@@ -10,7 +10,7 @@ from util.basic_transformations import BasicTransformations
 from util.image_display_helper import ImageDisplayHelper
 from util.pipeline_transformations import PipelineTransformations
 
-image_helper = ImageDisplayHelper(True, 2, 15)
+image_helper = ImageDisplayHelper(True, 2, 12)
 transformations = PipelineTransformations(BasicTransformations(image_helper))
 
 
@@ -27,7 +27,7 @@ def main(argv):
         image.image = image_boxes
         img_saver.save_image(image)
         image_helper.plot_results()
-        image_helper.reset_subplot_index()
+        image_helper.reset_subplot()
 
 
 def parse():

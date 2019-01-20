@@ -1,6 +1,5 @@
 import logging
 
-import cv2
 from matplotlib import pyplot as plt
 
 logger = logging.getLogger()
@@ -21,27 +20,6 @@ def plot_(figure, subplot, image, title):
 
     figure.plot(image)
     figure.xlabel(title)
-
-    return True
-
-
-def gray_scale(image):
-    return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-
-def bilateral_filter(image):
-    return cv2.bilateralFilter(image, 16, 32, 32)
-
-
-def show_results(original_image, gray_image, canny_image, auto_canny_image=None):
-    plt.figure("test", figsize=(30, 30))
-    plot(plt, 321, original_image, "Original image")
-    plot(plt, 322, gray_image, "Canny image")
-    plot(plt, 323, canny_image, "Y bound")
-    # plot(plt, 324, auto_canny_image, "X bound")
-
-    plt.tight_layout()
-    plt.show()
 
     return True
 
