@@ -1,20 +1,13 @@
 import logging
-
 import cv2
 import matplotlib as mpl
-import numpy as np
 from matplotlib import pyplot as plt
+import numpy as np
 
 logger = logging.getLogger()
 mpl.rcParams['figure.dpi'] = 150
 subplot_width = 3
 subplot_height = 5
-
-
-def load_image(path):
-    logger.info("Loading image from %s...", path)
-    image = cv2.imread(path)
-    return image
 
 
 def plot(figure, subplot, image, title):
@@ -139,18 +132,26 @@ def skeletonization(image):
     return skeleton, sobel_thresh
 
 
-def show_results(original_image, gray_image, canny_image, auto_canny_image):
+def show_results(original_image, gray_image, canny_image, auto_canny_image=None):
     plt.figure("test", figsize=(30, 30))
     plot(plt, 321, original_image, "Original image")
     plot(plt, 322, gray_image, "Canny image")
     plot(plt, 323, canny_image, "Y bound")
-    plot(plt, 324, auto_canny_image, "X bound")
+    # plot(plt, 324, auto_canny_image, "X bound")
 
     plt.tight_layout()
     plt.show()
 
     return True
 
+
+def show_one_image(image):
+    plt.figure("Show image", figsize=(30, 30))
+    plot(plt, 111, image, "Original image")
+    plt.tight_layout()
+    plt.show()
+
+    return True
 
 def plot_histograms(hist_1, hist_2, title):
     plt.figure("Histograms", figsize=(10, 5))

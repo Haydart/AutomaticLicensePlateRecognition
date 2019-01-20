@@ -1,7 +1,7 @@
 from utils import *
 
 if __name__ == '__main__':
-    image = load_image('dataset/license_plate_snapshots/test_079.jpg')
+    image = load_image('dataset/license_plate_snapshots/test_001.jpg')
     # image = imutils.resize(image, width=512)
 
     grayscale_image = gray_scale(image)
@@ -18,7 +18,7 @@ if __name__ == '__main__':
     plot_image(noise_removed_image, 5, 'Bilateral filtering BGR', fix_colors=False)
 
     vertical_image = sobel_vertical_edge_detection(noise_removed_image)
-    skeletonized_vertical_edges_image, _ = skeletonization(vertical_image)
+    skeletonized_vertical_edges_image, _ = skeletonization(otsu_threshold(vertical_image))
     plot_image(skeletonized_vertical_edges_image, 6, 'bilateral -> VSobel -> skeleton')
 
     histogram_equalized_image = histogram_equalization(noise_removed_image)
@@ -28,8 +28,9 @@ if __name__ == '__main__':
 
     subtracted_image = morphological_opening(histogram_equalized_image)
     plot_image(subtracted_image, 10, 'Opening subtracted')
-    plot_image(subtracted_image, 11, 'Opening subtracted BGR', fix_colors=False)
-    plot_image(canny_edge_detection(subtracted_image), 12, 'Canny after opening subtraction')
+    binarized_subtraction = otsu_threshold(subtracted_image)
+    plot_image(binarized_subtraction, 11, 'Subtraction -> otsu', fix_colors=False)
+    plot_image(otsu_threshold(sobel_vertical_edge_detection(binarized_subtraction)), 12, 'subtraction -> otsu -> sobel')
 
     plt.subplots_adjust(bottom=0.1, left=0.1, right=0.9, top=0.9, wspace=0.3, hspace=0.3)
 
