@@ -76,8 +76,9 @@ def bounding_box_filtered(image, candidates_filtered):
 
 
 def filter_heuristically(candidates):
+    print("All candidates", candidates)
     candidates = he.join_separated(candidates)
-
+    print(candidates)
     return candidates
 
 def main(argv):
@@ -91,7 +92,7 @@ def main(argv):
         # for sub_image in vehicle_detector.detect_vehicles(image.image):
         #     image.image = sub_image
             candidates = process(image.image)
-            # image_boxes = bounding_box(image.image, candidates_filtered)
+            # image_boxes = bounding_box(image.image, candidates)
             candidates_filtered = filter_heuristically(candidates.all)
             image_boxes = bounding_box_filtered(image.image, candidates_filtered)
 
