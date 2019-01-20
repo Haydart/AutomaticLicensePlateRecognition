@@ -72,7 +72,7 @@ class BindsFinder:
 
         return bands
 
-    def _find_x_bands_phase_one(self, image, bands_count_limit=5, plate_min_width=30):
+    def _find_x_bands_phase_one(self, image, bands_count_limit=4, plate_min_width=30):
         before = x_projection = np.sum(image, axis=0).tolist()
         # before = x_projection = x_projection / np.max(x_projection)
         x_projection = signal.convolve(x_projection, self.mask, mode='same')

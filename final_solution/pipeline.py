@@ -5,6 +5,7 @@ import final_solution.src.input_output as io
 import final_solution.src.band_clipping as bc
 import final_solution.src.boundings as bb
 import final_solution.src.vehicles_detection as vd
+import final_solution.src.heuristics as he
 
 
 from copy import copy
@@ -37,12 +38,12 @@ def process(image):
     model = AdvancedTransforms()
     image_work = model.preprocess(image_work)
 
-    # image_sobel_method_vertical, image_sobel_method_horizontal = model.skeletonized_sobel_method(copy(image_work))
-    # image_opening_method = model.opening_method(copy(image_work))
+    image_sobel_method_vertical, image_sobel_method_horizontal = model.skeletonized_sobel_method(copy(image_work))
+    image_opening_method = model.opening_method(copy(image_work))
     images_color_method = model.color_mask_method(copy(image))
 
-    # sobel_candidates = bc.find_candidates(bc.sobel_method, image_sobel_method_vertical, image_sobel_method_horizontal)
-    # opening_candidates = bc.find_candidates(bc.opening_method, image_opening_method)
+    sobel_candidates = bc.find_candidates(bc.sobel_method, image_sobel_method_vertical, image_sobel_method_horizontal)
+    opening_candidates = bc.find_candidates(bc.opening_method, image_opening_method)
 
     color_candidates = []
     for image_color in images_color_method:
@@ -53,11 +54,10 @@ def process(image):
             continue
 
     candidates = Candidates(
-        # sobel_candidates=sobel_candidates,
-        # opening_candidates=opening_candidates,
+        sobel_candidates=sobel_candidates,
+        opening_candidates=opening_candidates,
         color_candidtes=color_candidates
     )
-    print(candidates.color_candidates)
     return candidates
 
 
@@ -67,6 +67,18 @@ def bounding_box(image, candidates):
     image_boxes = bb.apply_bounding_boxes(image_boxes, candidates.opening_candidates, bb.RED)
     image_boxes = bb.apply_bounding_boxes(image_boxes, candidates.color_candidates, bb.BLUE)
     return image_boxes
+
+
+def bounding_box_filtered(image, candidates_filtered):
+    image_boxes = copy(image)
+    image_boxes = bb.apply_bounding_boxes(image_boxes, candidates_filtered, bb.GREEN)
+    return image_boxes
+
+
+def filter_heuristically(candidates):
+    candidates = he.join_separated(candidates)
+
+    return candidates
 
 def main(argv):
     args = parse()
@@ -79,7 +91,9 @@ def main(argv):
         # for sub_image in vehicle_detector.detect_vehicles(image.image):
         #     image.image = sub_image
             candidates = process(image.image)
-            image_boxes = bounding_box(image.image, candidates)
+            # image_boxes = bounding_box(image.image, candidates_filtered)
+            candidates_filtered = filter_heuristically(candidates.all)
+            image_boxes = bounding_box_filtered(image.image, candidates_filtered)
 
             image.image = image_boxes
             img_saver.save_image(image)
