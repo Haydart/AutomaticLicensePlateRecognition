@@ -1,6 +1,7 @@
 from copy import copy
 
 from util.basic_transformations import BasicTransformations
+from util.image_display_helper import ImageDisplayHelper
 
 
 class PipelineTransformations:
@@ -9,7 +10,7 @@ class PipelineTransformations:
 
     def __init__(self, debug_pipeline):
         self.pipeline_debug_enabled = debug_pipeline
-        self.basic_transformations = BasicTransformations(debug_pipeline)
+        self.basic_transformations = BasicTransformations(ImageDisplayHelper(debug_pipeline, 2, 5))
 
     def preprocess(self, image):
         image = self.basic_transformations.gray_scale(image)
