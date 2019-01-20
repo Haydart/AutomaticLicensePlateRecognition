@@ -35,13 +35,13 @@ class BasicTransformations:
     def sobel_vertical_edge_detection(self, image):
         vertical_image = cv2.Sobel(image, cv2.CV_32F, 1, 0, ksize=3)
         image = self._normalize_sobel_to_cv8u(vertical_image)
-        self.display_helper.add_to_plot(self, image, title='Canny', fix_colors=True)
+        self.display_helper.add_to_plot(self, image, title='Vertical sobel', fix_colors=True)
         return image
 
     def sobel_horizontal_edge_detection(self, image):
         horizontal_image = cv2.Sobel(image, cv2.CV_32F, 0, 1, ksize=3)
         image = self._normalize_sobel_to_cv8u(horizontal_image)
-        self.display_helper.add_to_plot(self, image, title='Canny', fix_colors=True)
+        self.display_helper.add_to_plot(self, image, title='Horizontal sobel', fix_colors=True)
         return image
 
     def _normalize_sobel_to_cv8u(self, sobel_image):
