@@ -75,10 +75,9 @@ def bounding_box_filtered(image, candidates_filtered):
     return image_boxes
 
 
-def filter_heuristically(candidates):
-    print("All candidates", candidates)
-    candidates = he.join_separated(candidates)
-    print(candidates)
+def filter_heuristically(candidates, image_size):
+    # candidates = he.join_separated(candidates)
+    candidates = he.remove_big_areas(candidates, image_size)
     return candidates
 
 def main(argv):
@@ -93,7 +92,11 @@ def main(argv):
         #     image.image = sub_image
             candidates = process(image.image)
             # image_boxes = bounding_box(image.image, candidates)
-            candidates_filtered = filter_heuristically(candidates.all)
+
+            numrows = len(image.image)
+            numcols = len(image.image[0])
+
+            candidates_filtered = filter_heuristically(candidates.all, (numrows, numcols))
             image_boxes = bounding_box_filtered(image.image, candidates_filtered)
 
             image.image = image_boxes
