@@ -50,6 +50,15 @@ def process(image):
 
     sobel_candidates = bc.find_candidates(bc.sobel_method, vert_sobel_image, hor_sobel_image)
     opening_candidates = bc.find_candidates(bc.opening_method, image_opening_method_image)
+    try:
+        sobel_candidates = bc.find_candidates(bc.sobel_method, image_sobel_method_vertical, image_sobel_method_horizontal)
+    except ValueError:
+        sobel_candidates = []
+
+    try:
+        opening_candidates = bc.find_candidates(bc.opening_method, image_opening_method)
+    except ValueError:
+        opening_candidates = []
 
     color_candidates = []
     for image_color in images_color_method_image:
@@ -64,7 +73,6 @@ def process(image):
         opening_candidates=opening_candidates,
         color_candidates=color_candidates
     )
-
     return candidates
 
 
@@ -75,6 +83,45 @@ def apply_bounding_boxex(image, candidates):
     image_boxes = bb.apply_bounding_boxes(image_boxes, candidates.color_candidates, bb.BLUE)
     image_helper.add_to_plot(image_boxes, title='Final candidates')
     return image_boxes
+
+
+def bounding_box_filtered(image, candidates_filtered):
+    image_boxes = copy(image)
+    image_boxes = bb.apply_bounding_boxes(image_boxes, candidates_filtered, bb.GREEN)
+    return image_boxes
+
+
+def filter_heuristically(candidates, image_size):
+    candidates = he.join_separated(candidates)
+    candidates = he.remove_big_areas(candidates, image_size)
+    candidates = he.remove_vertical(candidates)
+    candidates = he.remove_horizontal(candidates, image_size[1])
+    return candidates
+
+def main(argv):
+    args = parse()
+
+    img_loader = io.ImageLoader()
+    img_saver = io.ImageSaver(args.output_dir)
+
+    vehicle_detector = vd.VehiclesDetector()
+    for image in img_loader.load_images(args.input_dir):
+        counter = 0
+        for sub_image in vehicle_detector.detect_vehicles(image.image):
+            image.image = sub_image
+            candidates = process(image.image)
+            # image_boxes = bounding_box(image.image, candidates)
+
+            numrows = len(image.image)
+            numcols = len(image.image[0])
+
+            candidates_filtered = filter_heuristically(candidates.all, (numrows, numcols))
+            image_boxes = bounding_box_filtered(image.image, candidates_filtered)
+
+            image.image = image_boxes
+            img_saver.save_image(image, counter)
+            counter = counter + 1
+        counter = 0
 
 
 if __name__ == '__main__':

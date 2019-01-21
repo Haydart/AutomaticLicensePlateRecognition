@@ -47,7 +47,7 @@ class BandsFinder:
                 b1 = index
                 break
 
-        return b0, pick + b1
+        return b0, pick + b1 + 1
 
     def _find_y_bands(self, bands_count_limit=5):
         before = y_projection = np.sum(self.image, axis=1).tolist()
@@ -70,7 +70,7 @@ class BandsFinder:
 
         return bands
 
-    def _find_x_bands_phase_one(self, image, bands_count_limit=5, plate_min_width=30):
+    def _find_x_bands_phase_one(self, image, bands_count_limit=4, plate_min_width=30):
         before = x_projection = np.sum(image, axis=0).tolist()
         # before = x_projection = x_projection / np.max(x_projection)
         x_projection = signal.convolve(x_projection, self.mask, mode='same')
