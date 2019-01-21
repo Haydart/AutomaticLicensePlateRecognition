@@ -42,8 +42,15 @@ def process(image):
     image_opening_method = model.opening_method(copy(image_work))
     images_color_method = model.color_mask_method(copy(image))
 
-    sobel_candidates = bc.find_candidates(bc.sobel_method, image_sobel_method_vertical, image_sobel_method_horizontal)
-    opening_candidates = bc.find_candidates(bc.opening_method, image_opening_method)
+    try:
+        sobel_candidates = bc.find_candidates(bc.sobel_method, image_sobel_method_vertical, image_sobel_method_horizontal)
+    except ValueError:
+        sobel_candidates = []
+
+    try:
+        opening_candidates = bc.find_candidates(bc.opening_method, image_opening_method)
+    except ValueError:
+        opening_candidates = []
 
     color_candidates = []
     for image_color in images_color_method:
@@ -90,8 +97,9 @@ def main(argv):
 
     vehicle_detector = vd.VehiclesDetector()
     for image in img_loader.load_images(args.input_dir):
-        # for sub_image in vehicle_detector.detect_vehicles(image.image):
-        #     image.image = sub_image
+        counter = 0
+        for sub_image in vehicle_detector.detect_vehicles(image.image):
+            image.image = sub_image
             candidates = process(image.image)
             # image_boxes = bounding_box(image.image, candidates)
 
@@ -102,7 +110,9 @@ def main(argv):
             image_boxes = bounding_box_filtered(image.image, candidates_filtered)
 
             image.image = image_boxes
-            img_saver.save_image(image)
+            img_saver.save_image(image, counter)
+            counter = counter + 1
+        counter = 0
 
 
 if __name__ == '__main__':
