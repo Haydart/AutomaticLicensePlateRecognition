@@ -26,6 +26,7 @@ def main(argv):
 
         image.image = image_boxes
         img_saver.save_image(image)
+
         image_helper.plot_results()
         image_helper.reset_subplot()
 
@@ -72,6 +73,7 @@ def apply_bounding_boxex(image, candidates):
     image_boxes = bb.apply_bounding_boxes(image_boxes, candidates.sobel_candidates, bb.GREEN)
     image_boxes = bb.apply_bounding_boxes(image_boxes, candidates.opening_candidates, bb.RED)
     image_boxes = bb.apply_bounding_boxes(image_boxes, candidates.color_candidates, bb.BLUE)
+    image_helper.add_to_plot(image_boxes, title='Final candidates')
     return image_boxes
 
 

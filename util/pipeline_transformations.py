@@ -11,6 +11,7 @@ class PipelineTransformations:
     def preprocess(self, image):
         image = self.bt.gray_scale(image)
         image = self.bt.bilateral_filter(image)
+        image = self.bt.contrast_brightness(image)
         return image
 
     def apply_skeletonized_sobel(self, image):
@@ -26,6 +27,8 @@ class PipelineTransformations:
         image = self.bt.histogram_equalization(image)
         image = self.bt.morphological_opening(image)
         image = self.bt.binary_threshold(image, 100)
+        image = self.bt.sobel_vertical_edge_detection(image)
+        image = self.bt.skeletonize(image)
         return image
 
     def apply_color_masks(self, image):
