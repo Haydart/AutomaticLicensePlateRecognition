@@ -71,15 +71,42 @@ def remove_big_areas(bands, size):
         area_box = ((y1 - y0) * (x1 - x0))
 
         prc = area_box / area_picture
-        print(prc)
-        if prc <= 0.08:
+        if prc <= 0.07:
             bands_new.append(band)
         else:
-            print('Removed', prc)
+            print('Removed area', prc)
 
     return bands_new
 
 
+def remove_vertical(bands, ratio_limit=0.6):
+    bands_new = []
+    for band in bands:
+        y0, y1, x0, x1 = band
+
+        ratio = (x1 - x0) / (y1 - y0)
+
+        if ratio > ratio_limit:
+            bands_new.append(band)
+        else:
+            print('Removed vertical ratio', ratio)
+
+    return bands_new
+
+
+def remove_horizontal(bands, width_image, percent_limit=0.4):
+    bands_new = []
+    for band in bands:
+        y0, y1, x0, x1 = band
+        width_box = (x1 - x0)
+
+        prc = width_box / width_image
+        if prc <= percent_limit:
+            bands_new.append(band)
+        else:
+            print('Removed horizontal length', prc)
+
+    return bands_new
 
 
 if __name__ == '__main__':

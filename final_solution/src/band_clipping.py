@@ -49,7 +49,7 @@ class BindsFinder:
                 b1 = index
                 break
 
-        return b0, pick + b1
+        return b0, pick + b1 + 1
 
     def _find_y_bands(self, bands_count_limit=5):
         before = y_projection = np.sum(self.image, axis=1).tolist()
