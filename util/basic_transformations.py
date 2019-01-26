@@ -13,7 +13,7 @@ class BasicTransformations:
         return image
 
     def bilateral_filter(self, image):
-        image = cv2.bilateralFilter(image, 16, 24, 24)
+        image = cv2.bilateralFilter(image, 16, 32, 32)
         self.display_helper.add_to_plot(image, title='Bilateral', fix_colors=True)
         return image
 
@@ -64,7 +64,7 @@ class BasicTransformations:
         size = np.size(image)
         skeletonized = np.zeros(image.shape, np.uint8)
 
-        image = self.otsu_threshold(image)
+        image = self.binary_threshold(image, 127)
 
         # Invert if a lot of white spaces
         non_zeros = np.count_nonzero(image)
@@ -89,7 +89,7 @@ class BasicTransformations:
         self.display_helper.add_to_plot(skeletonized, title='Skeletonization', fix_colors=True)
         return skeletonized
 
-    def morphological_opening(self, image, kernel_size=(3, 3), iterations=15):
+    def morphological_opening(self, image, kernel_size=(7, 3), iterations=15):
         opening_mask = cv2.getStructuringElement(cv2.MORPH_RECT, kernel_size)
         opening_image = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel=opening_mask, iterations=iterations)
         image = cv2.subtract(image, opening_image)
