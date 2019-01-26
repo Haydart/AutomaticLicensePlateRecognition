@@ -7,9 +7,12 @@ from util.basic_transformations import BasicTransformations
 from util.image_display_helper import ImageDisplayHelper
 from util.input_output import *
 
+display = ImageDisplayHelper(False, 2, 5)
+bt = BasicTransformations(display)
+
 
 def process(image_path):
-    display = ImageDisplayHelper(True, 2, 5)
+    display = ImageDisplayHelper(False, 2, 5)
     bt = BasicTransformations(display)
 
     image = Image.open(image_path)
@@ -43,6 +46,26 @@ def process(image_path):
     cv2.waitKey()
 
 
+def deskew(image):
+    import util.utils as ut
+    gray_image = bt.gray_scale(image)
+    contrast_bumped_image = bt.contrast_brightness(gray_image, alpha=2, beta=50)
+
+    binarized_image = bt.otsu_threshold(gray_image)
+    eroded_image = bt.erosion(binarized_image)
+    closed_image = bt.morphological_closing(binarized_image, iterations=5)
+    eroded_closed_image = bt.morphological_closing(eroded_image, iterations=5)
+    # ut.show_one_image(eroded_closed_image)
+
+    _, result_polygon = _find_plate_contour(eroded_closed_image, image)
+    polygon_flat_list = [item for sublist in result_polygon for item in sublist]
+    plate_corners_list = [(arr[0], arr[1]) for arr in polygon_flat_list]
+
+    deskewed_image = four_point_transform(gray_image, np.array(plate_corners_list))
+    _draw_plate_polygons(image, result_polygon)
+    return deskewed_image
+
+
 def _find_plate_contour(preprocessed_image, original_image):
     _, contours, _ = cv2.findContours(preprocessed_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_KCOS)
     contours = sorted(contours, key=cv2.contourArea, reverse=True)[:10]
@@ -52,10 +75,10 @@ def _find_plate_contour(preprocessed_image, original_image):
 
     for contour in contours:
         contour_area = cv2.contourArea(contour)
-        print("Contour area: ", contour_area, " contour is ", contour)
+        # print("Contour area: ", contour_area, " contour is ", contour)
         contour_perimeter = cv2.arcLength(contour, True)
         approximated_contour_polygon = cv2.approxPolyDP(contour, 0.03 * contour_perimeter, closed=True)
-        print("approximated contour polygon", approximated_contour_polygon)
+        # print("approximated contour polygon", approximated_contour_polygon)
         polygons_with_areas.append((approximated_contour_polygon, contour_area))
 
     result_polygon = max(polygons_with_areas, key=lambda item: item[1])[0]

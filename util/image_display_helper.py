@@ -52,7 +52,7 @@ class ImageDisplayHelper:
             plt.subplots_adjust(bottom=0.1, left=0.02, right=0.75, top=0.98, wspace=1, hspace=1)
             fig = plt.gcf()
             fig.set_size_inches(5, 25)
-            # plt.tight_layout()
+            plt.tight_layout()
             print('plot display')
             plt.show()
 

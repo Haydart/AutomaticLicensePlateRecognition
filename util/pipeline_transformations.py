@@ -3,7 +3,7 @@ from copy import copy
 
 class PipelineTransformations:
     bt = None
-    pipeline_debug_enabled = False
+    pipeline_debug_enabled = True
 
     def __init__(self, basic_transformations):
         self.bt = basic_transformations
@@ -26,9 +26,7 @@ class PipelineTransformations:
     def apply_morph_opening(self, image):
         image = self.bt.histogram_equalization(image)
         image = self.bt.morphological_opening(image)
-        image = self.bt.binary_threshold(image, 100)
-        image = self.bt.sobel_vertical_edge_detection(image)
-        image = self.bt.skeletonize(image)
+        image = self.bt.binary_threshold(image, 90)
         return image
 
     def apply_color_masks(self, image):

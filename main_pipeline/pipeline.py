@@ -1,19 +1,20 @@
 import argparse
 import sys
 from copy import copy
+import cv2
 
 import util.band_clipping as bc
 import util.bounding_boxes as bb
 import util.heuristics as heuristics
 import util.input_output as io
-
 from main_pipeline.candidates import Candidates
 from util.basic_transformations import BasicTransformations
 from util.image_display_helper import ImageDisplayHelper
 from util.pipeline_transformations import PipelineTransformations
 from util.vehicles_detection import VehiclesDetector
 
-image_helper = ImageDisplayHelper(True, 2, 20)
+
+image_helper = ImageDisplayHelper(True, w2, subplot_height=10)
 transformations = PipelineTransformations(BasicTransformations(image_helper))
 vehicle_detector = VehiclesDetector()
 
@@ -29,7 +30,12 @@ def main(argv):
         for sub_image in vehicle_detector.detect_vehicles(image.image):
             image.image = sub_image
             candidates = process(image.image)
-            # image_boxes = apply_bounding_boxex(image.image, candidates)
+
+            orginal = image.image
+            image_boxes = apply_bounding_boxex(image.image, candidates)
+            image.image = image_boxes
+            img_saver.save_image(image, -1)
+            image.image = orginal
 
             numrows = len(image.image)
             numcols = len(image.image[0])
@@ -40,6 +46,17 @@ def main(argv):
             image.image = image_boxes
             img_saver.save_image(image, counter)
 
+            # for idx, bond in enumerate(candidates_filtered):
+            #     y0, y1, x0, x1 = bond
+            #     print( idx, y0, y1, x0, x1)
+            #     deskewed = rs.deskew(image.image[y0:y1, x0:x1])
+            #     import util.utils as ut
+            #     # ut.show_one_image(image.image[y0:y1, x0:x1])
+            #     # ut.show_one_image(deskewed)
+            #     ocr_file = 'to_ocr{}.jpg'.format(idx)
+            #     # cv2.imwrite(ocr_file, deskewed)
+            #     ocr.read_text(ocr_file)
+            #
             image_helper.plot_results()
             image_helper.reset_subplot()
             counter = counter + 1
