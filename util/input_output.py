@@ -35,15 +35,15 @@ class ImageSaver:
     def __init__(self, path):
         self.path = path
 
-    def save_image(self, image):
-        path = self.__make_save_path(image.path)
+    def save_image(self, image, counter):
+        path = self.__make_save_path(image.path, counter)
         cv2.imwrite(path, image.image)
         print('Image saved at:' + path)
 
-    def __make_save_path(self, source_path):
+    def __make_save_path(self, source_path, counter):
         source_name = source_path.split('/')[-1]
 
-        name = source_name
+        name = source_name + str(counter) + source_name
         path = os.path.join(self.path, name)
 
         return path

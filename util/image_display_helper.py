@@ -14,6 +14,7 @@ class ImageDisplayHelper:
         self.subplot_width = subplot_width
         self.subplot_height = subplot_height
         self.pipeline_debug_enabled = debug_pipeline
+        plt.figure("Pipeline", figsize=(30, 30))
 
     def reset_subplot_index(self):
         self.subplot_index = 0
@@ -28,7 +29,7 @@ class ImageDisplayHelper:
                 current_subplot_index = subplot_index
 
             try:
-                plt.subplot(self.subplot_height, self.subplot_width, current_subplot_index)
+                plt.subplot(7, 2, current_subplot_index)
             except SyntaxError:
                 print("Please enlarge subplot space in image helper definition")
 
@@ -45,9 +46,11 @@ class ImageDisplayHelper:
 
     def plot_results(self):
         if self.pipeline_debug_enabled:
-            plt.subplots_adjust(bottom=0.1, left=0.1, right=0.9, top=0.9, wspace=0.3, hspace=0.3)
-            fig = plt.gcf()
-            fig.set_size_inches(5, 7.5)
+            # plt.subplots_adjust(bottom=0.1, left=0.1, right=0.9, top=0.9, wspace=0.3, hspace=0.3)
+            # fig = plt.gcf()
+
+            # fig.set_size_inches(5, 7.5)
+            # plt.tight_layout()
             print('plot display')
             plt.show()
 

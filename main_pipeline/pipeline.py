@@ -5,12 +5,15 @@ from copy import copy
 import util.band_clipping as bc
 import util.bounding_boxes as bb
 import util.input_output as io
+import final_solution.src.vehicles_detection as vd
+import final_solution.src.heuristics as he
+
 from main_pipeline.candidates import Candidates
 from util.basic_transformations import BasicTransformations
 from util.image_display_helper import ImageDisplayHelper
 from util.pipeline_transformations import PipelineTransformations
 
-image_helper = ImageDisplayHelper(True, 2, 15)
+image_helper = ImageDisplayHelper(True, 2, 20)
 transformations = PipelineTransformations(BasicTransformations(image_helper))
 
 
@@ -20,15 +23,27 @@ def main(argv):
     img_loader = io.BatchImageLoader()
     img_saver = io.ImageSaver(args.output_dir)
 
+    vehicle_detector = vd.VehiclesDetector()
+
     for image in img_loader.load_images(args.input_dir):
-        candidates = process(image.image)
-        image_boxes = apply_bounding_boxex(image.image, candidates)
+        counter = 0
+        for sub_image in vehicle_detector.detect_vehicles(image.image):
+            image.image = sub_image
+            candidates = process(image.image)
+            # image_boxes = apply_bounding_boxex(image.image, candidates)
 
-        image.image = image_boxes
-        img_saver.save_image(image)
-        image_helper.plot_results()
-        image_helper.reset_subplot_index()
+            numrows = len(image.image)
+            numcols = len(image.image[0])
 
+            candidates_filtered = filter_heuristically(candidates.all, (numrows, numcols))
+            image_boxes = bounding_box_filtered(image.image, candidates_filtered)
+
+            image.image = image_boxes
+            img_saver.save_image(image, counter)
+
+            image_helper.plot_results()
+            image_helper.reset_subplot_index()
+            counter = counter + 1
 
 def parse():
     parser = argparse.ArgumentParser()
@@ -72,6 +87,19 @@ def apply_bounding_boxex(image, candidates):
     image_boxes = bb.apply_bounding_boxes(image_boxes, candidates.opening_candidates, bb.RED)
     image_boxes = bb.apply_bounding_boxes(image_boxes, candidates.color_candidates, bb.BLUE)
     return image_boxes
+
+
+def bounding_box_filtered(image, candidates_filtered):
+    image_boxes = copy(image)
+    image_boxes = bb.apply_bounding_boxes(image_boxes, candidates_filtered, bb.GREEN)
+    return image_boxes
+
+def filter_heuristically(candidates, image_size):
+    candidates = he.join_separated(candidates)
+    candidates = he.remove_big_areas(candidates, image_size)
+    candidates = he.remove_vertical(candidates)
+    candidates = he.remove_horizontal(candidates, image_size[1])
+    return candidates
 
 
 if __name__ == '__main__':

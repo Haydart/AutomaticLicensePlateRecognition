@@ -25,7 +25,7 @@ class PipelineTransformations:
     def apply_morph_opening(self, image):
         image = self.bt.histogram_equalization(image)
         image = self.bt.morphological_opening(image)
-        image = self.bt.binary_threshold(image, 100)
+        image = self.bt.binary_threshold(image, 80)
         return image
 
     def apply_color_masks(self, image):
