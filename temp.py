@@ -33,11 +33,21 @@ def erosion(image, kernel_size=(3, 3), iterations=1):
     return cv2.erode(image, kernel_size, iterations=iterations)
 
 
+def morphological_closing(image, kernel_size=(3, 3), iterations=6):
+    kernel = np.ones(kernel_size, np.uint8)
+    return cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel, iterations=iterations)
 
+
+def morphological_opening(self, image, kernel_size=(7, 3), iterations=15):
+    opening_mask = cv2.getStructuringElement(cv2.MORPH_RECT, kernel_size)
+    opening_image = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel=opening_mask, iterations=iterations)
+    image = cv2.subtract(image, opening_image)
+    self.display_helper.add_to_plot(image, title='Morph opening', fix_colors=True)
+    return image
 
 
 # Loads the image then enhances it
-image = Image.open('dataset/skewed_trimmed_samples/I00004.png')
+image = Image.open('dataset/skewed_trimmed_samples/I00005.png')
 contrast = ImageEnhance.Contrast(image)
 img = contrast.enhance(2)
 img = np.asarray(img)
@@ -48,21 +58,17 @@ gray_image = cv2.cvtColor(contrast, cv2.COLOR_BGR2GRAY)  # there is a problem he
 
 # Otsu's thresholding
 ret2, th2 = cv2.threshold(gray_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-# Otsu's thresholding after Gaussian filtering
-blur = cv2.GaussianBlur(gray_image, (5, 5), 0)
-ret3, th3 = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
-eroded = erosion(th3, iterations=5)
+eroded = erosion(th2, iterations=5)
 _, result_polygon = _find_plate_contour(eroded, img)
 polygon_image = _draw_plate_polygons(img, result_polygon)
 
 # writes enhanced and thresholded img
-cv2.imwrite('temp3.png', th3)
+cv2.imwrite('temp3.png', th2)
 
 cv2.imshow("contrast bumped", img)
 cv2.imshow("grayscale after contrast", gray_image)
 cv2.imshow("otsu", th2)
-cv2.imshow("atsu after gaussian denoise", th3)
 cv2.imshow("erosion", eroded)
-cv2.imshow("approx polygon after erosion", polygon_image)
+cv2.imshow("approx polygon", polygon_image)
 cv2.waitKey()
