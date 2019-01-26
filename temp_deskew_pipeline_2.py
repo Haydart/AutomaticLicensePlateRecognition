@@ -46,25 +46,35 @@ def morphological_opening(self, image, kernel_size=(7, 3), iterations=15):
 
 
 # Loads the image then enhances it
-image = Image.open('dataset/skewed_trimmed_samples/skewed_001.jpg')
+image = Image.open('dataset/skewed_trimmed_samples/I00000.png')
 contrast = ImageEnhance.Contrast(image)
 img = contrast.enhance(10)
 img = np.asarray(img)
-r, g, b, a = cv2.split(img)
+r, g, b = cv2.split(img)
 contrast = cv2.merge([b, g, r])
 # Reads the enhanced image and converts it to grayscale, creates new file
 gray_image = cv2.cvtColor(contrast, cv2.COLOR_BGR2GRAY)  # there is a problem here
 
 ret2, th2 = cv2.threshold(gray_image, 200, 255, cv2.THRESH_BINARY)
 
-_, result_polygon = _find_plate_contour(th2, img)
-polygon_image = _draw_plate_polygons(img, result_polygon)
+edges = cv2.Canny(th2, 75, 150)
 
-# writes enhanced and thresholded img
-cv2.imwrite('temp3.png', th2)
+lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 50, maxLineGap=10, minLineLength=50)
 
-cv2.imshow("contrast bumped", img)
-cv2.imshow("grayscale after contrast", gray_image)
-cv2.imshow("otsu", th2)
-cv2.imshow("approx polygon", polygon_image)
-cv2.waitKey()
+for line in lines:
+    x1, y1, x2, y2 = line[0]
+    cv2.line(img, (x1, y1), (x2, y2), (0, 255, 0), 3)
+
+cv2.imshow("Edges", edges)
+cv2.imshow("Image", img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+# # writes enhanced and thresholded img
+# cv2.imwrite('temp3.png', th2)
+#
+# cv2.imshow("contrast bumped", img)
+# cv2.imshow("grayscale after contrast", gray_image)
+# cv2.imshow("otsu", th2)
+# cv2.imshow("approx polygon", polygon_image)
+# cv2.waitKey()
