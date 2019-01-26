@@ -1,6 +1,7 @@
 from random import randint
 
 import numpy as np
+from PIL import Image, ImageEnhance
 
 from util.basic_transformations import BasicTransformations
 from util.image_display_helper import ImageDisplayHelper
@@ -11,10 +12,11 @@ def process(image_path):
     display = ImageDisplayHelper(True, 2, 5)
     bt = BasicTransformations(display)
 
-    image = cv2.imread(image_path)
-    gray_image = bt.gray_scale(image_path)
-    contrast_bumped_image = bt.contrast_brightness(gray_image, alpha=2, beta=50)
+    image = Image.open(image_path)
+    contrast_bumped_image = np.asarray(ImageEnhance.Contrast(image).enhance(5))
+    image = np.asarray(image)
 
+    gray_image = bt.gray_scale(contrast_bumped_image)
     binarized_image = bt.otsu_threshold(gray_image)
     eroded_image = bt.erosion(binarized_image)
     closed_image = bt.morphological_closing(binarized_image, iterations=5)
@@ -27,8 +29,9 @@ def process(image_path):
     deskewed_image = four_point_transform(gray_image, np.array(plate_corners_list))
     _draw_plate_polygons(image, result_polygon)
 
+    cv2.imshow("Original", image)
     cv2.imshow("Grayscale", gray_image)
-    cv2.imshow("Contrast bumped", 4)
+    cv2.imshow("Contrast bumped", contrast_bumped_image)
     cv2.imshow("Bin", binarized_image)
     cv2.imshow("Bin -> Erosion", eroded_image)
     cv2.imshow("Bin -> Erosion -> Closing", eroded_closed_image)
@@ -110,4 +113,4 @@ def four_point_transform(image, points):
 
 
 if __name__ == '__main__':
-    process("dataset/skewed_trimmed_samples/skewed_008.jpg")
+    process("dataset/skewed_trimmed_samples/skewed_009.jpg")
