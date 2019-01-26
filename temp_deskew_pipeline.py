@@ -42,25 +42,22 @@ def morphological_opening(self, image, kernel_size=(7, 3), iterations=15):
     opening_mask = cv2.getStructuringElement(cv2.MORPH_RECT, kernel_size)
     opening_image = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel=opening_mask, iterations=iterations)
     image = cv2.subtract(image, opening_image)
-    self.display_helper.add_to_plot(image, title='Morph opening', fix_colors=True)
     return image
 
 
 # Loads the image then enhances it
-image = Image.open('dataset/skewed_trimmed_samples/I00005.png')
+image = Image.open('dataset/skewed_trimmed_samples/skewed_009.jpg')
 contrast = ImageEnhance.Contrast(image)
-img = contrast.enhance(2)
+img = contrast.enhance(10)
 img = np.asarray(img)
-r, g, b = cv2.split(img)
+r, g, b, a = cv2.split(img)
 contrast = cv2.merge([b, g, r])
 # Reads the enhanced image and converts it to grayscale, creates new file
 gray_image = cv2.cvtColor(contrast, cv2.COLOR_BGR2GRAY)  # there is a problem here
 
-# Otsu's thresholding
-ret2, th2 = cv2.threshold(gray_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+ret2, th2 = cv2.threshold(gray_image, 200, 255, cv2.THRESH_BINARY)
 
-eroded = erosion(th2, iterations=5)
-_, result_polygon = _find_plate_contour(eroded, img)
+_, result_polygon = _find_plate_contour(th2, img)
 polygon_image = _draw_plate_polygons(img, result_polygon)
 
 # writes enhanced and thresholded img
@@ -69,6 +66,5 @@ cv2.imwrite('temp3.png', th2)
 cv2.imshow("contrast bumped", img)
 cv2.imshow("grayscale after contrast", gray_image)
 cv2.imshow("otsu", th2)
-cv2.imshow("erosion", eroded)
 cv2.imshow("approx polygon", polygon_image)
 cv2.waitKey()
