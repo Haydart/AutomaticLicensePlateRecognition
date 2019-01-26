@@ -1,6 +1,7 @@
 from unittest import TestCase
 
-from final_solution.src.heuristics import *
+from util.heuristics import *
+
 
 class TestHeuristics(TestCase):
 
