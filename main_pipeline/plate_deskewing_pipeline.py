@@ -12,6 +12,7 @@ bt = BasicTransformations(display_helper)
 
 
 def process(image_path):
+    print('Processing {}...'.format(image_path))
     image = Image.open(image_path)
     contrast_image = ImageEnhance.Contrast(image)
     img = contrast_image.enhance(3)
@@ -21,7 +22,8 @@ def process(image_path):
 
     display_helper.add_to_plot(contrast_image, title="Contrast bump")
     gray_image = bt.gray_scale(contrast_image)
-    binarized_image = bt.binary_threshold(gray_image, 210)
+    blurred_image = bt.blur(gray_image)
+    binarized_image = bt.binary_threshold(blurred_image, 200)
     result_polygon = cf.find_plate_contours(binarized_image)
 
     print(result_polygon)
@@ -29,8 +31,14 @@ def process(image_path):
     display_helper.add_to_plot(polygon_image, title="Approx polygon")
 
     display_helper.plot_results()
+    display_helper.reset_subplot()
     print("DONE")
 
 
 if __name__ == '__main__':
-    process('../dataset/skewed_trimmed_samples/I00006.png')
+    import os
+
+    dir_path = '../dataset/skewed_trimmed_samples/'
+    for filename in os.listdir(dir_path):
+        if filename.startswith("I0000"):
+            process('{}{}'.format(dir_path, filename))

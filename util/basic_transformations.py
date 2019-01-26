@@ -12,8 +12,13 @@ class BasicTransformations:
         self.display_helper.add_to_plot(image, title='Grayscale', fix_colors=True)
         return image
 
-    def bilateral_filter(self, image):
-        image = cv2.bilateralFilter(image, 16, 32, 32)
+    def blur(self, image):
+        image = cv2.blur(image, ksize=(3, 5))
+        self.display_helper.add_to_plot(image, title='Blur', fix_colors=True)
+        return image
+
+    def bilateral_filter(self, image, d=16, sigma_color=32, sigma_space=32):
+        image = cv2.bilateralFilter(image, d, sigma_color, sigma_space)
         self.display_helper.add_to_plot(image, title='Bilateral', fix_colors=True)
         return image
 
