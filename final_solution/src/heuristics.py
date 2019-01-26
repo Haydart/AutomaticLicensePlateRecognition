@@ -71,7 +71,7 @@ def remove_big_areas(bands, size):
         area_box = ((y1 - y0) * (x1 - x0))
 
         prc = area_box / area_picture
-        if prc <= 0.07:
+        if prc <= 0.10:
             bands_new.append(band)
         else:
             print('Removed area', prc)
