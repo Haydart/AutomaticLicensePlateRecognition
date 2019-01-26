@@ -50,7 +50,7 @@ class ImageDisplayHelper:
             # fig = plt.gcf()
 
             # fig.set_size_inches(5, 7.5)
-            # plt.tight_layout()
+            plt.tight_layout()
             print('plot display')
             plt.show()
 

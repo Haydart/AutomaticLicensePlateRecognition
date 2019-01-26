@@ -108,6 +108,12 @@ def remove_horizontal(bands, width_image, percent_limit=0.4):
 
     return bands_new
 
+def join_inside(bands):
+    for band in bands:
+        y0a, y1a, x0a, x1a = band
+
+
+
 
 if __name__ == '__main__':
     bands = [(220, 252, 436, 487), (220, 252, 487, 976), (220, 252, 976, 1000), (255, 282, 42, 75)]

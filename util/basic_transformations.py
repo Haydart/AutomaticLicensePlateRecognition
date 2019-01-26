@@ -66,6 +66,12 @@ class BasicTransformations:
 
         image = self.otsu_threshold(image)
 
+        # Invert if a lot of white spaces
+        non_zeros = np.count_nonzero(image)
+        zeros = image.size - non_zeros
+        if non_zeros > zeros:
+            image = cv2.bitwise_not(image)
+
         element = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 3))
         done = False
 

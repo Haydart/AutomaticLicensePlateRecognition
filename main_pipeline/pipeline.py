@@ -1,17 +1,21 @@
 import argparse
 import sys
 from copy import copy
+import cv2
 
 import util.band_clipping as bc
 import util.bounding_boxes as bb
 import util.input_output as io
 import final_solution.src.vehicles_detection as vd
 import final_solution.src.heuristics as he
+import remove_skew as rs
+import recognize_license_plate as ocr
 
 from main_pipeline.candidates import Candidates
 from util.basic_transformations import BasicTransformations
 from util.image_display_helper import ImageDisplayHelper
 from util.pipeline_transformations import PipelineTransformations
+
 
 image_helper = ImageDisplayHelper(True, 2, 20)
 transformations = PipelineTransformations(BasicTransformations(image_helper))
@@ -30,7 +34,12 @@ def main(argv):
         for sub_image in vehicle_detector.detect_vehicles(image.image):
             image.image = sub_image
             candidates = process(image.image)
-            # image_boxes = apply_bounding_boxex(image.image, candidates)
+
+            orginal = image.image
+            image_boxes = apply_bounding_boxex(image.image, candidates)
+            image.image = image_boxes
+            img_saver.save_image(image, -1)
+            image.image = orginal
 
             numrows = len(image.image)
             numcols = len(image.image[0])
@@ -41,6 +50,17 @@ def main(argv):
             image.image = image_boxes
             img_saver.save_image(image, counter)
 
+            # for idx, bond in enumerate(candidates_filtered):
+            #     y0, y1, x0, x1 = bond
+            #     print( idx, y0, y1, x0, x1)
+            #     deskewed = rs.deskew(image.image[y0:y1, x0:x1])
+            #     import util.utils as ut
+            #     # ut.show_one_image(image.image[y0:y1, x0:x1])
+            #     # ut.show_one_image(deskewed)
+            #     ocr_file = 'to_ocr{}.jpg'.format(idx)
+            #     # cv2.imwrite(ocr_file, deskewed)
+            #     ocr.read_text(ocr_file)
+            #
             image_helper.plot_results()
             image_helper.reset_subplot_index()
             counter = counter + 1
@@ -94,11 +114,12 @@ def bounding_box_filtered(image, candidates_filtered):
     image_boxes = bb.apply_bounding_boxes(image_boxes, candidates_filtered, bb.GREEN)
     return image_boxes
 
+
 def filter_heuristically(candidates, image_size):
-    candidates = he.join_separated(candidates)
     candidates = he.remove_big_areas(candidates, image_size)
     candidates = he.remove_vertical(candidates)
     candidates = he.remove_horizontal(candidates, image_size[1])
+    candidates = he.join_separated(candidates)
     return candidates
 
 
