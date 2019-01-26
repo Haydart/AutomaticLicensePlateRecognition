@@ -1,11 +1,8 @@
-import os
-
-from final_solution.src.band_clipping import BindsFinder
-from datasets import DatasetsProvider, samples, sample
-
-
 import cv2
 import numpy as np
+
+from datasets import DatasetsProvider, sample
+from util.band_clipping import BandsFinder
 
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
@@ -24,7 +21,7 @@ def show_bounds(img, band, color):
 def canny_method(image):
     canny_image = canny_edge_detection(image)
 
-    bf = BindsFinder(canny_image)
+    bf = BandsFinder(canny_image)
     bands = bf.find_bands()
 
     return bands
@@ -66,21 +63,21 @@ def process():
     vertical_sobel = sobel_vertical_edge_detection(noise_removed_image)
     vertical_sobel_skeleton, vertical_sobel_thresh = skeletonization(vertical_sobel)
 
-    bf = BindsFinder(horizontal_sobel_skeleton)
+    bf = BandsFinder(horizontal_sobel_skeleton)
     bands = bf.find_bands()
 
     for band in bands:
         show_bounds(image, band, RED)
 
-    plot_image(grayscale_image, 1, 'grayscale')
-    plot_image(noise_removed_image, 2, 'bilateral')
-    plot_image(image, 3, 'image with bounds')
-    plot_image(horizontal_sobel, 3, 'horizontal sobel')
-    plot_image(horizontal_sobel_thresh, 4, 'horizontal sobel threshold')
-    plot_image(horizontal_sobel_skeleton, 5, 'horizontal sobel skeleton')
-    plot_image(vertical_sobel, 6, 'vertical sobel')
-    plot_image(vertical_sobel_thresh, 7, 'vertical sobel threshold')
-    plot_image(vertical_sobel_skeleton, 8, 'vertical sobel skeleton')
+    display.add_to_plot(grayscale_image, 1, 'grayscale')
+    display.add_to_plot(noise_removed_image, 2, 'bilateral')
+    display.add_to_plot(image, 3, 'image with bounds')
+    display.add_to_plot(horizontal_sobel, 3, 'horizontal sobel')
+    display.add_to_plot(horizontal_sobel_thresh, 4, 'horizontal sobel threshold')
+    display.add_to_plot(horizontal_sobel_skeleton, 5, 'horizontal sobel skeleton')
+    display.add_to_plot(vertical_sobel, 6, 'vertical sobel')
+    display.add_to_plot(vertical_sobel_thresh, 7, 'vertical sobel threshold')
+    display.add_to_plot(vertical_sobel_skeleton, 8, 'vertical sobel skeleton')
 
     plt.subplots_adjust(bottom=0.1, left=0.1, right=0.9, top=0.9, wspace=0.3, hspace=0.3)
     fig = plt.gcf()

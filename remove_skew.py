@@ -1,19 +1,46 @@
 from random import randint
-import cv2
+
 import numpy as np
 
-
-def morphological_closing(image, kernel_size=(3, 3), iterations=6):
-    kernel = np.ones(kernel_size, np.uint8)
-    return cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel, iterations=iterations)
-
-
-def erosion(image, kernel_size=(3, 3), iterations=1):
-    kernel_size = np.ones(kernel_size, np.uint8)
-    return cv2.erode(image, kernel_size, iterations=iterations)
+from util.basic_transformations import BasicTransformations
+from util.image_display_helper import ImageDisplayHelper
+from util.input_output import *
 
 
-def find_plate_contour(preprocessed_image, original_image):
+def process(image_path):
+    display = ImageDisplayHelper(True, 2, 5)
+    bt = BasicTransformations(display)
+
+    image = cv2.imread(image_path)
+    gray_image = bt.gray_scale(image_path)
+    contrast_bumped_image = bt.contrast_brightness(gray_image, alpha=2, beta=50)
+
+    binarized_image = bt.otsu_threshold(gray_image)
+    eroded_image = bt.erosion(binarized_image)
+    closed_image = bt.morphological_closing(binarized_image, iterations=5)
+    eroded_closed_image = bt.morphological_closing(eroded_image, iterations=5)
+
+    _, result_polygon = _find_plate_contour(eroded_closed_image, image)
+    polygon_flat_list = [item for sublist in result_polygon for item in sublist]
+    plate_corners_list = [(arr[0], arr[1]) for arr in polygon_flat_list]
+
+    deskewed_image = four_point_transform(gray_image, np.array(plate_corners_list))
+    _draw_plate_polygons(image, result_polygon)
+
+    cv2.imshow("Grayscale", gray_image)
+    cv2.imshow("Contrast bumped", 4)
+    cv2.imshow("Bin", binarized_image)
+    cv2.imshow("Bin -> Erosion", eroded_image)
+    cv2.imshow("Bin -> Erosion -> Closing", eroded_closed_image)
+    cv2.imshow("Bin -> Closing", closed_image)
+    cv2.imshow("Result Polygon", image)
+    cv2.imshow("Deskewed image", deskewed_image)
+    cv2.imwrite("ocr-ready.jpg", deskewed_image)
+
+    cv2.waitKey()
+
+
+def _find_plate_contour(preprocessed_image, original_image):
     _, contours, _ = cv2.findContours(preprocessed_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_KCOS)
     contours = sorted(contours, key=cv2.contourArea, reverse=True)[:10]
     # take into consideration only 10 contours covering greatest area
@@ -32,11 +59,11 @@ def find_plate_contour(preprocessed_image, original_image):
     return original_image, result_polygon
 
 
-def draw_plate_polygons(image, approximated_polygon):
+def _draw_plate_polygons(image, approximated_polygon):
     return cv2.drawContours(image, [approximated_polygon], -1, (randint(0, 255), randint(0, 255), randint(0, 255)), 3)
 
 
-def order_corner_points(points):
+def _order_corner_points(points):
     # initialize a list of coordinates that will be ordered top-left, top-right, bottom-right, bottom-left
     rect = np.zeros((4, 2), dtype="float32")
     # the top-left point will have the smallest sum, whereas
@@ -53,7 +80,7 @@ def order_corner_points(points):
 
 
 def four_point_transform(image, points):
-    rect = order_corner_points(points)
+    rect = _order_corner_points(points)
     (top_left, top_right, bottom_right, bottom_left) = rect
 
     # compute the width of the new image, which will be the
@@ -82,36 +109,5 @@ def four_point_transform(image, points):
     return warped
 
 
-def process():
-    # image = load_image('skewed_trimmed_samples/skewed_007.jpg')
-    image = load_image('detect.jpg')
-    gray_image = gray_scale(image)
-    # contrast_bumped_image = contrast_bump(gray_image, alpha=2, beta=50)
-
-    ret, binarized_image = cv2.threshold(gray_image, 175, 255, cv2.THRESH_BINARY)
-    eroded_image = erosion(binarized_image)
-    closed_image = morphological_closing(binarized_image, iterations=5)
-    eroded_closed_image = morphological_closing(eroded_image, iterations=5)
-
-    # _, result_polygon = find_plate_contour(eroded_closed_image, image)
-    # polygon_flat_list = [item for sublist in result_polygon for item in sublist]
-    # plate_corners_list = [(arr[0], arr[1]) for arr in polygon_flat_list]
-    #
-    # deskewed_image = four_point_transform(gray_image, np.array(plate_corners_list))
-    # draw_plate_polygons(image, result_polygon)
-
-    cv2.imshow("Grayscale", gray_image)
-    # cv2.imshow("Contrast bumped", 4)
-    cv2.imshow("Bin", binarized_image)
-    cv2.imshow("Bin -> Erosion", eroded_image)
-    cv2.imshow("Bin -> Erosion -> Closing", eroded_closed_image)
-    cv2.imshow("Bin -> Closing", closed_image)
-    cv2.imshow("Result Polygon", image)
-    # cv2.imshow("Deskewed image", deskewed_image)
-    # cv2.imwrite("ocr-ready.jpg", deskewed_image)
-
-    cv2.waitKey()
-
-
 if __name__ == '__main__':
-    process()
+    process("dataset/skewed_trimmed_samples/skewed_008.jpg")
