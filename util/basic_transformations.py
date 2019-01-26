@@ -74,12 +74,7 @@ class BasicTransformations:
         skeletonized = np.zeros(image.shape, np.uint8)
 
         image = self.otsu_threshold(image)
-
-        # Invert if a lot of white spaces
-        non_zeros = np.count_nonzero(image)
-        zeros = image.size - non_zeros
-        if non_zeros > zeros:
-            image = cv2.bitwise_not(image)
+        image = self.negative(image)
 
         element = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 3))
         done = False

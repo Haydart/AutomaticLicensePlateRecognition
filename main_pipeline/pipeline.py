@@ -44,8 +44,8 @@ def main(argv):
             numrows = len(image.image)
             numcols = len(image.image[0])
 
-            candidates_filtered = filter_heuristically(candidates.all, (numrows, numcols))
-            image_boxes = bounding_box_filtered(image.image, candidates_filtered)
+            # candidates_filtered = filter_heuristically(candidates.all, (numrows, numcols))
+            # image_boxes = bounding_box_filtered(image.image, candidates_filtered)
 
             # image.image = image_boxes
             # img_saver.save_image(image, counter)

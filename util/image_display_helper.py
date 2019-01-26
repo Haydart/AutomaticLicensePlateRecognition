@@ -18,6 +18,7 @@ class ImageDisplayHelper:
 
     def reset_subplot_index(self):
         self.subplot_index = 0
+        plt.figure("Pipeline", figsize=(30, 30))
 
     def add_to_plot(self, image, subplot_index=None, title='', fix_colors=True):
         if self.pipeline_debug_enabled:
@@ -29,7 +30,7 @@ class ImageDisplayHelper:
                 current_subplot_index = subplot_index
 
             try:
-                plt.subplot(7, 2, current_subplot_index)
+                plt.subplot(9, 2, current_subplot_index)
             except SyntaxError:
                 print("Please enlarge subplot space in image helper definition")
 
