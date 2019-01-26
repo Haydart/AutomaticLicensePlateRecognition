@@ -6,6 +6,7 @@ import util.band_clipping as bc
 import util.bounding_boxes as bb
 import util.heuristics as heuristics
 import util.input_output as io
+
 from main_pipeline.candidates import Candidates
 from util.basic_transformations import BasicTransformations
 from util.image_display_helper import ImageDisplayHelper
@@ -24,14 +25,24 @@ def main(argv):
     img_saver = io.ImageSaver(args.output_dir)
 
     for image in img_loader.load_images(args.input_dir):
-        candidates = process(image.image)
-        image_boxes = apply_bounding_boxex(image.image, candidates)
+        counter = 0
+        for sub_image in vehicle_detector.detect_vehicles(image.image):
+            image.image = sub_image
+            candidates = process(image.image)
+            # image_boxes = apply_bounding_boxex(image.image, candidates)
 
-        image.image = image_boxes
-        img_saver.save_image(image)
+            numrows = len(image.image)
+            numcols = len(image.image[0])
 
-        image_helper.plot_results()
-        image_helper.reset_subplot()
+            candidates_filtered = filter_heuristically(candidates.all, (numrows, numcols))
+            image_boxes = bounding_box_filtered(image.image, candidates_filtered)
+
+            image.image = image_boxes
+            img_saver.save_image(image, counter)
+
+            image_helper.plot_results()
+            image_helper.reset_subplot()
+            counter = counter + 1
 
 
 def parse():
@@ -52,6 +63,7 @@ def process(image):
     color_method_image = transformations.apply_color_masks(copy(image))
 
     sobel_candidates = bc.find_candidates(bc.sobel_method, vert_sobel_image, hor_sobel_image)
+
     opening_candidates = bc.find_candidates(bc.opening_method, opening_method_image)
     try:
         sobel_candidates = bc.find_candidates(bc.sobel_method, vert_sobel_image, hor_sobel_image)

@@ -16,6 +16,7 @@ class ImageDisplayHelper:
         self.subplot_width = subplot_width
         self.subplot_height = subplot_height
         self.pipeline_debug_enabled = debug_pipeline
+        plt.figure("Pipeline", figsize=(30, 30))
 
     def reset_subplot(self):
         self.subplot_index = 0
@@ -51,8 +52,9 @@ class ImageDisplayHelper:
             plt.subplots_adjust(bottom=0.1, left=0.02, right=0.75, top=0.98, wspace=1, hspace=1)
             fig = plt.gcf()
             fig.set_size_inches(5, 25)
-            plt.show()
+            # plt.tight_layout()
             print('plot display')
+            plt.show()
 
     def save_results(self, path):
         plt.savefig(path)
