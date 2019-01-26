@@ -1,5 +1,3 @@
-from random import randint
-
 import numpy as np
 from PIL import Image, ImageEnhance
 
@@ -47,7 +45,6 @@ def process(image_path):
 
 
 def deskew(image):
-    import util.utils as ut
     gray_image = bt.gray_scale(image)
     contrast_bumped_image = bt.contrast_brightness(gray_image, alpha=2, beta=50)
 
@@ -64,29 +61,6 @@ def deskew(image):
     deskewed_image = four_point_transform(gray_image, np.array(plate_corners_list))
     _draw_plate_polygons(image, result_polygon)
     return deskewed_image
-
-
-def _find_plate_contour(preprocessed_image, original_image):
-    _, contours, _ = cv2.findContours(preprocessed_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_KCOS)
-    contours = sorted(contours, key=cv2.contourArea, reverse=True)[:10]
-    # take into consideration only 10 contours covering greatest area
-
-    polygons_with_areas = []  # [(contour, area), (...)]
-
-    for contour in contours:
-        contour_area = cv2.contourArea(contour)
-        # print("Contour area: ", contour_area, " contour is ", contour)
-        contour_perimeter = cv2.arcLength(contour, True)
-        approximated_contour_polygon = cv2.approxPolyDP(contour, 0.03 * contour_perimeter, closed=True)
-        # print("approximated contour polygon", approximated_contour_polygon)
-        polygons_with_areas.append((approximated_contour_polygon, contour_area))
-
-    result_polygon = max(polygons_with_areas, key=lambda item: item[1])[0]
-    return original_image, result_polygon
-
-
-def _draw_plate_polygons(image, approximated_polygon):
-    return cv2.drawContours(image, [approximated_polygon], -1, (randint(0, 255), randint(0, 255), randint(0, 255)), 3)
 
 
 def _order_corner_points(points):

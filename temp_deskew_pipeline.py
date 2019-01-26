@@ -38,7 +38,7 @@ def morphological_closing(image, kernel_size=(3, 3), iterations=6):
     return cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel, iterations=iterations)
 
 
-def morphological_opening(self, image, kernel_size=(7, 3), iterations=15):
+def morphological_opening(image, kernel_size=(7, 3), iterations=15):
     opening_mask = cv2.getStructuringElement(cv2.MORPH_RECT, kernel_size)
     opening_image = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel=opening_mask, iterations=iterations)
     image = cv2.subtract(image, opening_image)
@@ -46,7 +46,7 @@ def morphological_opening(self, image, kernel_size=(7, 3), iterations=15):
 
 
 # Loads the image then enhances it
-image = Image.open('dataset/skewed_trimmed_samples/skewed_001.jpg')
+image = Image.open('dataset/skewed_trimmed_samples/I00000.png')
 contrast = ImageEnhance.Contrast(image)
 img = contrast.enhance(10)
 img = np.asarray(img)

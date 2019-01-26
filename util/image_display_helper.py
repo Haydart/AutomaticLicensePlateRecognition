@@ -2,7 +2,7 @@ import cv2
 import matplotlib as mpl
 
 mpl.interactive(True)
-mpl.rcParams['figure.dpi'] = 300
+mpl.rcParams['figure.dpi'] = 150
 from matplotlib import pyplot as plt
 
 
