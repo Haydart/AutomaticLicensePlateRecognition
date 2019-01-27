@@ -54,7 +54,7 @@ def process_image(image, image_path=''):
         display_helper.plot_results()
         display_helper.reset_subplot()
 
-        cv2.imwrite('../output/ocr_ready/{}'.format(image_path.split('/')[-1]), deskewed_image)
+        # cv2.imwrite('../output/ocr_ready/{}'.format(image_path.split('/')[-1]), deskewed_image)
 
         return deskewed_image
 
