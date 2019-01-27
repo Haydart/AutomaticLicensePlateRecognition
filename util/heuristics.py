@@ -17,9 +17,9 @@ def join_separated_2(bands):
     new_bands = []
 
     while not sorted_bands == new_bands:
-        print("_____")
-        print("S bands", sorted_bands)
-        print("N bands", new_bands)
+        # print("_____")
+        # print("S bands", sorted_bands)
+        # print("N bands", new_bands)
 
         skip = set()
 

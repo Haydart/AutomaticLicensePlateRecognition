@@ -43,6 +43,6 @@ if __name__ == '__main__':
     fig = plt.gcf()
     fig.set_size_inches(10, 15)
 
-    print('calculated')
+    # print('calculated')
 
     plt.show()
