@@ -21,12 +21,14 @@ def join_separated_2(bands):
         print("S bands", sorted_bands)
         print("N bands", new_bands)
 
+        skip = set()
+
         if new_bands:
             sorted_bands = new_bands
             new_bands = []
 
         for ida, left in enumerate(sorted_bands):
-            for idb, right in enumerate(sorted_bands[ida:], ida):
+            for right in sorted_bands[ida:]:
                 if should_join(left, right):
                     y0a, y1a, x0a, x1a = left
                     y0b, y1b, x0b, x1b = right
@@ -38,10 +40,15 @@ def join_separated_2(bands):
                     joined = (y0, y1, x0, x1)
 
                     if joined not in new_bands:
-                        new_bands.append(joined)
+                        if left != right:
+                            new_bands.append(joined)
+                            skip.add(left)
+                            skip.add(right)
+                            new_bands.remove(left)
                 else:
                     if left not in new_bands:
-                        new_bands.append(left)
+                        if left not in skip:
+                            new_bands.append(left)
 
     return sorted_bands
 
@@ -50,7 +57,6 @@ def should_join(left, right):
     y0a, y1a, x0a, x1a = left
     y0b, y1b, x0b, x1b = right
     return is_in_the_same_row(y0a, y0b) and is_in_the_same_row(y1a, y1b) and is_close_to(x1a, x0b)
-
 
 
 def join_separated(bands):
