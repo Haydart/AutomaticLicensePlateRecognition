@@ -31,6 +31,14 @@ def process(image_path):
     polygon_image = cf.draw_plate_polygon(img, result_polygon)
     display_helper.add_to_plot(polygon_image, title="Approx polygon")
 
+    hough_lines(gray_image, img)
+
+    display_helper.plot_results()
+    display_helper.reset_subplot()
+    print("DONE")
+
+
+def hough_lines(gray_image, img):
     edges = cv2.Canny(gray_image, 50, 150, apertureSize=3)
     min_line_length = 100
     max_line_gap = 10
@@ -39,19 +47,20 @@ def process(image_path):
         cv2.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
     display_helper.add_to_plot(img, title="Hough Lines Prob")
 
-    display_helper.plot_results()
-    display_helper.reset_subplot()
-    print("DONE")
-
 
 def connected_components(binarized_image):
     eroded_image = bt.erosion(binarized_image)
-    nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(eroded_image, connectivity=4)
+    components_count, output, stats, centroids = cv2.connectedComponentsWithStats(eroded_image, connectivity=4)
+
     sizes = stats[:, -1]
-    print(sizes)
+    centroids_areas = np.column_stack((centroids, sizes))
+    centroids_areas = np.delete(centroids_areas, 0, axis=0)
+    sorted_centroids_areas = centroids_areas[centroids_areas[:, -1].argsort()[::-1]]  # sort descending by size column
+    two_largest_sizes
+
     max_label = 1
     max_size = sizes[1]
-    for i in range(2, nb_components):
+    for i in range(2, components_count):
         if sizes[i] > max_size:
             max_label = i
             max_size = sizes[i]
