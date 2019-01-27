@@ -23,11 +23,13 @@ def process(image_path):
     display_helper.add_to_plot(contrast_image, title="Contrast bump")
     gray_image = bt.gray_scale(contrast_image)
     binarized_image = bt.binary_threshold(gray_image, 200)
-    result_polygon = cf.find_plate_contours(binarized_image)
-    print(result_polygon)
 
-    connected_components(binarized_image)
+    plate_component_image = connected_components(binarized_image)
+    display_helper.add_to_plot(plate_component_image, title="Plate connected component")
 
+    # plate_component_image = cv2.normalize(src=plate_component_image, dst=None, alpha=0, beta=255,
+    #                                       norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8UC1)
+    result_polygon = cf.find_plate_contours(plate_component_image)
     polygon_image = cf.draw_plate_polygon(img, result_polygon)
     display_helper.add_to_plot(polygon_image, title="Approx polygon")
 
@@ -61,15 +63,15 @@ def connected_components(binarized_image):
     ))
 
     # delete background component
-    centroids_areas_no_black = np.delete(centroids_areas, 0, axis=0)
-    # sort descending by size column
-    sorted_components_info = centroids_areas_no_black[centroids_areas_no_black[:, -1].argsort()[::-1]]
+    components_areas_centroids = np.delete(centroids_areas, 0, axis=0)
+    # sort components descending by size column
+    sorted_components_info = components_areas_centroids[components_areas_centroids[:, -1].argsort()[::-1]]
 
     largest_component_info = choose_plate_component(binarized_image, sorted_components_info)
     largest_components_image = np.zeros(output.shape)
     # mask the image to only contain the chosen connected component
     largest_components_image[output == largest_component_info[0]] = 255
-    display_helper.add_to_plot(largest_components_image, title="Connected components")
+    return largest_components_image
 
 
 def choose_plate_component(image, sorted_components_info):
@@ -101,5 +103,5 @@ if __name__ == '__main__':
 
     dir_path = '../dataset/skewed_trimmed_samples/'
     for filename in os.listdir(dir_path):
-        if filename.startswith("I0001"):
+        if filename.startswith("I0000"):
             process('{}{}'.format(dir_path, filename))
