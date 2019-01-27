@@ -83,6 +83,7 @@ class BandsFinder:
         projection = np.copy(x_projection)
         for i in range(bands_count_limit):
             (x0, x1) = self._find_band(projection, c=self.x_c)
+            # utils.show_one_image(self.image[:, x0:x1])
             if x1-x0 >= plate_min_width:
                 bands.append((x0, x1))
 

@@ -17,7 +17,7 @@ from util.image_display_helper import ImageDisplayHelper
 from util.pipeline_transformations import PipelineTransformations
 
 
-image_helper = ImageDisplayHelper(True, 2, 20)
+image_helper = ImageDisplayHelper(False, 2, 20)
 transformations = PipelineTransformations(BasicTransformations(image_helper))
 
 
@@ -30,7 +30,7 @@ def main(argv):
     vehicle_detector = vd.VehiclesDetector()
 
     for image in img_loader.load_images(args.input_dir):
-        counter = 0
+        counter = 1
         for sub_image in vehicle_detector.detect_vehicles(image.image):
             image.image = sub_image
             candidates = process(image.image)
@@ -38,29 +38,29 @@ def main(argv):
             orginal = image.image
             image_boxes = apply_bounding_boxex(image.image, candidates)
             image.image = image_boxes
-            img_saver.save_image(image, counter)
+            img_saver.save_image(image, 0)
             image.image = orginal
 
             numrows = len(image.image)
             numcols = len(image.image[0])
 
-            # candidates_filtered = filter_heuristically(candidates.all, (numrows, numcols))
-            # image_boxes = bounding_box_filtered(image.image, candidates_filtered)
+            candidates_filtered = filter_heuristically(candidates.all, (numrows, numcols))
+            image_boxes = bounding_box_filtered(image.image, candidates_filtered)
 
-            # image.image = image_boxes
-            # img_saver.save_image(image, counter)
-            #
-            # # for idx, bond in enumerate(candidates_filtered):
-            # #     y0, y1, x0, x1 = bond
-            # #     print( idx, y0, y1, x0, x1)
-            # #     deskewed = rs.deskew(image.image[y0:y1, x0:x1])
-            # #     import util.utils as ut
-            # #     # ut.show_one_image(image.image[y0:y1, x0:x1])
-            # #     # ut.show_one_image(deskewed)
-            # #     ocr_file = 'to_ocr{}.jpg'.format(idx)
-            # #     # cv2.imwrite(ocr_file, deskewed)
-            # #     ocr.read_text(ocr_file)
-            # #
+            image.image = image_boxes
+            img_saver.save_image(image, counter)
+
+            # for idx, bond in enumerate(candidates_filtered):
+            #     y0, y1, x0, x1 = bond
+            #     print( idx, y0, y1, x0, x1)
+            #     deskewed = rs.deskew(image.image[y0:y1, x0:x1])
+            #     import util.utils as ut
+            #     # ut.show_one_image(image.image[y0:y1, x0:x1])
+            #     # ut.show_one_image(deskewed)
+            #     ocr_file = 'to_ocr{}.jpg'.format(idx)
+            #     # cv2.imwrite(ocr_file, deskewed)
+            #     ocr.read_text(ocr_file)
+
             image_helper.plot_results()
             image_helper.reset_subplot_index()
             counter = counter + 1
@@ -116,10 +116,10 @@ def bounding_box_filtered(image, candidates_filtered):
 
 
 def filter_heuristically(candidates, image_size):
-    candidates = he.remove_big_areas(candidates, image_size)
     # candidates = he.remove_vertical(candidates)
     # candidates = he.remove_horizontal(candidates, image_size[1])
-    # candidates = he.join_separated(candidates)
+    candidates = he.join_separated_2(candidates)
+    # candidates = he.remove_big_areas(candidates, image_size)
     return candidates
 
 

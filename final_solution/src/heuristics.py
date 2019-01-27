@@ -9,8 +9,38 @@ def pairwise(iterable):
     return zip(a, b)
 
 
-is_in_the_same_row = lambda ya, yb: (abs(ya -yb) <= 20)
+is_in_the_same_row = lambda ya, yb: (abs(ya - yb) <= 20)
 is_close_to = lambda x1a, x0b: (abs(x0b - x1a) <= 30)
+
+def join_separated_2(bands):
+    sorted_bands = sorted(bands, key=lambda tup: (tup[0], tup[2]))
+    new_bands = set()
+    loop = True
+
+    tmp_bands = set()
+    while loop:
+        loop = False
+        new_bands = set()
+        for left in sorted_bands:
+            y0a, y1a, x0a, x1a = left
+            for right in sorted_bands:
+                y0b, y1b, x0b, x1b = right
+
+                if is_in_the_same_row(y0a, y0b) and is_in_the_same_row(y1a, y1b):
+                    if is_close_to(x1a, x0b):
+                        y0 = min(y0a, y0b)
+                        y1 = max(y1a, y1b)
+                        x0 = min(x0a, x0b)
+                        x1 = max(y1a, y1b)
+                        new_bands.add((y0, y1, x0, x1))
+                        loop = True
+
+        sorted_bands = sorted(list(new_bands), key=lambda tup: (tup[0], tup[2]))
+
+    return new_bands
+
+
+
 
 
 def join_separated(bands):
@@ -107,12 +137,6 @@ def remove_horizontal(bands, width_image, percent_limit=0.4):
             print('Removed horizontal length', prc)
 
     return bands_new
-
-def join_inside(bands):
-    for band in bands:
-        y0a, y1a, x0a, x1a = band
-
-
 
 
 if __name__ == '__main__':
