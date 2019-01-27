@@ -48,6 +48,7 @@ class PlateConnectedComponentExtractor:
         # otherwise, choose component, for which distance from image center to its centroid is the smallest
         largest_component_area_trust_threshold = 4
         largest_components_sizes = np.sort(largest_components_info[:, -1])
+        print(largest_components_info)
         if len(largest_components_sizes) == 2:
             if largest_components_sizes[1] / largest_components_sizes[0] <= largest_component_area_trust_threshold:
                 np.apply_along_axis(calculate_centroid_distance, 1, largest_components_info)
@@ -55,3 +56,5 @@ class PlateConnectedComponentExtractor:
                 return largest_components_info[largest_components_info[:, -2].argsort()][0, :]
             else:
                 return largest_components_info[0, :]
+        elif len(largest_components_sizes) == 1:
+            return largest_components_info[0]
