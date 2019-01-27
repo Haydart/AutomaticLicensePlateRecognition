@@ -10,7 +10,7 @@ from util.image_display_helper import ImageDisplayHelper
 from util.plate_connected_component import PlateConnectedComponentExtractor
 from util.plate_contours import PlateContoursFinder
 
-display_helper = ImageDisplayHelper(False, 2, 14)
+display_helper = ImageDisplayHelper(False, 2, 10)
 bt = BasicTransformations(display_helper)
 cf = PlateContoursFinder()
 ex = PlateConnectedComponentExtractor(bt)
@@ -18,25 +18,27 @@ ds = PlateDeskewingTransformer()
 
 
 def process_path(image_path):
-    process_image(cv2.imread(image_path))
+    process_image(cv2.imread(image_path), image_path)
 
 
-def process_image(image):
+def process_image(image, image_path=''):
+    print('\nProcessing {}...'.format(image_path))
     image = Image.fromarray(image)
     contrast_image = ImageEnhance.Contrast(image)
-    image = contrast_image.enhance(3)
+    image = contrast_image.enhance(9)
     image = np.asarray(image.copy())
     channels_list = cv2.split(image)
     contrast_image = cv2.merge([channels_list[2], channels_list[1], channels_list[0]])  # b, g, r
 
     display_helper.add_to_plot(contrast_image, title="Contrast bump")
     gray_image = bt.gray_scale(contrast_image)
-    binarized_image = bt.binary_threshold(gray_image, 200)
+    binarized_image = bt.otsu_threshold(gray_image)
 
     plate_component_image = ex.extract_plate_connected_component(binarized_image)
     display_helper.add_to_plot(plate_component_image, title="Plate connected component")
 
     plate_polygon = cf.find_plate_contours(plate_component_image)
+
     if plate_polygon is not None:
         polygon_image = cf.draw_plate_polygon(image.copy(), plate_polygon)
         display_helper.add_to_plot(polygon_image, title="Approx polygon")
@@ -51,6 +53,8 @@ def process_image(image):
 
         display_helper.plot_results()
         display_helper.reset_subplot()
+
+        cv2.imwrite('../output/ocr_ready/{}'.format(image_path.split('/')[-1]), deskewed_image)
 
         return deskewed_image
 
@@ -69,5 +73,5 @@ def hough_lines(gray_image, img):
 if __name__ == '__main__':
     dir_path = '../dataset/skewed_trimmed_samples/'
     for filename in os.listdir(dir_path):
-        if filename.startswith("skewed_"):
-            process('{}{}'.format(dir_path, filename))
+        if filename.startswith("I0000"):
+            process_path('{}{}'.format(dir_path, filename))
