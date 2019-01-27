@@ -30,7 +30,7 @@ class ImageDisplayHelper:
                 current_subplot_index = subplot_index
 
             try:
-                plt.subplot(9, 2, current_subplot_index)
+                plt.subplot(self.subplot_height, self.subplot_width, current_subplot_index)
             except SyntaxError:
                 print("Please enlarge subplot space in image helper definition")
 
