@@ -3,6 +3,7 @@ import cv2
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
+PINK = (255, 192, 203)
 
 
 def apply_bounding_boxes(image, bands, color=GREEN):

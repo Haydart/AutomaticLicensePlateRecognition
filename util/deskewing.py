@@ -1,5 +1,5 @@
 import numpy as np
-from cv2 import cv2
+import cv2
 
 
 class PlateDeskewingTransformer:
@@ -34,6 +34,8 @@ class PlateDeskewingTransformer:
         return warped
 
     def _order_corner_points(self, points):
+        points = [item for sublist in points for item in sublist]
+        points = np.array([(arr[0], arr[1]) for arr in points])
         # initialize a list of coordinates that will be ordered top-left, top-right, bottom-right, bottom-left
         rect = np.zeros((4, 2), dtype="float32")
         # the top-left point will have the smallest sum, whereas

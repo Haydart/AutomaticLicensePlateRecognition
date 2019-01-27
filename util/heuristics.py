@@ -11,34 +11,45 @@ def pairwise(iterable):
 is_in_the_same_row = lambda ya, yb: (abs(ya - yb) <= 20)
 is_close_to = lambda x1a, x0b: (abs(x0b - x1a) <= 30)
 
+
 def join_separated_2(bands):
     sorted_bands = sorted(bands, key=lambda tup: (tup[0], tup[2]))
-    new_bands = set()
-    loop = True
+    new_bands = []
 
-    tmp_bands = set()
-    while loop:
-        loop = False
-        new_bands = set()
-        for left in sorted_bands:
-            y0a, y1a, x0a, x1a = left
-            for right in sorted_bands:
-                y0b, y1b, x0b, x1b = right
+    while not sorted_bands == new_bands:
+        print("_____")
+        print("S bands", sorted_bands)
+        print("N bands", new_bands)
 
-                if is_in_the_same_row(y0a, y0b) and is_in_the_same_row(y1a, y1b):
-                    if is_close_to(x1a, x0b):
-                        y0 = min(y0a, y0b)
-                        y1 = max(y1a, y1b)
-                        x0 = min(x0a, x0b)
-                        x1 = max(y1a, y1b)
-                        new_bands.add((y0, y1, x0, x1))
-                        loop = True
+        if new_bands:
+            sorted_bands = new_bands
+            new_bands = []
 
-        sorted_bands = sorted(list(new_bands), key=lambda tup: (tup[0], tup[2]))
+        for ida, left in enumerate(sorted_bands):
+            for idb, right in enumerate(sorted_bands[ida:], ida):
+                if should_join(left, right):
+                    y0a, y1a, x0a, x1a = left
+                    y0b, y1b, x0b, x1b = right
 
-    return new_bands
+                    y0 = min(y0a, y0b)
+                    y1 = max(y1a, y1b)
+                    x0 = min(x0a, x0b)
+                    x1 = max(x1a, x1b)
+                    joined = (y0, y1, x0, x1)
+
+                    if joined not in new_bands:
+                        new_bands.append(joined)
+                else:
+                    if left not in new_bands:
+                        new_bands.append(left)
+
+    return sorted_bands
 
 
+def should_join(left, right):
+    y0a, y1a, x0a, x1a = left
+    y0b, y1b, x0b, x1b = right
+    return is_in_the_same_row(y0a, y0b) and is_in_the_same_row(y1a, y1b) and is_close_to(x1a, x0b)
 
 
 
