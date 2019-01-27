@@ -14,6 +14,7 @@ from util.basic_transformations import BasicTransformations
 from util.image_display_helper import ImageDisplayHelper
 from util.pipeline_transformations import PipelineTransformations
 from util.vehicles_detection import VehiclesDetector
+import main_pipeline.plate_deskewing_pipeline as pdp
 
 image_helper = ImageDisplayHelper(False, subplot_width=2, subplot_height=10)
 transformations = PipelineTransformations(BasicTransformations(image_helper))
@@ -34,9 +35,9 @@ def main(argv):
             candidates = process(image.image)
 
             image_boxes = apply_bounding_boxex(image.image, candidates)
-            # image.image = image_boxes
-            # img_saver.save_image(image, counter)
-            # counter = counter + 1
+            image.image = image_boxes
+            img_saver.save_image(image, counter)
+            counter = counter + 1
             image.image = sub_image
 
             numrows = len(image.image)
@@ -48,19 +49,22 @@ def main(argv):
             image.image = image_boxes
             img_saver.save_image(image, counter)
             counter = counter + 1
-            print('____')
 
-            # for idx, bond in enumerate(candidates_filtered):
-            #     y0, y1, x0, x1 = bond
-            #     print(idx, y0, y1, x0, x1)
-            #     # ut.show_one_image(sub_image[y0:y1, x0:x1])
-            #     deskewed = pdp.process_image(sub_image[y0:y1, x0:x1])
-            #
+            for idx, bond in enumerate(candidates_filtered):
+                y0, y1, x0, x1 = bond
+                print(idx, y0, y1, x0, x1)
+                image.image = sub_image[y0:y1, x0:x1]
+                write_deskewed(image, counter_ocr)
+                counter_ocr = counter_ocr + 1
+
+                # ut.show_one_image(sub_image[y0:y1, x0:x1])
+                # deskewed = pdp.process_image(sub_image[y0:y1, x0:x1])
+
             #     if deskewed is not None:
             #         # ut.show_one_image(deskewed)
             #         image.image = deskewed
             #         write_deskewed(image, counter_ocr)
-            #         counter_ocr = counter_ocr + 1
+            # #         counter_ocr = counter_ocr + 1
             #         # ocr.read_text(ocr_file)
 
             image_helper.plot_results()
@@ -68,7 +72,7 @@ def main(argv):
 
 
 def write_deskewed(image, counter):
-    root = '../output/results/toocr/'
+    root = '../final_solution/results/toocr/'
     source_name = image.path.split('/')[-1]
     source_name_raw = source_name.split('.')[-2]
 
@@ -141,6 +145,8 @@ def filter_heuristically(candidates, image_size):
     candidates = heuristics.remove_vertical(candidates)
     candidates = heuristics.remove_horizontal(candidates, image_size[1])
     candidates = heuristics.join_separated_2(candidates)
+    candidates = heuristics.enhance_area(candidates)
+
     return candidates
 
 
