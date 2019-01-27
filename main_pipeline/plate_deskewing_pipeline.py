@@ -53,27 +53,22 @@ def connected_components(binarized_image):
     components_count, output, stats, centroids = cv2.connectedComponentsWithStats(eroded_image, connectivity=4)
 
     sizes = stats[:, -1]
-    centroids_areas = np.column_stack((centroids, sizes))
-    centroids_areas = np.delete(centroids_areas, 0, axis=0)
-    sorted_centroids_areas = centroids_areas[centroids_areas[:, -1].argsort()[::-1]]  # sort descending by size column
-    two_largest_sizes
+    centroids_areas = np.column_stack((np.arange(components_count, dtype=int), centroids, sizes))
+    centroids_areas_no_black = np.delete(centroids_areas, 0, axis=0)
+    sorted_centroids_areas = centroids_areas_no_black[
+        centroids_areas_no_black[:, -1].argsort()[::-1]]  # sort descending by size column
+    two_largest_components_info = sorted_centroids_areas[:2, :]
+    largest_components_labels = sorted_centroids_areas[:, 0]
 
-    max_label = 1
-    max_size = sizes[1]
-    for i in range(2, components_count):
-        if sizes[i] > max_size:
-            max_label = i
-            max_size = sizes[i]
-
-    img2 = np.zeros(output.shape)
-    img2[output == max_label] = 255
+    largest_compone = np.zeros(output.shape)
+    largest_compone[output == max_label] = 255
     # label_hue = np.uint8(179 * output / np.max(output))
     # blank_ch = 255 * np.ones_like(label_hue)
     # labeled_img = cv2.merge([label_hue, blank_ch, blank_ch])
     # labeled_img = cv2.cvtColor(labeled_img, cv2.COLOR_HSV2BGR)
     # # set bg label to black
     # labeled_img[label_hue == 0] = 0
-    display_helper.add_to_plot(img2, title="Connected components")
+    display_helper.add_to_plot(largest_compone, title="Connected components")
 
 
 if __name__ == '__main__':
