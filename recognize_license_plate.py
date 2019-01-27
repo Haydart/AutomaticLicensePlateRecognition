@@ -18,9 +18,9 @@ if __name__ == '__main__':
             image = cv2.imread('{}/{}'.format(dir_path, filename))
             gray_image = bt.gray_scale(image)
             binarized_image = bt.otsu_threshold(gray_image)
-            dilated_image = bt.dilation(binarized_image)
+            eroded_image = bt.erosion(binarized_image)
             config = '-l eng --oem 3 --psm 10'
-            print(pytesseract.image_to_boxes(Image.fromarray(gray_image), config=config))
+            print(pytesseract.image_to_boxes(Image.fromarray(eroded_image), config=config))
 
     dh.plot_results()
 
