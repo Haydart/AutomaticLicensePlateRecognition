@@ -27,8 +27,8 @@ def process(image_path):
     plate_component_image = connected_components(binarized_image)
     display_helper.add_to_plot(plate_component_image, title="Plate connected component")
 
-    # plate_component_image = cv2.normalize(src=plate_component_image, dst=None, alpha=0, beta=255,
-    #                                       norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8UC1)
+    plate_component_image = cv2.normalize(src=plate_component_image, dst=None, alpha=0, beta=255,
+                                          norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8UC1)
     result_polygon = cf.find_plate_contours(plate_component_image)
     polygon_image = cf.draw_plate_polygon(img, result_polygon)
     display_helper.add_to_plot(polygon_image, title="Approx polygon")
