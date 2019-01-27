@@ -12,7 +12,7 @@ from util.image_display_helper import ImageDisplayHelper
 from util.pipeline_transformations import PipelineTransformations
 from util.vehicles_detection import VehiclesDetector
 
-image_helper = ImageDisplayHelper(True, subplot_width=2, subplot_height=10)
+image_helper = ImageDisplayHelper(False, subplot_width=2, subplot_height=10)
 transformations = PipelineTransformations(BasicTransformations(image_helper))
 vehicle_detector = VehiclesDetector()
 

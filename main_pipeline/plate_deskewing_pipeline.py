@@ -1,6 +1,6 @@
+import cv2
 import numpy as np
 from PIL import Image, ImageEnhance
-from cv2 import cv2
 
 from util.basic_transformations import BasicTransformations
 from util.image_display_helper import ImageDisplayHelper
@@ -55,5 +55,7 @@ if __name__ == '__main__':
 
     dir_path = '../dataset/skewed_trimmed_samples/'
     for filename in os.listdir(dir_path):
-        if filename.startswith("I0000"):
+        if filename.startswith("skewed_"):
             process('{}{}'.format(dir_path, filename))
+
+# def deskewe(file_name):

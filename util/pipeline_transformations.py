@@ -11,7 +11,7 @@ class PipelineTransformations:
     def preprocess(self, image):
         image = self.bt.gray_scale(image)
         image = self.bt.bilateral_filter(image)
-        image = self.bt.contrast_brightness(image)
+        # image = self.bt.contrast_brightness(image)
         return image
 
     def apply_skeletonized_sobel(self, image):
