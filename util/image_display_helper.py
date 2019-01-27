@@ -16,7 +16,7 @@ class ImageDisplayHelper:
         self.pipeline_debug_enabled = debug_pipeline
         plt.figure("Pipeline", figsize=(30, 30))
 
-    def reset_subplot_index(self):
+    def reset_subplot(self):
         self.subplot_index = 0
         plt.figure("Pipeline", figsize=(30, 30))
 

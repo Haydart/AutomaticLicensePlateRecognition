@@ -1,24 +1,20 @@
 import argparse
 import sys
 from copy import copy
-import cv2
 
 import util.band_clipping as bc
 import util.bounding_boxes as bb
+import util.heuristics as heuristics
 import util.input_output as io
-import final_solution.src.vehicles_detection as vd
-import final_solution.src.heuristics as he
-import remove_skew as rs
-import recognize_license_plate as ocr
-
 from main_pipeline.candidates import Candidates
 from util.basic_transformations import BasicTransformations
 from util.image_display_helper import ImageDisplayHelper
 from util.pipeline_transformations import PipelineTransformations
+from util.vehicles_detection import VehiclesDetector
 
-
-image_helper = ImageDisplayHelper(False, 2, 20)
+image_helper = ImageDisplayHelper(True, subplot_width=2, subplot_height=10)
 transformations = PipelineTransformations(BasicTransformations(image_helper))
+vehicle_detector = VehiclesDetector()
 
 
 def main(argv):
@@ -26,8 +22,6 @@ def main(argv):
 
     img_loader = io.BatchImageLoader()
     img_saver = io.ImageSaver(args.output_dir)
-
-    vehicle_detector = vd.VehiclesDetector()
 
     for image in img_loader.load_images(args.input_dir):
         counter = 1
@@ -62,8 +56,9 @@ def main(argv):
             #     ocr.read_text(ocr_file)
 
             image_helper.plot_results()
-            image_helper.reset_subplot_index()
+            image_helper.reset_subplot()
             counter = counter + 1
+
 
 def parse():
     parser = argparse.ArgumentParser()
@@ -79,14 +74,21 @@ def process(image):
     working_image = transformations.preprocess(working_image)
 
     vert_sobel_image, hor_sobel_image = transformations.apply_skeletonized_sobel(copy(working_image))
-    image_opening_method_image = transformations.apply_morph_opening(copy(working_image))
-    images_color_method_image = transformations.apply_color_masks(copy(image))
+    opening_method_image = transformations.apply_morph_opening(copy(working_image))
+    color_method_image = transformations.apply_color_masks(copy(image))
 
-    sobel_candidates = bc.find_candidates(bc.sobel_method, vert_sobel_image, hor_sobel_image)
-    opening_candidates = bc.find_candidates(bc.opening_method, image_opening_method_image)
+    try:
+        sobel_candidates = bc.find_candidates(bc.sobel_method, vert_sobel_image, hor_sobel_image)
+    except ValueError:
+        sobel_candidates = []
+
+    try:
+        opening_candidates = bc.find_candidates(bc.opening_method, opening_method_image)
+    except ValueError:
+        opening_candidates = []
 
     color_candidates = []
-    for image_color in images_color_method_image:
+    for image_color in color_method_image:
         try:
             candidates = bc.find_candidates(bc.color_method, image_color)
             color_candidates.extend(candidates)
@@ -106,6 +108,7 @@ def apply_bounding_boxex(image, candidates):
     image_boxes = bb.apply_bounding_boxes(image_boxes, candidates.sobel_candidates, bb.GREEN)
     image_boxes = bb.apply_bounding_boxes(image_boxes, candidates.opening_candidates, bb.RED)
     image_boxes = bb.apply_bounding_boxes(image_boxes, candidates.color_candidates, bb.BLUE)
+    image_helper.add_to_plot(image_boxes, title='Final candidates')
     return image_boxes
 
 
@@ -116,10 +119,10 @@ def bounding_box_filtered(image, candidates_filtered):
 
 
 def filter_heuristically(candidates, image_size):
-    # candidates = he.remove_vertical(candidates)
-    # candidates = he.remove_horizontal(candidates, image_size[1])
-    candidates = he.join_separated_2(candidates)
-    # candidates = he.remove_big_areas(candidates, image_size)
+    candidates = heuristics.join_separated(candidates)
+    candidates = heuristics.remove_big_areas(candidates, image_size)
+    candidates = heuristics.remove_vertical(candidates)
+    candidates = heuristics.remove_horizontal(candidates, image_size[1])
     return candidates
 
 
