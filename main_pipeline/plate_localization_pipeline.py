@@ -1,8 +1,9 @@
 import argparse
+import os
 import sys
 from copy import copy
+
 import cv2
-import os
 
 import util.band_clipping as bc
 import util.bounding_boxes as bb
@@ -13,8 +14,6 @@ from util.basic_transformations import BasicTransformations
 from util.image_display_helper import ImageDisplayHelper
 from util.pipeline_transformations import PipelineTransformations
 from util.vehicles_detection import VehiclesDetector
-import main_pipeline.plate_deskewing_pipeline as pdp
-import util.utils as ut
 
 image_helper = ImageDisplayHelper(False, subplot_width=2, subplot_height=10)
 transformations = PipelineTransformations(BasicTransformations(image_helper))
@@ -69,7 +68,7 @@ def main(argv):
 
 
 def write_deskewed(image, counter):
-    root = '../final_solution/results/toocr/'
+    root = '../output/results/toocr/'
     source_name = image.path.split('/')[-1]
     source_name_raw = source_name.split('.')[-2]
 

@@ -14,12 +14,13 @@ if __name__ == '__main__':
     dir_path = 'dataset/ocr_ready'
     for filename in os.listdir(dir_path):
         if any(filename.endswith(ext) for ext in ['.jpg', '.png', '.jpeg']):
-            print('\n Processing file {}'.format(filename))
-            image = cv2.imread('{}/{}'.format(dir_path, filename))
-            gray_image = bt.gray_scale(image)
-            binarized_image = bt.otsu_threshold(gray_image)
-            config = '-l eng --oem 1 --psm 10'
-            print(pytesseract.image_to_string(Image.fromarray(gray_image), config=config))
+            if filename.startswith('ocr'):
+                print('\n Processing file {}'.format(filename))
+                image = cv2.imread('{}/{}'.format(dir_path, filename))
+                gray_image = bt.gray_scale(image)
+                binarized_image = bt.otsu_threshold(gray_image)
+                config = '-l eng --oem 1 --psm 10'
+                print(pytesseract.image_to_string(Image.fromarray(gray_image), config=config))
 
     dh.plot_results()
 

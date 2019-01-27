@@ -18,6 +18,7 @@ class ImageDisplayHelper:
 
     def reset_subplot(self):
         self.subplot_index = 0
+        plt.gcf().clf()
         plt.figure("Pipeline", figsize=(30, 30))
 
     def add_to_plot(self, image, subplot_index=None, title='', fix_colors=True):
