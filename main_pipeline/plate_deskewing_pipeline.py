@@ -13,13 +13,16 @@ bt = BasicTransformations(display_helper)
 ex = PlateConnectedComponentExtractor(bt)
 
 
-def process(image_path):
-    print('Processing {}...'.format(image_path))
-    image = Image.open(image_path)
+def process_path(image_path):
+    process_image(cv2.imread(image_path))
+
+
+def process_image(image):
+    image = Image.fromarray(image)
     contrast_image = ImageEnhance.Contrast(image)
-    img = contrast_image.enhance(3)
-    img = np.asarray(img)
-    channels_list = cv2.split(img)
+    image = contrast_image.enhance(3)
+    image = np.asarray(image.copy())
+    channels_list = cv2.split(image)
     contrast_image = cv2.merge([channels_list[2], channels_list[1], channels_list[0]])  # b, g, r
 
     display_helper.add_to_plot(contrast_image, title="Contrast bump")
@@ -30,24 +33,28 @@ def process(image_path):
     display_helper.add_to_plot(plate_component_image, title="Plate connected component")
 
     result_polygon = cf.find_plate_contours(plate_component_image)
-    polygon_image = cf.draw_plate_polygon(img, result_polygon)
+    polygon_image = cf.draw_plate_polygon(image.copy(), result_polygon)
     display_helper.add_to_plot(polygon_image, title="Approx polygon")
 
-    hough_lines(gray_image, img)
+    contours = np.asarray(cv2.findContours(plate_component_image, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE))
+
+    hough_lines(plate_component_image, image.copy())
 
     display_helper.plot_results()
     display_helper.reset_subplot()
-    print("DONE")
+
+    return plate_component_image
 
 
 def hough_lines(gray_image, img):
     edges = cv2.Canny(gray_image, 50, 150, apertureSize=3)
-    min_line_length = 100
-    max_line_gap = 10
+    min_line_length = 50
+    max_line_gap = 50
     lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 100, min_line_length, max_line_gap)
-    for x1, y1, x2, y2 in lines[0]:
-        cv2.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
-    display_helper.add_to_plot(img, title="Hough Lines Prob")
+    if lines is not None:
+        for x1, y1, x2, y2 in lines[0]:
+            cv2.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+        display_helper.add_to_plot(img, title="Hough Lines Prob")
 
 
 if __name__ == '__main__':
@@ -56,4 +63,4 @@ if __name__ == '__main__':
     dir_path = '../dataset/skewed_trimmed_samples/'
     for filename in os.listdir(dir_path):
         if filename.startswith("I0000"):
-            process('{}{}'.format(dir_path, filename))
+            process_image('{}{}'.format(dir_path, filename))
