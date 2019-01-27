@@ -1,6 +1,6 @@
 from random import randint
 
-from cv2 import cv2
+import cv2
 
 
 class PlateContoursFinder:

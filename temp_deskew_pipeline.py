@@ -14,10 +14,10 @@ def _find_plate_contour(preprocessed_image, original_image):
 
     for contour in contours:
         contour_area = cv2.contourArea(contour)
-        print("Contour area: ", contour_area, " contour is ", contour)
+        # print("Contour area: ", contour_area, " contour is ", contour)
         contour_perimeter = cv2.arcLength(contour, True)
         approximated_contour_polygon = cv2.approxPolyDP(contour, 0.03 * contour_perimeter, closed=True)
-        print("approximated contour polygon", approximated_contour_polygon)
+        # print("approximated contour polygon", approximated_contour_polygon)
         polygons_with_areas.append((approximated_contour_polygon, contour_area))
 
     result_polygon = max(polygons_with_areas, key=lambda item: item[1])[0]

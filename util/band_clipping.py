@@ -2,6 +2,7 @@ import math
 
 import numpy as np
 from scipy import signal
+import util.utils as utils
 
 mask_0 = [1, 3, 5, 7, 5, 9, 3, 1]
 mask_1 = [1, 5, 9, 12, 15, 12, 9, 5, 1]
@@ -19,7 +20,7 @@ class BandsFinder:
     def __init__(self, image):
         self.image = np.array(image / np.max(image))
         self.mask = mask_8
-        self.y_c = 0.20
+        self.y_c = 0.30
         self.x_c = 0.42
         self.trim_c = 0.2
         self.derivation_step = 4
@@ -63,6 +64,7 @@ class BandsFinder:
 
             if y1-y0 >= 10:
                 bands.append((y0, y1))
+                # utils.show_one_image(self.image[y0:y1,:])
 
             projection[y0:y1+1] = 0
 
@@ -70,7 +72,7 @@ class BandsFinder:
 
         return bands
 
-    def _find_x_bands_phase_one(self, image, bands_count_limit=4, plate_min_width=30):
+    def _find_x_bands_phase_one(self, image, bands_count_limit=3, plate_min_width=20):
         before = x_projection = np.sum(image, axis=0).tolist()
         # before = x_projection = x_projection / np.max(x_projection)
         x_projection = signal.convolve(x_projection, self.mask, mode='same')
@@ -81,6 +83,7 @@ class BandsFinder:
         projection = np.copy(x_projection)
         for i in range(bands_count_limit):
             (x0, x1) = self._find_band(projection, c=self.x_c)
+            # utils.show_one_image(self.image[:, x0:x1])
             if x1-x0 >= plate_min_width:
                 bands.append((x0, x1))
 
@@ -135,7 +138,7 @@ class BandsFinder:
 
         # utils.plot_histograms(projection, derivative, str(self.mask[0:5]))
 
-        return b0, center_index + b1
+        return b0, center_index + b1 + 1
 
     def find_bands(self, phase_two_image=None):
         bands = []

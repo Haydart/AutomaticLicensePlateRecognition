@@ -8,8 +8,56 @@ def pairwise(iterable):
     return zip(a, b)
 
 
-is_in_the_same_row = lambda ya, yb: (abs(ya -yb) <= 20)
+is_in_the_same_row = lambda ya, yb: (abs(ya - yb) <= 20)
 is_close_to = lambda x1a, x0b: (abs(x0b - x1a) <= 30)
+
+
+def join_separated_2(bands):
+    sorted_bands = sorted(bands, key=lambda tup: (tup[0], tup[2]))
+    new_bands = []
+
+    while not sorted_bands == new_bands:
+        # print("_____")
+        # print("S bands", sorted_bands)
+        # print("N bands", new_bands)
+
+        skip = set()
+
+        if new_bands:
+            sorted_bands = new_bands
+            new_bands = []
+
+        for ida, left in enumerate(sorted_bands):
+            for right in sorted_bands[ida:]:
+                if should_join(left, right):
+                    y0a, y1a, x0a, x1a = left
+                    y0b, y1b, x0b, x1b = right
+
+                    y0 = min(y0a, y0b)
+                    y1 = max(y1a, y1b)
+                    x0 = min(x0a, x0b)
+                    x1 = max(x1a, x1b)
+                    joined = (y0, y1, x0, x1)
+
+                    if joined not in new_bands:
+                        if left != right:
+                            new_bands.append(joined)
+                            skip.add(left)
+                            skip.add(right)
+                            if left in new_bands:
+                                new_bands.remove(left)
+                else:
+                    if left not in new_bands:
+                        if left not in skip:
+                            new_bands.append(left)
+
+    return sorted_bands
+
+
+def should_join(left, right):
+    y0a, y1a, x0a, x1a = left
+    y0b, y1b, x0b, x1b = right
+    return is_in_the_same_row(y0a, y0b) and is_in_the_same_row(y1a, y1b) and is_close_to(x1a, x0b)
 
 
 def join_separated(bands):
@@ -70,7 +118,7 @@ def remove_big_areas(bands, size):
         area_box = ((y1 - y0) * (x1 - x0))
 
         prc = area_box / area_picture
-        if prc <= 0.07:
+        if prc <= 0.10:
             bands_new.append(band)
         else:
             print('Removed area', prc)
@@ -106,12 +154,6 @@ def remove_horizontal(bands, width_image, percent_limit=0.4):
             print('Removed horizontal length', prc)
 
     return bands_new
-
-def join_inside(bands):
-    for band in bands:
-        y0a, y1a, x0a, x1a = band
-
-
 
 
 if __name__ == '__main__':

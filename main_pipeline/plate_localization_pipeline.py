@@ -1,6 +1,8 @@
 import argparse
 import sys
 from copy import copy
+import cv2
+import os
 
 import util.band_clipping as bc
 import util.bounding_boxes as bb
@@ -11,8 +13,10 @@ from util.basic_transformations import BasicTransformations
 from util.image_display_helper import ImageDisplayHelper
 from util.pipeline_transformations import PipelineTransformations
 from util.vehicles_detection import VehiclesDetector
+import main_pipeline.plate_deskewing_pipeline as pdp
+import util.utils as ut
 
-image_helper = ImageDisplayHelper(True, w2, subplot_height=10)
+image_helper = ImageDisplayHelper(False, subplot_width=2, subplot_height=10)
 transformations = PipelineTransformations(BasicTransformations(image_helper))
 vehicle_detector = VehiclesDetector()
 
@@ -25,15 +29,16 @@ def main(argv):
 
     for image in img_loader.load_images(args.input_dir):
         counter = 0
+        counter_ocr = 0
         for sub_image in vehicle_detector.detect_vehicles(image.image):
             image.image = sub_image
             candidates = process(image.image)
 
-            orginal = image.image
             image_boxes = apply_bounding_boxex(image.image, candidates)
-            image.image = image_boxes
-            img_saver.save_image(image, -1)
-            image.image = orginal
+            # image.image = image_boxes
+            # img_saver.save_image(image, counter)
+            # counter = counter + 1
+            image.image = sub_image
 
             numrows = len(image.image)
             numcols = len(image.image[0])
@@ -43,21 +48,35 @@ def main(argv):
 
             image.image = image_boxes
             img_saver.save_image(image, counter)
+            counter = counter + 1
+            print('____')
 
             # for idx, bond in enumerate(candidates_filtered):
             #     y0, y1, x0, x1 = bond
-            #     print( idx, y0, y1, x0, x1)
-            #     deskewed = rs.deskew(image.image[y0:y1, x0:x1])
-            #     import util.utils as ut
-            #     # ut.show_one_image(image.image[y0:y1, x0:x1])
-            #     # ut.show_one_image(deskewed)
-            #     ocr_file = 'to_ocr{}.jpg'.format(idx)
-            #     # cv2.imwrite(ocr_file, deskewed)
-            #     ocr.read_text(ocr_file)
+            #     print(idx, y0, y1, x0, x1)
+            #     # ut.show_one_image(sub_image[y0:y1, x0:x1])
+            #     deskewed = pdp.process_image(sub_image[y0:y1, x0:x1])
             #
+            #     if deskewed is not None:
+            #         # ut.show_one_image(deskewed)
+            #         image.image = deskewed
+            #         write_deskewed(image, counter_ocr)
+            #         counter_ocr = counter_ocr + 1
+            #         # ocr.read_text(ocr_file)
+
             image_helper.plot_results()
             image_helper.reset_subplot()
-            counter = counter + 1
+
+
+def write_deskewed(image, counter):
+    root = '../final_solution/results/toocr/'
+    source_name = image.path.split('/')[-1]
+    source_name_raw = source_name.split('.')[-2]
+
+    name = '{}_{}.jpg'.format(source_name_raw , counter)
+    path = os.path.join(root, name)
+    cv2.imwrite(path, image.image)
+    print('Saved in: ', path)
 
 
 def parse():
@@ -77,9 +96,6 @@ def process(image):
     opening_method_image = transformations.apply_morph_opening(copy(working_image))
     color_method_image = transformations.apply_color_masks(copy(image))
 
-    sobel_candidates = bc.find_candidates(bc.sobel_method, vert_sobel_image, hor_sobel_image)
-
-    opening_candidates = bc.find_candidates(bc.opening_method, opening_method_image)
     try:
         sobel_candidates = bc.find_candidates(bc.sobel_method, vert_sobel_image, hor_sobel_image)
     except ValueError:
@@ -117,42 +133,16 @@ def apply_bounding_boxex(image, candidates):
 
 def bounding_box_filtered(image, candidates_filtered):
     image_boxes = copy(image)
-    image_boxes = bb.apply_bounding_boxes(image_boxes, candidates_filtered, bb.GREEN)
+    image_boxes = bb.apply_bounding_boxes(image_boxes, candidates_filtered, bb.PINK)
     return image_boxes
 
 
 def filter_heuristically(candidates, image_size):
-    candidates = heuristics.join_separated(candidates)
     candidates = heuristics.remove_big_areas(candidates, image_size)
     candidates = heuristics.remove_vertical(candidates)
     candidates = heuristics.remove_horizontal(candidates, image_size[1])
+    candidates = heuristics.join_separated_2(candidates)
     return candidates
-
-
-#
-# def main(argv):
-#     args = parse()
-#
-#     img_loader = io.BatchImageLoader()
-#     img_saver = io.ImageSaver(args.output_dir)
-#
-#     for image in img_loader.load_images(args.input_dir):
-#         counter = 0
-#         for sub_image in vehicle_detector.detect_vehicles(image.image):
-#             image.image = sub_image
-#             candidates = process(image.image)
-#             # image_boxes = bounding_box(image.image, candidates)
-#
-#             numrows = len(image.image)
-#             numcols = len(image.image[0])
-#
-#             candidates_filtered = filter_heuristically(candidates.all, (numrows, numcols))
-#             image_boxes = bounding_box_filtered(image.image, candidates_filtered)
-#
-#             image.image = image_boxes
-#             img_saver.save_image(image)
-#             counter = counter + 1
-#         counter = 0
 
 
 if __name__ == '__main__':

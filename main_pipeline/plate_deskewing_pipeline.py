@@ -1,8 +1,8 @@
 import os
 
+import cv2
 import numpy as np
 from PIL import Image, ImageEnhance
-from cv2 import cv2
 
 from util.basic_transformations import BasicTransformations
 from util.deskewing import PlateDeskewingTransformer
@@ -10,7 +10,7 @@ from util.image_display_helper import ImageDisplayHelper
 from util.plate_connected_component import PlateConnectedComponentExtractor
 from util.plate_contours import PlateContoursFinder
 
-display_helper = ImageDisplayHelper(True, 2, 14)
+display_helper = ImageDisplayHelper(False, 2, 14)
 bt = BasicTransformations(display_helper)
 cf = PlateContoursFinder()
 ex = PlateConnectedComponentExtractor(bt)

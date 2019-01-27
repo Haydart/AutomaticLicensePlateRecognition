@@ -64,7 +64,7 @@ def _show_and_save_detected_vehicles_predictions(boxes, class_ids, confidences, 
             h = box[3]
             _draw_prediction(image, class_ids[i], confidences[i], round(x), round(y), round(x + w), round(y + h))
 
-    print(image_path.split('/')[-1])
+    # print(image_path.split('/')[-1])
     cv2.imwrite("output/yolov3/{}".format(image_path.split('/')[-1]), image)
     cv2.waitKey()
     cv2.destroyAllWindows()
@@ -103,5 +103,5 @@ def calculate_area(box):
 if __name__ == '__main__':
     for index, file_name in enumerate(os.listdir("dataset/UFPR-ALPR-snapshots"), 1):
         if any(file_name.endswith(ext) for ext in ['.jpg', '.png', '.jpeg']):
-            print("Processing image {}: {}".format(index, file_name))
+            # print("Processing image {}: {}".format(index, file_name))
             detect_vehicles("dataset/UFPR-ALPR-snapshots/{}".format(file_name))

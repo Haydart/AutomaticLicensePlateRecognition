@@ -65,17 +65,21 @@ class BasicTransformations:
         self.display_helper.add_to_plot(threshed, title='Otsu threshold', fix_colors=True)
         return threshed
 
+    def negative(self, image):
+        negative = image
+        non_zeros = np.count_nonzero(image)
+        zeros = image.size - non_zeros
+        if non_zeros > zeros:
+            negative = cv2.bitwise_not(image)
+            self.display_helper.add_to_plot(negative, title='Negative', fix_colors=True)
+        return negative
+
     def skeletonize(self, image):
         size = np.size(image)
         skeletonized = np.zeros(image.shape, np.uint8)
 
-        image = self.binary_threshold(image, 127)
-
-        # Invert if a lot of white spaces
-        non_zeros = np.count_nonzero(image)
-        zeros = image.size - non_zeros
-        if non_zeros > zeros:
-            image = cv2.bitwise_not(image)
+        image = self.otsu_threshold(image)
+        image = self.negative(image)
 
         element = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 3))
         done = False

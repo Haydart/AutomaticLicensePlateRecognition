@@ -23,6 +23,5 @@ if __name__ == '__main__':
 
     dh.plot_results()
 
-
 def read_text(image_path):
     print(pytesseract.image_to_data(Image.open(image_path)))
