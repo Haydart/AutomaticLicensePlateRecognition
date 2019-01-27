@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 from PIL import Image, ImageEnhance
 from cv2 import cv2
@@ -35,21 +37,22 @@ def process_image(image):
     display_helper.add_to_plot(plate_component_image, title="Plate connected component")
 
     plate_polygon = cf.find_plate_contours(plate_component_image)
-    polygon_image = cf.draw_plate_polygon(image.copy(), plate_polygon)
-    display_helper.add_to_plot(polygon_image, title="Approx polygon")
+    if plate_polygon is not None:
+        polygon_image = cf.draw_plate_polygon(image.copy(), plate_polygon)
+        display_helper.add_to_plot(polygon_image, title="Approx polygon")
 
-    # contours = np.asarray(cv2.findContours(plate_component_image, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE))
-    # hough_lines(plate_component_image, image.copy())
+        # contours = np.asarray(cv2.findContours(plate_component_image, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE))
+        # hough_lines(plate_component_image, image.copy())
 
-    deskewed_image = None
-    if plate_polygon.shape[0] == 4:
-        deskewed_image = ds.four_point_transform(gray_image, plate_polygon)
-        display_helper.add_to_plot(deskewed_image, title="Deskewed image")
+        deskewed_image = None
+        if plate_polygon.shape[0] == 4:
+            deskewed_image = ds.four_point_transform(gray_image, plate_polygon)
+            display_helper.add_to_plot(deskewed_image, title="Deskewed image")
 
-    display_helper.plot_results()
-    display_helper.reset_subplot()
+        display_helper.plot_results()
+        display_helper.reset_subplot()
 
-    return deskewed_image
+        return deskewed_image
 
 
 def hough_lines(gray_image, img):
@@ -64,9 +67,7 @@ def hough_lines(gray_image, img):
 
 
 if __name__ == '__main__':
-    import os
-
     dir_path = '../dataset/skewed_trimmed_samples/'
     for filename in os.listdir(dir_path):
-        if filename.startswith("I0000"):
+        if filename.startswith("I0001"):
             process_path('{}{}'.format(dir_path, filename))
