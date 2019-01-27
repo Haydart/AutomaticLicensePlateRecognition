@@ -14,7 +14,7 @@ from util.vehicles_detection import VehiclesDetector
 import main_pipeline.plate_deskewing_pipeline as pdp
 import util.utils as ut
 
-image_helper = ImageDisplayHelper(False, subplot_width=2, subplot_height=10)
+image_helper = ImageDisplayHelper(True, subplot_width=2, subplot_height=10)
 transformations = PipelineTransformations(BasicTransformations(image_helper))
 vehicle_detector = VehiclesDetector()
 
@@ -123,9 +123,9 @@ def bounding_box_filtered(image, candidates_filtered):
 
 
 def filter_heuristically(candidates, image_size):
-    # candidates = heuristics.remove_big_areas(candidates, image_size)
-    # candidates = heuristics.remove_vertical(candidates)
-    # candidates = heuristics.remove_horizontal(candidates, image_size[1])
+    candidates = heuristics.remove_big_areas(candidates, image_size)
+    candidates = heuristics.remove_vertical(candidates)
+    candidates = heuristics.remove_horizontal(candidates, image_size[1])
     candidates = heuristics.join_separated_2(candidates)
     return candidates
 

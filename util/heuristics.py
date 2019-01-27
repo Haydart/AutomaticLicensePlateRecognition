@@ -44,7 +44,8 @@ def join_separated_2(bands):
                             new_bands.append(joined)
                             skip.add(left)
                             skip.add(right)
-                            new_bands.remove(left)
+                            if left in new_bands:
+                                new_bands.remove(left)
                 else:
                     if left not in new_bands:
                         if left not in skip:

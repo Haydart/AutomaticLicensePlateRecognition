@@ -72,7 +72,7 @@ class BandsFinder:
 
         return bands
 
-    def _find_x_bands_phase_one(self, image, bands_count_limit=3, plate_min_width=25):
+    def _find_x_bands_phase_one(self, image, bands_count_limit=3, plate_min_width=20):
         before = x_projection = np.sum(image, axis=0).tolist()
         # before = x_projection = x_projection / np.max(x_projection)
         x_projection = signal.convolve(x_projection, self.mask, mode='same')
@@ -83,7 +83,7 @@ class BandsFinder:
         projection = np.copy(x_projection)
         for i in range(bands_count_limit):
             (x0, x1) = self._find_band(projection, c=self.x_c)
-            # utils.show_one_image(self.image[:, x0:x1])
+            utils.show_one_image(self.image[:, x0:x1])
             if x1-x0 >= plate_min_width:
                 bands.append((x0, x1))
 
