@@ -20,8 +20,9 @@ class PlateContoursFinder:
             # print("approximated contour polygon", approximated_contour_polygon)
             polygons_with_areas.append((approximated_contour_polygon, contour_area))
 
-        result_polygon = max(polygons_with_areas, key=lambda item: item[1])[0]
-        return cv2.convexHull(result_polygon)
+        if polygons_with_areas:
+            result_polygon = max(polygons_with_areas, key=lambda item: item[1])[0]
+            return cv2.convexHull(result_polygon)
 
     def draw_plate_polygon(self, image, approx_polygon):
         color = (randint(0, 255), randint(0, 255), randint(0, 255))
