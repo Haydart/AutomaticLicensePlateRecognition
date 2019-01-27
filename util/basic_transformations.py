@@ -4,7 +4,7 @@ import numpy as np
 
 class BasicTransformations:
 
-    def __init__(self, display_helper):
+    def __init__(self, display_helper=None):
         self.display_helper = display_helper
 
     def gray_scale(self, image):
