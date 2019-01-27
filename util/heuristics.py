@@ -162,6 +162,20 @@ def remove_horizontal(bands, width_image, percent_limit=0.4):
     return bands_new
 
 
+def enhance_area(bands):
+    bands_new = []
+    up = 10
+    for band in bands:
+        y0, y1, x0, x1 = band
+        y0 = y0 - up
+        y1 = y1 + up
+        x0 = x0 - up
+        x1 = x1 + up
+
+        bands_new.append((y0, y1, x0, x1))
+
+    return bands_new
+
 if __name__ == '__main__':
     bands = [(220, 252, 436, 487), (220, 252, 487, 976), (220, 252, 976, 1000), (255, 282, 42, 75)]
 
