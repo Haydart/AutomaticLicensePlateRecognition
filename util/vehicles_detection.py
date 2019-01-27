@@ -59,7 +59,7 @@ class VehiclesDetector:
         images = []
         for i in indices:
             i = i[0]
-            if class_ids[i] < len(self.classes):
+            if class_ids[i] < len(self.classes) and class_ids[i] in self.classes_of_interest_ids:
                 box = boxes[i]
                 x = int(max(box[0], 0))
                 y = int(max(box[1], 0))

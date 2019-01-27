@@ -4,6 +4,8 @@ import cv2
 import numpy as np
 
 classes = [line.strip() for line in open("yolo_suite/classes.txt", 'r').readlines()]
+classes_of_interest = ['car', 'motorbike', 'bus', 'truck']
+classes_of_interest_ids = [classes.index(class_name) for class_name in classes_of_interest]
 COLORS = np.random.uniform(0, 255, size=(len(classes), 3))
 
 
@@ -54,12 +56,13 @@ def detect_vehicles(image_path):
 def _show_and_save_detected_vehicles_predictions(boxes, class_ids, confidences, image, image_path, indices):
     for i in indices:
         i = i[0]
-        box = boxes[i]
-        x = box[0]
-        y = box[1]
-        w = box[2]
-        h = box[3]
-        _draw_prediction(image, class_ids[i], confidences[i], round(x), round(y), round(x + w), round(y + h))
+        if class_ids[i] < len(classes) and class_ids[i] in classes_of_interest_ids:
+            box = boxes[i]
+            x = box[0]
+            y = box[1]
+            w = box[2]
+            h = box[3]
+            _draw_prediction(image, class_ids[i], confidences[i], round(x), round(y), round(x + w), round(y + h))
 
     print(image_path.split('/')[-1])
     cv2.imwrite("output/yolov3/{}".format(image_path.split('/')[-1]), image)
