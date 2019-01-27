@@ -22,12 +22,16 @@ def process(image_path):
 
     display_helper.add_to_plot(contrast_image, title="Contrast bump")
     gray_image = bt.gray_scale(contrast_image)
-    blurred_image = bt.blur(gray_image)
-    binarized_image = bt.binary_threshold(blurred_image, 200)
+    binarized_image = bt.binary_threshold(gray_image, 200)
     result_polygon = cf.find_plate_contours(binarized_image)
+
+    closed_image = bt.morphological_closing(binarized_image, iterations=10, kernel_size=(2, 2))
+
+    ret, labels = cv2.connectedComponents(binarized_image)
 
     print(result_polygon)
     polygon_image = cf.draw_plate_polygon(img, result_polygon)
+
     display_helper.add_to_plot(polygon_image, title="Approx polygon")
 
     display_helper.plot_results()

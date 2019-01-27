@@ -103,8 +103,8 @@ class BasicTransformations:
 
     def morphological_closing(self, image, kernel_size=(3, 3), iterations=6):
         kernel = np.ones(kernel_size, np.uint8)
-        self.display_helper.add_to_plot(image, title='Morph closing', fix_colors=True)
         image = cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel, iterations=iterations)
+        self.display_helper.add_to_plot(image, title='Morph closing', fix_colors=True)
         return image
 
     def erosion(self, image, kernel_size=(3, 3), iterations=1):
