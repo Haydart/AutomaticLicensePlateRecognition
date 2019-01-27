@@ -13,7 +13,9 @@ is_close_to = lambda x1a, x0b: (abs(x0b - x1a) <= 30)
 
 
 def join_separated_2(bands):
+    print('Bands size', len(bands))
     sorted_bands = sorted(bands, key=lambda tup: (tup[0], tup[2]))
+    print("S bands", sorted_bands)
     new_bands = []
 
     while not sorted_bands == new_bands:
@@ -46,6 +48,10 @@ def join_separated_2(bands):
                             skip.add(right)
                             if left in new_bands:
                                 new_bands.remove(left)
+                        elif left == sorted_bands[-1]:
+                            if left not in skip:
+                                new_bands.append(left)
+
                 else:
                     if left not in new_bands:
                         if left not in skip:
