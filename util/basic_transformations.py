@@ -109,8 +109,9 @@ class BasicTransformations:
 
     def erosion(self, image, kernel_size=(3, 3), iterations=1):
         kernel_size = np.ones(kernel_size, np.uint8)
+        image = cv2.erode(image, kernel_size, iterations=iterations)
         self.display_helper.add_to_plot(image, title='Erosion', fix_colors=True)
-        return cv2.erode(image, kernel_size, iterations=iterations)
+        return image
 
     def color_mask(self, image, color):
         image_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
