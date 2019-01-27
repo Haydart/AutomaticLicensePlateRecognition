@@ -26,7 +26,8 @@ class PlateConnectedComponentExtractor:
         largest_component_info = self._choose_plate_component(binarized_image, sorted_components_info)
         largest_components_image = np.zeros(output.shape)
         # mask the image to only contain the chosen connected component
-        largest_components_image[output == largest_component_info[0]] = 255
+        if largest_component_info is not None and largest_component_info[0] is not None:
+            largest_components_image[output == largest_component_info[0]] = 255
 
         return cv2.normalize(largest_components_image, dst=None, alpha=0, beta=255,
                              norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8UC1)
@@ -47,9 +48,10 @@ class PlateConnectedComponentExtractor:
         # otherwise, choose component, for which distance from image center to its centroid is the smallest
         largest_component_area_trust_threshold = 4
         largest_components_sizes = np.sort(largest_components_info[:, -1])
-        if largest_components_sizes[1] / largest_components_sizes[0] <= largest_component_area_trust_threshold:
-            np.apply_along_axis(calculate_centroid_distance, 1, largest_components_info)
-            # sort ascending by centroid-image center distance
-            return largest_components_info[largest_components_info[:, -2].argsort()][0, :]
-        else:
-            return largest_components_info[0, :]
+        if len(largest_components_sizes) == 2:
+            if largest_components_sizes[1] / largest_components_sizes[0] <= largest_component_area_trust_threshold:
+                np.apply_along_axis(calculate_centroid_distance, 1, largest_components_info)
+                # sort ascending by centroid-image center distance
+                return largest_components_info[largest_components_info[:, -2].argsort()][0, :]
+            else:
+                return largest_components_info[0, :]
