@@ -3,14 +3,16 @@ from PIL import Image, ImageEnhance
 from cv2 import cv2
 
 from util.basic_transformations import BasicTransformations
+from util.deskewing import PlateDeskewingTransformer
 from util.image_display_helper import ImageDisplayHelper
 from util.plate_connected_component import PlateConnectedComponentExtractor
 from util.plate_contours import PlateContoursFinder
 
-cf = PlateContoursFinder()
 display_helper = ImageDisplayHelper(True, 2, 14)
 bt = BasicTransformations(display_helper)
+cf = PlateContoursFinder()
 ex = PlateConnectedComponentExtractor(bt)
+ds = PlateDeskewingTransformer()
 
 
 def process_path(image_path):
@@ -32,18 +34,22 @@ def process_image(image):
     plate_component_image = ex.extract_plate_connected_component(binarized_image)
     display_helper.add_to_plot(plate_component_image, title="Plate connected component")
 
-    result_polygon = cf.find_plate_contours(plate_component_image)
-    polygon_image = cf.draw_plate_polygon(image.copy(), result_polygon)
+    plate_polygon = cf.find_plate_contours(plate_component_image)
+    polygon_image = cf.draw_plate_polygon(image.copy(), plate_polygon)
     display_helper.add_to_plot(polygon_image, title="Approx polygon")
 
-    contours = np.asarray(cv2.findContours(plate_component_image, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE))
+    # contours = np.asarray(cv2.findContours(plate_component_image, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE))
+    # hough_lines(plate_component_image, image.copy())
 
-    hough_lines(plate_component_image, image.copy())
+    deskewed_image = None
+    if plate_polygon.shape[0] == 4:
+        deskewed_image = ds.four_point_transform(gray_image, plate_polygon)
+        display_helper.add_to_plot(deskewed_image, title="Deskewed image")
 
     display_helper.plot_results()
     display_helper.reset_subplot()
 
-    return plate_component_image
+    return deskewed_image
 
 
 def hough_lines(gray_image, img):
@@ -63,4 +69,4 @@ if __name__ == '__main__':
     dir_path = '../dataset/skewed_trimmed_samples/'
     for filename in os.listdir(dir_path):
         if filename.startswith("I0000"):
-            process_image('{}{}'.format(dir_path, filename))
+            process_path('{}{}'.format(dir_path, filename))
