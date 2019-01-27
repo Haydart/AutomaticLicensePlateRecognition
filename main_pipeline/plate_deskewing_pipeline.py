@@ -24,12 +24,19 @@ def process(image_path):
     gray_image = bt.gray_scale(contrast_image)
     binarized_image = bt.binary_threshold(gray_image, 200)
     result_polygon = cf.find_plate_contours(binarized_image)
-
-    closed_image = bt.morphological_closing(binarized_image, iterations=10, kernel_size=(2, 2))
-
-    ret, labels = cv2.connectedComponents(binarized_image)
-
     print(result_polygon)
+
+    eroded_image = bt.erosion(binarized_image)
+    ret, labels = cv2.connectedComponents(eroded_image)
+    label_hue = np.uint8(179 * labels / np.max(labels))
+    blank_ch = 255 * np.ones_like(label_hue)
+    labeled_img = cv2.merge([label_hue, blank_ch, blank_ch])
+    labeled_img = cv2.cvtColor(labeled_img, cv2.COLOR_HSV2BGR)
+    # set bg label to black
+    labeled_img[label_hue == 0] = 0
+
+    display_helper.add_to_plot(labeled_img, title="Connected components")
+
     polygon_image = cf.draw_plate_polygon(img, result_polygon)
 
     display_helper.add_to_plot(polygon_image, title="Approx polygon")
