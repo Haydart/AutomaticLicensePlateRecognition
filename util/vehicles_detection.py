@@ -6,6 +6,9 @@ class VehiclesDetector:
 
     def __init__(self):
         self.classes = self.load_classes()
+        self.classes_of_interest = ['car', 'motorbike', 'bus', 'truck']
+        self.classes_of_interest_ids = [self.classes.index(class_name) for class_name in self.classes_of_interest]
+        print(self.classes_of_interest_ids)
 
     def load_classes(self):
         classes = []
@@ -33,7 +36,7 @@ class VehiclesDetector:
         class_ids = []
         confidences = []
         boxes = []
-        confidence_threshold = 0.5
+        confidence_threshold = 0.6
         nms_threshold = 0.4
 
         for out in outs:
@@ -56,7 +59,7 @@ class VehiclesDetector:
         images = []
         for i in indices:
             i = i[0]
-            if class_ids[i] < len(self.classes):
+            if class_ids[i] < len(self.classes) and class_ids[i] in self.classes_of_interest_ids:
                 box = boxes[i]
                 x = int(max(box[0], 0))
                 y = int(max(box[1], 0))
@@ -68,6 +71,9 @@ class VehiclesDetector:
                 x0 = round(x)
                 x1 = round(x + w)
                 print(y0, y1, x0, x1)
-                images.append(image[y0:y1,x0:x1])
+                images.append(image[y0:y1, x0:x1])
 
         return images
+
+
+vh = VehiclesDetector()

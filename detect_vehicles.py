@@ -3,9 +3,9 @@ import os
 import cv2
 import numpy as np
 
-from util.utils import load_image
-
 classes = [line.strip() for line in open("yolo_suite/classes.txt", 'r').readlines()]
+classes_of_interest = ['car', 'motorbike', 'bus', 'truck']
+classes_of_interest_ids = [classes.index(class_name) for class_name in classes_of_interest]
 COLORS = np.random.uniform(0, 255, size=(len(classes), 3))
 
 
@@ -16,7 +16,7 @@ def _get_output_layers(net):
 
 
 def detect_vehicles(image_path):
-    image = load_image(image_path)
+    image = cv2.imread(image_path)
     image_width = image.shape[1]
     image_height = image.shape[0]
     scale = 0.00392
@@ -56,14 +56,16 @@ def detect_vehicles(image_path):
 def _show_and_save_detected_vehicles_predictions(boxes, class_ids, confidences, image, image_path, indices):
     for i in indices:
         i = i[0]
-        box = boxes[i]
-        x = box[0]
-        y = box[1]
-        w = box[2]
-        h = box[3]
-        _draw_prediction(image, class_ids[i], confidences[i], round(x), round(y), round(x + w), round(y + h))
+        if class_ids[i] < len(classes) and class_ids[i] in classes_of_interest_ids:
+            box = boxes[i]
+            x = box[0]
+            y = box[1]
+            w = box[2]
+            h = box[3]
+            _draw_prediction(image, class_ids[i], confidences[i], round(x), round(y), round(x + w), round(y + h))
 
-    cv2.imwrite("output/yolov3{}".format(image_path), image)
+    print(image_path.split('/')[-1])
+    cv2.imwrite("output/yolov3/{}".format(image_path.split('/')[-1]), image)
     cv2.waitKey()
     cv2.destroyAllWindows()
 
@@ -100,5 +102,6 @@ def calculate_area(box):
 
 if __name__ == '__main__':
     for index, file_name in enumerate(os.listdir("dataset/UFPR-ALPR-snapshots"), 1):
-        print("Processing image {}: {}".format(index, file_name))
-        detect_vehicles("dataset/UFPR-ALPR-snapshots/{}".format(file_name))
+        if any(file_name.endswith(ext) for ext in ['.jpg', '.png', '.jpeg']):
+            print("Processing image {}: {}".format(index, file_name))
+            detect_vehicles("dataset/UFPR-ALPR-snapshots/{}".format(file_name))
