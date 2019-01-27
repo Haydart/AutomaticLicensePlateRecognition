@@ -58,17 +58,18 @@ def connected_components(binarized_image):
     sorted_centroids_areas = centroids_areas_no_black[
         centroids_areas_no_black[:, -1].argsort()[::-1]]  # sort descending by size column
     two_largest_components_info = sorted_centroids_areas[:2, :]
-    largest_components_labels = sorted_centroids_areas[:, 0]
+    largest_components_labels = two_largest_components_info[:, 0]
 
-    largest_compone = np.zeros(output.shape)
-    largest_compone[output == max_label] = 255
+    largest_components_image = np.zeros(output.shape)
+    for label in largest_components_labels:
+        largest_components_image[output == label] = 255
     # label_hue = np.uint8(179 * output / np.max(output))
     # blank_ch = 255 * np.ones_like(label_hue)
     # labeled_img = cv2.merge([label_hue, blank_ch, blank_ch])
     # labeled_img = cv2.cvtColor(labeled_img, cv2.COLOR_HSV2BGR)
     # # set bg label to black
     # labeled_img[label_hue == 0] = 0
-    display_helper.add_to_plot(largest_compone, title="Connected components")
+    display_helper.add_to_plot(largest_components_image, title="Connected components")
 
 
 if __name__ == '__main__':
