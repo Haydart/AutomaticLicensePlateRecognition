@@ -12,8 +12,13 @@ class BasicTransformations:
         self.display_helper.add_to_plot(image, title='Grayscale', fix_colors=True)
         return image
 
-    def bilateral_filter(self, image):
-        image = cv2.bilateralFilter(image, 16, 32, 32)
+    def blur(self, image):
+        image = cv2.blur(image, ksize=(3, 5))
+        self.display_helper.add_to_plot(image, title='Blur', fix_colors=True)
+        return image
+
+    def bilateral_filter(self, image, d=16, sigma_color=32, sigma_space=32):
+        image = cv2.bilateralFilter(image, d, sigma_color, sigma_space)
         self.display_helper.add_to_plot(image, title='Bilateral', fix_colors=True)
         return image
 
@@ -98,14 +103,15 @@ class BasicTransformations:
 
     def morphological_closing(self, image, kernel_size=(3, 3), iterations=6):
         kernel = np.ones(kernel_size, np.uint8)
-        self.display_helper.add_to_plot(image, title='Morph closing', fix_colors=True)
         image = cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel, iterations=iterations)
+        self.display_helper.add_to_plot(image, title='Morph closing', fix_colors=True)
         return image
 
     def erosion(self, image, kernel_size=(3, 3), iterations=1):
         kernel_size = np.ones(kernel_size, np.uint8)
+        image = cv2.erode(image, kernel_size, iterations=iterations)
         self.display_helper.add_to_plot(image, title='Erosion', fix_colors=True)
-        return cv2.erode(image, kernel_size, iterations=iterations)
+        return image
 
     def color_mask(self, image, color):
         image_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)

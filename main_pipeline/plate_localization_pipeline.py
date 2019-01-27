@@ -1,7 +1,6 @@
 import argparse
 import sys
 from copy import copy
-import cv2
 
 import util.band_clipping as bc
 import util.bounding_boxes as bb
@@ -12,7 +11,6 @@ from util.basic_transformations import BasicTransformations
 from util.image_display_helper import ImageDisplayHelper
 from util.pipeline_transformations import PipelineTransformations
 from util.vehicles_detection import VehiclesDetector
-
 
 image_helper = ImageDisplayHelper(True, w2, subplot_height=10)
 transformations = PipelineTransformations(BasicTransformations(image_helper))
