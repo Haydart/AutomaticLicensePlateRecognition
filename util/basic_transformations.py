@@ -60,7 +60,7 @@ class BasicTransformations:
         self.display_helper.add_to_plot(threshed, title='Binary threshold', fix_colors=True)
         return threshed
 
-    def otsu_threshold(self, image):
+    def otsu_threshold(self, image, threshold=0, maxval=255):
         _, threshed = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         self.display_helper.add_to_plot(threshed, title='Otsu threshold', fix_colors=True)
         return threshed
@@ -108,9 +108,15 @@ class BasicTransformations:
         return image
 
     def erosion(self, image, kernel_size=(3, 3), iterations=1):
-        kernel_size = np.ones(kernel_size, np.uint8)
-        image = cv2.erode(image, kernel_size, iterations=iterations)
+        kernel = np.ones(kernel_size, np.uint8)
+        image = cv2.erode(image, kernel, iterations=iterations)
         self.display_helper.add_to_plot(image, title='Erosion', fix_colors=True)
+        return image
+
+    def dilation(self, image, kernel_size=(3, 3), iterations=1):
+        kernel = np.ones(kernel_size, np.uint8)
+        image = cv2.dilate(image, kernel, iterations=iterations)
+        self.display_helper.add_to_plot(image, title='Dilation', fix_colors=True)
         return image
 
     def color_mask(self, image, color):

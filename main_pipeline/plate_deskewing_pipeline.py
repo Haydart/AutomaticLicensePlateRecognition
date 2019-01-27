@@ -18,10 +18,10 @@ ds = PlateDeskewingTransformer()
 
 
 def process_path(image_path):
-    process_image(cv2.imread(image_path))
+    process_image(cv2.imread(image_path), image_path)
 
 
-def process_image(image):
+def process_image(image, image_path=''):
     image = Image.fromarray(image)
     contrast_image = ImageEnhance.Contrast(image)
     image = contrast_image.enhance(3)
@@ -52,6 +52,8 @@ def process_image(image):
         display_helper.plot_results()
         display_helper.reset_subplot()
 
+        cv2.imwrite('../output/ocr_ready/{}'.format(image_path.split('/')[-1]), deskewed_image)
+
         return deskewed_image
 
 
@@ -69,5 +71,5 @@ def hough_lines(gray_image, img):
 if __name__ == '__main__':
     dir_path = '../dataset/skewed_trimmed_samples/'
     for filename in os.listdir(dir_path):
-        if filename.startswith("I0001"):
+        if filename.startswith("I000"):
             process_path('{}{}'.format(dir_path, filename))
