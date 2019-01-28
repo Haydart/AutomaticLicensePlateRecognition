@@ -143,13 +143,11 @@ def bounding_box_filtered(image, candidates_filtered):
 
 
 def filter_heuristically(candidates, image_size):
-    print('image size')
-    print(image_size)
     candidates = heuristics.remove_big_areas(candidates, image_size)
     candidates = heuristics.remove_vertical(candidates)
     candidates = heuristics.remove_horizontal(candidates, image_size[1])
     candidates = heuristics.join_separated_2(candidates)
-    candidates = heuristics.enhance_area(candidates)
+    candidates = heuristics.enhance_area(candidates, image_size)
 
     return candidates
 
