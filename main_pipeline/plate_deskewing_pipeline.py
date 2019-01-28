@@ -46,10 +46,8 @@ def process_image(image, image_path=''):
         # contours = np.asarray(cv2.findContours(plate_component_image, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE))
         # hough_lines(plate_component_image, image.copy())
 
-        deskewed_image = None
-        if plate_polygon.shape[0] == 4:
-            deskewed_image = ds.four_point_transform(gray_image, plate_polygon)
-            display_helper.add_to_plot(deskewed_image, title="Deskewed image")
+        deskewed_image = ds.four_point_transform(gray_image, plate_polygon)
+        display_helper.add_to_plot(deskewed_image, title="Deskewed image")
 
         display_helper.plot_results()
         display_helper.reset_subplot()

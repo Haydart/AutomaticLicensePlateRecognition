@@ -72,7 +72,7 @@ def write_deskewed(image, counter):
     source_name = image.path.split('/')[-1]
     source_name_raw = source_name.split('.')[-2]
 
-    name = '{}_{}.jpg'.format(source_name_raw , counter)
+    name = '{}_{}.jpg'.format(source_name_raw, counter)
     path = os.path.join(root, name)
     cv2.imwrite(path, image.image)
     print('Saved in: ', path)

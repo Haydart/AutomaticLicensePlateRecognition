@@ -15,23 +15,23 @@ class PlateContoursFinder:
         for contour in contours:
             contour_area = cv2.contourArea(contour)
             # print("Contour area: ", contour_area, " contour is ", contour)
-            approximated_contour_polygon = self.approx(contour)
+            approximated_contour_polygon = self._approx(contour)
             # print("approximated contour polygon", approximated_contour_polygon)
             polygons_with_areas.append((approximated_contour_polygon, contour_area))
 
         if polygons_with_areas:
             result_polygon = cv2.convexHull(max(polygons_with_areas, key=lambda item: item[1])[0])
-            print(result_polygon)
             epsilon = 0.03
+
             while result_polygon.shape[0] is not 4:
-                result_polygon = self.approx(result_polygon, epsilon)
+                result_polygon = self._approx(result_polygon, epsilon)
                 epsilon = epsilon + 0.01
-                print(result_polygon)
+
+            print(result_polygon)
             return result_polygon
 
-    def approx(self, contour, epsilon=0.02):
+    def _approx(self, contour, epsilon=0.02):
         contour_perimeter = cv2.arcLength(contour, closed=True)
-        # print(epsilon)
         approximated_contour_polygon = cv2.approxPolyDP(contour, epsilon * contour_perimeter, closed=True)
         return approximated_contour_polygon
 

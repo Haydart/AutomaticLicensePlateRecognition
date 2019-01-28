@@ -8,7 +8,6 @@ class VehiclesDetector:
         self.classes = self.load_classes()
         self.classes_of_interest = ['car', 'motorbike', 'bus', 'truck']
         self.classes_of_interest_ids = [self.classes.index(class_name) for class_name in self.classes_of_interest]
-        print(self.classes_of_interest_ids)
 
     def load_classes(self):
         classes = []
