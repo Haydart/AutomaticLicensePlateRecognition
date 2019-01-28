@@ -16,7 +16,7 @@ from util.image_display_helper import ImageDisplayHelper
 from util.pipeline_transformations import PipelineTransformations
 from util.vehicles_detection import VehiclesDetector
 
-image_helper = ImageDisplayHelper(False, subplot_width=2, subplot_height=10)
+image_helper = ImageDisplayHelper(debug_pipeline=False, subplot_width=2, subplot_height=10)
 transformations = PipelineTransformations(BasicTransformations(image_helper))
 vehicle_detector = VehiclesDetector()
 
@@ -61,11 +61,11 @@ def main(argv):
                 print("BEFORE DESKEW")
 
                 deskewed = pdp.process_image(sub_image_cut)
+                print(deskewed)
 
                 print("AFTER DESKEW")
 
                 if deskewed is not None:
-                    # ut.show_one_image(deskewed)
                     image.image = deskewed
                     write_deskewed(image, counter_ocr)
             # #         counter_ocr = counter_ocr + 1
