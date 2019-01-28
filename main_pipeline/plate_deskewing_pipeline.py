@@ -37,9 +37,6 @@ def process_image(image, image_path=''):
 
     plate_polygon = cf.find_plate_contours(plate_component_image)
 
-    print("POLYGON FOUND")
-    print(plate_polygon)
-
     if plate_polygon is not None:
         polygon_image = cf.draw_plate_polygon(image.copy(), plate_polygon)
         display_helper.add_to_plot(polygon_image, title="Approx polygon")

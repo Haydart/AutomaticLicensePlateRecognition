@@ -10,7 +10,6 @@ import util.band_clipping as bc
 import util.bounding_boxes as bb
 import util.heuristics as heuristics
 import util.input_output as io
-import util.utils as ut
 from main_pipeline.candidates import Candidates
 from util.basic_transformations import BasicTransformations
 from util.image_display_helper import ImageDisplayHelper
@@ -58,8 +57,7 @@ def main(argv):
                 counter_ocr = counter_ocr + 1
 
                 sub_image_cut = sub_image[y0:y1, x0:x1]
-                print(sub_image_cut)
-                ut.show_one_image(sub_image_cut)
+                # ut.show_one_image(sub_image_cut)
                 deskewed = pdp.process_image(sub_image_cut)
                 print('AFTER DESKEW')
 
@@ -76,7 +74,6 @@ def main(argv):
 
 def write_deskewed(image, counter):
     print('writing deskewed')
-    print(image)
     root = '../results/ocr_ready/'
     source_name = image.path.split('/')[-1]
     source_name_raw = source_name.split('.')[-2]
@@ -146,6 +143,8 @@ def bounding_box_filtered(image, candidates_filtered):
 
 
 def filter_heuristically(candidates, image_size):
+    print('image size')
+    print(image_size)
     candidates = heuristics.remove_big_areas(candidates, image_size)
     candidates = heuristics.remove_vertical(candidates)
     candidates = heuristics.remove_horizontal(candidates, image_size[1])
