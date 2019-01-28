@@ -8,7 +8,7 @@ from util.image_display_helper import ImageDisplayHelper
 from util.plate_connected_component import PlateConnectedComponentExtractor
 from util.plate_contours import PlateContoursFinder
 
-display_helper = ImageDisplayHelper(True, 2, 10)
+display_helper = ImageDisplayHelper(False, 2, 10)
 bt = BasicTransformations(display_helper)
 cf = PlateContoursFinder()
 ex = PlateConnectedComponentExtractor(bt)
@@ -23,7 +23,7 @@ def process_image(image, image_path=''):
     print('\nProcessing {}...'.format(image_path))
     image = Image.fromarray(image)
     contrast_image = ImageEnhance.Contrast(image)
-    image = contrast_image.enhance(9)
+    image = contrast_image.enhance(5)
     image = np.asarray(image.copy())
     channels_list = cv2.split(image)
     contrast_image = cv2.merge([channels_list[2], channels_list[1], channels_list[0]])  # b, g, r
