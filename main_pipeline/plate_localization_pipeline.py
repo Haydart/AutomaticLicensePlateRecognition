@@ -58,11 +58,7 @@ def main(argv):
 
                 sub_image_cut = sub_image[y0:y1, x0:x1]
 
-                print("BEFORE DESKEW")
-
                 deskewed = pdp.process_image(sub_image_cut)
-                print("IMAGE AFTER DESKEW")
-                print(deskewed)
 
                 if deskewed is not None:
                     image.image = deskewed

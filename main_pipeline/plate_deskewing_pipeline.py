@@ -8,7 +8,7 @@ from util.image_display_helper import ImageDisplayHelper
 from util.plate_connected_component import PlateConnectedComponentExtractor
 from util.plate_contours import PlateContoursFinder
 
-display_helper = ImageDisplayHelper(False, 2, 10)
+display_helper = ImageDisplayHelper(True, 2, 10)
 bt = BasicTransformations(display_helper)
 cf = PlateContoursFinder()
 ex = PlateConnectedComponentExtractor(bt)

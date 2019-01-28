@@ -1,5 +1,5 @@
-import numpy as np
 import cv2
+import numpy as np
 
 
 class PlateConnectedComponentExtractor:
@@ -7,8 +7,8 @@ class PlateConnectedComponentExtractor:
         self.bt = basic_transformations
 
     def extract_plate_connected_component(self, binarized_image):
-        eroded_image = self.bt.erosion(binarized_image)
-        components_count, output, stats, centroids = cv2.connectedComponentsWithStats(eroded_image, connectivity=4)
+        # eroded_image = self.bt.erosion(binarized_image)
+        components_count, output, stats, centroids = cv2.connectedComponentsWithStats(binarized_image, connectivity=4)
 
         sizes = stats[:, -1]
         centroids_areas = np.column_stack((
