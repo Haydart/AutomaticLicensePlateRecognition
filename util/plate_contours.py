@@ -22,11 +22,11 @@ class PlateContoursFinder:
         if polygons_with_areas:
             result_polygon = cv2.convexHull(max(polygons_with_areas, key=lambda item: item[1])[0])
             if result_polygon is not None and result_polygon.shape[0] >= 4:
-                epsilon = 0.03
+                epsilon = 0.025
 
-                while result_polygon.shape[0] is not 4:
+                while result_polygon.shape[0] >= 4:
                     result_polygon = self._approx(result_polygon, epsilon)
-                    epsilon = epsilon + 0.01
+                    epsilon = epsilon + 0.005
 
                 return result_polygon
 

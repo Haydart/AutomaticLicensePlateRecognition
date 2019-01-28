@@ -57,9 +57,12 @@ def main(argv):
                 counter_ocr = counter_ocr + 1
 
                 sub_image_cut = sub_image[y0:y1, x0:x1]
-                # ut.show_one_image(sub_image_cut)
+
+                print("BEFORE DESKEW")
+
                 deskewed = pdp.process_image(sub_image_cut)
-                print('AFTER DESKEW')
+
+                print("AFTER DESKEW")
 
                 if deskewed is not None:
                     # ut.show_one_image(deskewed)
