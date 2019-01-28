@@ -13,9 +13,7 @@ is_close_to = lambda x1a, x0b: (abs(x0b - x1a) <= 30)
 
 
 def join_separated_2(bands):
-    print('Bands size', len(bands))
     sorted_bands = sorted(bands, key=lambda tup: (tup[0], tup[2]))
-    print("S bands", sorted_bands)
     new_bands = []
 
     while not sorted_bands == new_bands:
@@ -126,8 +124,8 @@ def remove_big_areas(bands, size):
         prc = area_box / area_picture
         if prc <= 0.10:
             bands_new.append(band)
-        else:
-            print('Removed area', prc)
+        # else:
+        # print('Removed area', prc)
 
     return bands_new
 
@@ -141,8 +139,8 @@ def remove_vertical(bands, ratio_limit=0.6):
 
         if ratio > ratio_limit:
             bands_new.append(band)
-        else:
-            print('Removed vertical ratio', ratio)
+        # else:
+        # print('Removed vertical ratio', ratio)
 
     return bands_new
 
@@ -156,8 +154,8 @@ def remove_horizontal(bands, width_image, percent_limit=0.4):
         prc = width_box / width_image
         if prc <= percent_limit:
             bands_new.append(band)
-        else:
-            print('Removed horizontal length', prc)
+        # else:
+        # print('Removed horizontal length', prc)
 
     return bands_new
 

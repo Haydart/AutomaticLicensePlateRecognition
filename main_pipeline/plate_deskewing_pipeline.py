@@ -20,7 +20,6 @@ def process_path(image_path):
 
 
 def process_image(image, image_path=''):
-    print('\nProcessing {}...'.format(image_path))
     image = Image.fromarray(image)
     contrast_image = ImageEnhance.Contrast(image)
     image = contrast_image.enhance(5)
@@ -36,8 +35,6 @@ def process_image(image, image_path=''):
     display_helper.add_to_plot(plate_component_image, title="Plate connected component")
 
     plate_polygon = cf.find_plate_contours(plate_component_image)
-
-    print(plate_polygon)
 
     if plate_polygon is not None and plate_polygon.shape[0] == 4:
         polygon_image = cf.draw_plate_polygon(image.copy(), plate_polygon)

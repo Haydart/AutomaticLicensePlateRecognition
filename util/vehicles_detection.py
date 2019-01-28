@@ -69,7 +69,7 @@ class VehiclesDetector:
                 y1 = round(y + h)
                 x0 = round(x)
                 x1 = round(x + w)
-                print(y0, y1, x0, x1)
+                # print(y0, y1, x0, x1)
                 images.append(image[y0:y1, x0:x1])
 
         return images

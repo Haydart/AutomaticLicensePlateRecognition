@@ -5,6 +5,7 @@ from copy import copy
 
 import cv2
 
+import main_pipeline.ocr_pipeline as ocr
 import main_pipeline.plate_deskewing_pipeline as pdp
 import util.band_clipping as bc
 import util.bounding_boxes as bb
@@ -52,7 +53,7 @@ def main(argv):
 
             for idx, band in enumerate(candidates_filtered):
                 y0, y1, x0, x1 = band
-                print(idx, y0, y1, x0, x1)
+                # print(idx, y0, y1, x0, x1)
                 image.image = sub_image[y0:y1, x0:x1]
                 counter_ocr = counter_ocr + 1
 
@@ -63,15 +64,13 @@ def main(argv):
                 if deskewed is not None:
                     image.image = deskewed
                     write_deskewed(image, counter_ocr)
-            # #         counter_ocr = counter_ocr + 1
-            #         # ocr.read_text(ocr_file)
+                    ocr.process_image(deskewed)
 
             image_helper.plot_results()
             image_helper.reset_subplot()
 
 
 def write_deskewed(image, counter):
-    print('writing deskewed')
     root = '../results/ocr_ready/'
     source_name = image.path.split('/')[-1]
     source_name_raw = source_name.split('.')[-2]
@@ -79,7 +78,7 @@ def write_deskewed(image, counter):
     name = '{}_{}.jpg'.format(source_name_raw, counter)
     path = os.path.join(root, name)
     cv2.imwrite(path, image.image)
-    print('Saved in: ', path)
+    # print('Saved in: ', path)
 
 
 def parse():
