@@ -5,16 +5,17 @@ from copy import copy
 
 import cv2
 
+import main_pipeline.plate_deskewing_pipeline as pdp
 import util.band_clipping as bc
 import util.bounding_boxes as bb
 import util.heuristics as heuristics
 import util.input_output as io
+import util.utils as ut
 from main_pipeline.candidates import Candidates
 from util.basic_transformations import BasicTransformations
 from util.image_display_helper import ImageDisplayHelper
 from util.pipeline_transformations import PipelineTransformations
 from util.vehicles_detection import VehiclesDetector
-import main_pipeline.plate_deskewing_pipeline as pdp
 
 image_helper = ImageDisplayHelper(False, subplot_width=2, subplot_height=10)
 transformations = PipelineTransformations(BasicTransformations(image_helper))
@@ -50,20 +51,22 @@ def main(argv):
             img_saver.save_image(image, counter)
             counter = counter + 1
 
-            for idx, bond in enumerate(candidates_filtered):
-                y0, y1, x0, x1 = bond
+            for idx, band in enumerate(candidates_filtered):
+                y0, y1, x0, x1 = band
                 print(idx, y0, y1, x0, x1)
                 image.image = sub_image[y0:y1, x0:x1]
-                write_deskewed(image, counter_ocr)
                 counter_ocr = counter_ocr + 1
 
-                # ut.show_one_image(sub_image[y0:y1, x0:x1])
-                # deskewed = pdp.process_image(sub_image[y0:y1, x0:x1])
+                sub_image_cut = sub_image[y0:y1, x0:x1]
+                print(sub_image_cut)
+                ut.show_one_image(sub_image_cut)
+                deskewed = pdp.process_image(sub_image_cut)
+                print('AFTER DESKEW')
 
-            #     if deskewed is not None:
-            #         # ut.show_one_image(deskewed)
-            #         image.image = deskewed
-            #         write_deskewed(image, counter_ocr)
+                if deskewed is not None:
+                    # ut.show_one_image(deskewed)
+                    image.image = deskewed
+                    write_deskewed(image, counter_ocr)
             # #         counter_ocr = counter_ocr + 1
             #         # ocr.read_text(ocr_file)
 
@@ -72,7 +75,9 @@ def main(argv):
 
 
 def write_deskewed(image, counter):
-    root = '../final_solution/results/toocr/'
+    print('writing deskewed')
+    print(image)
+    root = '../results/ocr_ready/'
     source_name = image.path.split('/')[-1]
     source_name_raw = source_name.split('.')[-2]
 

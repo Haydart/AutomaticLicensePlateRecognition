@@ -21,14 +21,16 @@ class PlateContoursFinder:
 
         if polygons_with_areas:
             result_polygon = cv2.convexHull(max(polygons_with_areas, key=lambda item: item[1])[0])
-            epsilon = 0.03
+            if result_polygon is not None and result_polygon.shape[0] >= 4:
+                print(result_polygon)
+                epsilon = 0.03
 
-            while result_polygon.shape[0] is not 4:
-                result_polygon = self._approx(result_polygon, epsilon)
-                epsilon = epsilon + 0.01
+                while result_polygon.shape[0] is not 4:
+                    print('GOTCHA')
+                    result_polygon = self._approx(result_polygon, epsilon)
+                    epsilon = epsilon + 0.01
 
-            print(result_polygon)
-            return result_polygon
+                return result_polygon
 
     def _approx(self, contour, epsilon=0.02):
         contour_perimeter = cv2.arcLength(contour, closed=True)

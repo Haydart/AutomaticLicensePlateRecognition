@@ -1,5 +1,3 @@
-import os
-
 import cv2
 import numpy as np
 from PIL import Image, ImageEnhance
@@ -10,7 +8,7 @@ from util.image_display_helper import ImageDisplayHelper
 from util.plate_connected_component import PlateConnectedComponentExtractor
 from util.plate_contours import PlateContoursFinder
 
-display_helper = ImageDisplayHelper(True, 2, 10)
+display_helper = ImageDisplayHelper(False, 2, 10)
 bt = BasicTransformations(display_helper)
 cf = PlateContoursFinder()
 ex = PlateConnectedComponentExtractor(bt)
@@ -38,6 +36,9 @@ def process_image(image, image_path=''):
     display_helper.add_to_plot(plate_component_image, title="Plate connected component")
 
     plate_polygon = cf.find_plate_contours(plate_component_image)
+
+    print("POLYGON FOUND")
+    print(plate_polygon)
 
     if plate_polygon is not None:
         polygon_image = cf.draw_plate_polygon(image.copy(), plate_polygon)
@@ -67,9 +68,9 @@ def hough_lines(gray_image, img):
             cv2.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
         display_helper.add_to_plot(img, title="Hough Lines Prob")
 
-
-if __name__ == '__main__':
-    dir_path = '../dataset/skewed_trimmed_samples/'
-    for filename in os.listdir(dir_path):
-        if filename.startswith("IMG"):
-            process_path('{}{}'.format(dir_path, filename))
+#
+# if __name__ == '__main__':
+#     dir_path = '../dataset/skewed_trimmed_samples/'
+#     for filename in os.listdir(dir_path):
+#         if filename.startswith("IMG"):
+#             process_path('{}{}'.format(dir_path, filename))
