@@ -13,7 +13,9 @@ is_close_to = lambda x1a, x0b: (abs(x0b - x1a) <= 30)
 
 
 def join_separated_2(bands):
+    print('Bands size', len(bands))
     sorted_bands = sorted(bands, key=lambda tup: (tup[0], tup[2]))
+    print("S bands", sorted_bands)
     new_bands = []
 
     while not sorted_bands == new_bands:
@@ -46,6 +48,10 @@ def join_separated_2(bands):
                             skip.add(right)
                             if left in new_bands:
                                 new_bands.remove(left)
+                        elif left == sorted_bands[-1]:
+                            if left not in skip:
+                                new_bands.append(left)
+
                 else:
                     if left not in new_bands:
                         if left not in skip:
@@ -155,6 +161,20 @@ def remove_horizontal(bands, width_image, percent_limit=0.4):
 
     return bands_new
 
+
+def enhance_area(bands):
+    bands_new = []
+    up = 10
+    for band in bands:
+        y0, y1, x0, x1 = band
+        y0 = y0 - up
+        y1 = y1 + up
+        x0 = x0 - up
+        x1 = x1 + up
+
+        bands_new.append((y0, y1, x0, x1))
+
+    return bands_new
 
 if __name__ == '__main__':
     bands = [(220, 252, 436, 487), (220, 252, 487, 976), (220, 252, 976, 1000), (255, 282, 42, 75)]

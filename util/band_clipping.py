@@ -3,6 +3,7 @@ import math
 import numpy as np
 from scipy import signal
 import util.utils as utils
+import copy
 
 mask_0 = [1, 3, 5, 7, 5, 9, 3, 1]
 mask_1 = [1, 5, 9, 12, 15, 12, 9, 5, 1]
@@ -33,7 +34,7 @@ class BandsFinder:
         # Find left band
         left_pick_side = projection[0:pick]
 
-        b0 = pick
+        b0 = 0
         for index, intensity in reversed(list(enumerate(left_pick_side))):
             if intensity <= threshold:
                 b0 = index
@@ -52,7 +53,7 @@ class BandsFinder:
 
     def _find_y_bands(self, bands_count_limit=5):
         before = y_projection = np.sum(self.image, axis=1).tolist()
-        # before = y_projection = y_projection / np.max(y_projection)
+        before = y_projection = y_projection / np.max(y_projection)
         y_projection = signal.convolve(y_projection, self.mask, mode='same')
 
         # utils.plot_histograms(before, y_projection, str(self.mask[0:5]))
@@ -72,22 +73,26 @@ class BandsFinder:
 
         return bands
 
-    def _find_x_bands_phase_one(self, image, bands_count_limit=3, plate_min_width=20):
+    def _find_x_bands_phase_one(self, image, bands_count_limit=3, plate_min_width=25):
         before = x_projection = np.sum(image, axis=0).tolist()
-        # before = x_projection = x_projection / np.max(x_projection)
+        before = x_projection = x_projection / np.max(x_projection)
         x_projection = signal.convolve(x_projection, self.mask, mode='same')
 
         # utils.plot_histograms(before, x_projection, str(self.mask[0:5]))
+        # utils.show_one_image(image)
 
         bands = []
         projection = np.copy(x_projection)
         for i in range(bands_count_limit):
+            before = copy.copy(projection)
             (x0, x1) = self._find_band(projection, c=self.x_c)
-            # utils.show_one_image(self.image[:, x0:x1])
+
             if x1-x0 >= plate_min_width:
                 bands.append((x0, x1))
-
+                # utils.show_one_image(self.image[:, x0:x1])
             projection[x0:x1+1] = 0
+            # utils.plot_histograms(before, projection, str(self.mask[0:5]))
+
 
         return bands
 

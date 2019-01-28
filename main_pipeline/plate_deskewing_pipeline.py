@@ -10,7 +10,7 @@ from util.image_display_helper import ImageDisplayHelper
 from util.plate_connected_component import PlateConnectedComponentExtractor
 from util.plate_contours import PlateContoursFinder
 
-display_helper = ImageDisplayHelper(False, 2, 10)
+display_helper = ImageDisplayHelper(True, 2, 10)
 bt = BasicTransformations(display_helper)
 cf = PlateContoursFinder()
 ex = PlateConnectedComponentExtractor(bt)
@@ -52,7 +52,7 @@ def process_image(image, image_path=''):
         display_helper.plot_results()
         display_helper.reset_subplot()
 
-        cv2.imwrite('../output/ocr_ready/{}'.format(image_path.split('/')[-1]), deskewed_image)
+        # cv2.imwrite('../output/ocr_ready/{}'.format(image_path.split('/')[-1]), deskewed_image)
 
         return deskewed_image
 
@@ -71,5 +71,5 @@ def hough_lines(gray_image, img):
 if __name__ == '__main__':
     dir_path = '../dataset/skewed_trimmed_samples/'
     for filename in os.listdir(dir_path):
-        if filename.startswith("I0000"):
+        if filename.startswith("IMG"):
             process_path('{}{}'.format(dir_path, filename))
